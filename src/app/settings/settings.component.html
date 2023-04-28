@@ -1,0 +1,25 @@
+<div class="container">
+  <div class="option-row">
+    <p class="option-label">Input device : </p>
+    <select class="device-selector" id="indevice-selector" name="indevice">
+      <option *ngFor="let device of input_devices" [value]="device.label">{{device.label}}</option>
+    </select>
+  </div>
+  <div class="option-row">
+    <p class="option-label">Output device : </p>
+    <select class="device-selector" id="outdevice-selector" name="outdevice">
+      <option *ngFor="let device of output_devices" [value]="device.label">{{device.label}}</option>
+    </select>
+  </div>
+  <div class="option-row">
+    <p class="option-label">Video input : </p>
+    <select class="device-selector" id="camera-selector" name="camera" >
+      <option *ngFor="let device of cameras" [value]="device.label">{{device.label}}</option>
+    </select>
+  </div>
+  <hr/>
+  <div class="option-row">
+    <p class="option-label">Input volume : </p>
+    <input type="range" min="0" max="100" value="60" class="slider">
+  </div>
+</div>

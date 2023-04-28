@@ -1,0 +1,10 @@
+{
+  "/api": {
+    "target": "http://deepbox:6450",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": ""
+    }
+  }
+}

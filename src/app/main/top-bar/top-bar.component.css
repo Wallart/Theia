@@ -1,0 +1,23 @@
+#top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#status-indicator {
+  color: whitesmoke;
+  font-family: ".AppleSystemUIFont", serif;
+}
+
+#status-indicator div {
+  /*border: 1px solid;*/
+  display: inline-block;
+}
+
+#label {
+  margin-right: 5px;
+}
+
+#models-selector {
+  margin-right: 5px;
+}

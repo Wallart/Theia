@@ -1,0 +1,59 @@
+#bottom-bar {
+  display: flex;
+  justify-content: space-between;
+}
+
+#username-input {
+  width: 12%;
+}
+
+#message-input {
+  flex: 1;
+}
+
+input {
+  margin-right: 5px;
+  padding-left: 5px;
+  color: white;
+  border: 2px #7D7E7F solid;
+  background-color: #2c2d30;
+  border-radius: 5px;
+  height: 25px;
+}
+
+input:focus {
+  outline: none;
+}
+
+.button {
+  cursor: pointer;
+  border-radius: 5px;
+  width: 31px;
+  text-align: center;
+}
+
+.button:hover {
+  background-color: #313436;
+}
+
+#clear-button {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.button-icon {
+  /*border:1px solid crimson;*/
+  margin-top: 5px;
+  display: inline-block;
+  width: 21px;
+  height: 21px;
+  background-size: cover;
+}
+
+#clear-img {
+  background-image: url("../../../assets/trash.png");
+}
+
+#gear-img {
+  background-image: url("../../../assets/settings.png");
+}

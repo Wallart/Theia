@@ -1,0 +1,15 @@
+<div id="top-bar">
+  <div id="status-indicator">
+    <div id="label">Status :</div>
+    <div id="state">offline</div>
+  </div>
+  <div id="option-selectors">
+    <select name="models" id="models-selector">
+      <option *ngFor="let model of models" [value]="model">{{model}}</option>
+    </select>
+    <select name="prompts" id="prompts-selector">
+      <option *ngFor="let prompt of prompts" [value]="prompt">{{prompt}}</option>
+    </select>
+  </div>
+</div>
+

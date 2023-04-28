@@ -1,0 +1,11 @@
+<div id="chat-frame">
+  <div class="message" *ngFor="let message of chat.messages">
+    <div class="header">
+      <div class="username {{message.role}}">{{message.username}}</div>
+      <div class="timestamp">{{message.date | date:'MM/dd/yyyy H:mm'}}</div>
+    </div>
+    <div class="content">
+      <span class="typewriter" *ngFor="let sentence of message.content">{{sentence}}</span>
+    </div>
+  </div>
+</div>

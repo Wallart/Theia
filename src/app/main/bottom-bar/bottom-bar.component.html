@@ -1,0 +1,11 @@
+<div id="bottom-bar">
+  <input id="username-input" type="text" placeholder="Username" #username>
+  <input id="message-input" type="text" placeholder="Send a message..." (keydown.enter)="onSend($event)" #message>
+  <div class="button" id="clear-button" (click)="onClear()">
+    <div class="button-icon" id="clear-img"></div>
+  </div>
+  <div class="button" id="gear-button" (click)="onGear()">
+    <div class="button-icon" id="gear-img"></div>
+  </div>
+</div>
+

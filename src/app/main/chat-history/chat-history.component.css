@@ -1,0 +1,57 @@
+#chat-frame {
+  overflow: scroll;
+}
+
+.message {
+  /*border:1px solid;*/
+  padding: 10px;
+  font-family: ".AppleSystemUIFont", serif;
+  white-space: nowrap;
+}
+
+.message:nth-child(odd) {
+  background-color: #3d3d42;
+}
+
+.header .username {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 7px;
+  /*font-family: 'Helvetica Neue', serif;*/
+}
+
+.user {
+  color: #2969d9;
+}
+
+.bot {
+  color: #f2cb5a;
+}
+
+.header .timestamp {
+  color: #969696;
+  font-size: 0.7em;
+  display: inline-block;
+}
+
+.pending {
+  color: #989899;
+}
+
+.content {
+  /*border:1px solid;*/
+  margin-top: 5px;
+}
+
+.content span {
+  /*border: 1px solid;*/
+  margin-bottom: 5px;
+  display: block;
+  white-space: pre-wrap;
+}
+
+.content span::after {
+  content: '\A';
+  /*white-space: pre;*/
+}
+
