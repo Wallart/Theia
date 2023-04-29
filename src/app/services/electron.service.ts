@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IpcRenderer } from 'electron';
+import { IpcRenderer, Clipboard } from 'electron';
 
 @Injectable({
   providedIn: 'root'
@@ -7,11 +7,13 @@ import { IpcRenderer } from 'electron';
 export class ElectronService {
 
   private ipc: IpcRenderer | undefined;
+  private clipboard: Clipboard | undefined;
 
   constructor() {
     if ((<any>window).require) {
       try {
         this.ipc = (<any>window).require('electron').ipcRenderer;
+        this.clipboard = (<any>window).require('electron').clipboard;
       } catch (error) {
         throw error;
       }
@@ -23,6 +25,13 @@ export class ElectronService {
       return;
     }
     this.ipc.send(channel, ...args);
+  }
+
+  public writeToClipboard(text: string) {
+    if (!this.clipboard) {
+      return;
+    }
+    this.clipboard.writeText(text);
   }
 
   public get isElectronApp(): boolean {
