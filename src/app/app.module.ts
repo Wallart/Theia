@@ -9,6 +9,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { SettingsComponent } from './settings/settings.component';
 import { AppRoutingModule } from './app-routing.module';
 import { MainComponent } from './main/main.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -21,9 +22,10 @@ import { MainComponent } from './main/main.component';
     MainComponent
   ],
   imports: [
-    BrowserModule,
-    HttpClientModule,
-    AppRoutingModule
+      BrowserModule,
+      HttpClientModule,
+      AppRoutingModule,
+      FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

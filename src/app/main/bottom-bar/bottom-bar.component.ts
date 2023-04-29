@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { ElectronService } from '../../services/electron.service';
 import { HyperionService } from '../../services/hyperion.service';
+import { AudioSinkService } from '../../services/audio-sink.service';
 
 @Component({
   selector: 'bottom-bar',
@@ -12,7 +13,7 @@ export class BottomBarComponent {
   @ViewChild('message') message: any;
   @ViewChild('username') username: any;
 
-  constructor(private electron: ElectronService, private chat: ChatService, private hyperion: HyperionService) {}
+  constructor(private electron: ElectronService, private chat: ChatService, private hyperion: HyperionService, private sink: AudioSinkService) {}
 
   onClear() {
     this.chat.clear();
@@ -33,9 +34,9 @@ export class BottomBarComponent {
     this.chat.addUserMsg(username, [message], new Date());
     this.hyperion.send(username, message).subscribe((response) => {
       const decodedData = {};
-      this.hyperion.frameDecode(response, decodedData, (validFrame: any) => {
-        const message = [validFrame['ANS']];
-        this.chat.addBotMsg(message, new Date(validFrame['TIM'] * 1000));
+      this.hyperion.frameDecode(response, decodedData, (frame: any) => {
+        this.chat.addBotMsg([frame['ANS']], frame['TIM']);
+        this.sink.setBuffer(frame['PCM'], frame['TIM']);
       });
     });
   }

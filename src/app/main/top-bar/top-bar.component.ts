@@ -5,17 +5,37 @@ import { HyperionService } from '../../services/hyperion.service';
 @Component({
   selector: 'top-bar',
   templateUrl: './top-bar.component.html',
-  styleUrls: ['./top-bar.component.css'],
-  providers: [HyperionService]
+  styleUrls: ['./top-bar.component.css']
 })
 export class TopBarComponent {
   models: any;
+  selectedModel: string;
   prompts: any;
+  selectedPrompt: string;
+  state: string;
 
-  constructor(private hyperion: HyperionService) {
+  constructor(public hyperion: HyperionService) {
+    this.selectedModel = '';
+    this.selectedPrompt = '';
     this.models = [];
     this.prompts = [];
-    hyperion.getModels().subscribe((response) => this.models = response);
-    hyperion.getPrompts().subscribe((response) => this.prompts = response);
+    this.state = 'offline';
+  }
+
+  ngOnInit() {
+    this.hyperion.getModels().subscribe((res) => this.models = res);
+    this.hyperion.getModel().subscribe((res) => this.selectedModel = res as string);
+
+    this.hyperion.getPrompts().subscribe((res) => this.prompts = res);
+    this.hyperion.getPrompt().subscribe((res) => this.selectedPrompt = res as string);
+    this.hyperion.getState().subscribe((res) => this.state = 'online');
+  }
+
+  onModelChanged() {
+    this.hyperion.model = this.selectedModel;
+  }
+
+  onPromptChanged() {
+    this.hyperion.prompt = this.selectedPrompt;
   }
 }

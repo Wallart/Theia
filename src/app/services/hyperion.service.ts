@@ -1,24 +1,25 @@
+import { from } from 'rxjs';
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ElectronService } from './electron.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HyperionService {
-  botName: string;
+  model: string = '';
+  models: string[] = [];
+  prompt: string = '';
+  prompts: string[] = [];
+  botName: string = '';
   targetUrl: string;
 
   constructor(private http: HttpClient, private electron: ElectronService) {
-    this.botName = '';
     if (electron.isElectronApp) {
       this.targetUrl = 'http://deepbox:6450';
     } else {
       this.targetUrl = 'http://localhost:4200/api';
     }
-    this.getName().subscribe((response) => {
-      this.botName = response as string;
-    });
   }
 
   send(user: string, message: string) {
@@ -30,7 +31,9 @@ export class HyperionService {
     const httpOptions = {
       responseType: 'arraybuffer',
       headers: new HttpHeaders({
-        SID: 'toto'
+        SID: 'toto',
+        model: this.model,
+        preprompt: this.prompt
       })
     };
 
@@ -38,24 +41,61 @@ export class HyperionService {
     return this.http.post(`${this.targetUrl}/chat`, payload, httpOptions);
   }
 
+  getState() {
+    return this.http.get(`${this.targetUrl}/state`, {responseType: 'text'});
+  }
+
   getName() {
-    return this.http.get(`${this.targetUrl}/name`, {responseType: 'text'});
+    if (this.botName === '') {
+      const req = this.http.get(`${this.targetUrl}/name`, {responseType: 'text'});
+      req.subscribe((res) => this.botName = res);
+      return from(req);
+    } else {
+      return from([this.botName]);
+    }
   }
 
   getPrompt() {
-    return this.http.get(`${this.targetUrl}/prompt`);
+    if (this.prompt === '') {
+      const req = this.http.get(`${this.targetUrl}/prompt`, {responseType: 'text'});
+      req.subscribe((res) => this.prompt = res);
+      return from(req);
+    } else {
+      return from([this.prompt]);
+    }
   }
 
   getPrompts() {
-    return this.http.get(`${this.targetUrl}/prompts`);
+    if (this.prompts.length === 0) {
+      const req = this.http.get(`${this.targetUrl}/prompts`);
+      req.subscribe((res) => this.prompts = res as string[]);
+      return from(req);
+    } else {
+      return from(this.prompts);
+    }
   }
 
   getModel() {
-    return this.http.get(`${this.targetUrl}/model`);
+    if (this.model === '') {
+      const req = this.http.get(`${this.targetUrl}/model`, {responseType: 'text'});
+      req.subscribe((res) => {
+        // debugger;
+        this.model = res;
+      });
+      return from(req);
+    } else {
+      return from([this.model]);
+    }
   }
 
   getModels() {
-    return this.http.get(`${this.targetUrl}/models`);
+    if (this.models.length === 0) {
+      const req = this.http.get(`${this.targetUrl}/models`);
+      req.subscribe((res) => this.models = res as string[]);
+      return from(req);
+    } else {
+      return from(this.models);
+    }
   }
 
   frameDecode(buffer: ArrayBuffer, decodedData: any, callback: Function) {
@@ -67,7 +107,8 @@ export class HyperionService {
         }
 
         if (chunkHeader === 'TIM') {
-          decodedData['TIM'] = new DataView(buffer.slice(3, 11)).getFloat64(0, true);
+          const timestamp = new DataView(buffer.slice(3, 11)).getFloat64(0, true);
+          decodedData['TIM'] = new Date(timestamp * 1000);
           buffer = buffer.slice(11);
         } else {
           let chunkSize = new DataView(buffer).getInt32(3)

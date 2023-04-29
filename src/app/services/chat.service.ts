@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HyperionService} from "./hyperion.service";
+import { HyperionService } from './hyperion.service';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +49,9 @@ export class ChatService {
   }
 
   addBotMsg(content: string[], date: any) {
-    this.add(this.hyperion.botName, 'bot', content, date);
+    this.hyperion.getName().subscribe((botName: string) => {
+      debugger;
+      this.add(botName, 'bot', content, date);
+    });
   }
 }
