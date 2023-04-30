@@ -82,7 +82,7 @@ export class HyperionService {
       req.subscribe((res) => this.prompts = res as string[]);
       return from(req);
     } else {
-      return from(this.prompts);
+      return from([this.prompts]);
     }
   }
 
@@ -105,7 +105,7 @@ export class HyperionService {
       req.subscribe((res) => this.models = res as string[]);
       return from(req);
     } else {
-      return from(this.models);
+      return from([this.models]);
     }
   }
 
