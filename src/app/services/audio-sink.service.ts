@@ -47,6 +47,11 @@ export class AudioSinkService {
       return;
     }
 
+    if (arrayBuffer.byteLength === 0) {
+      console.warn('Empty PCM array.');
+      return;
+    }
+
     if (this.busy) {
       this.queue.push([arrayBuffer, date]);
       return;
