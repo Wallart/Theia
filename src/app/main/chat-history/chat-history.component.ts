@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { ElectronService } from '../../services/electron.service';
 
@@ -8,7 +8,16 @@ import { ElectronService } from '../../services/electron.service';
   styleUrls: ['./chat-history.component.css']
 })
 export class ChatHistoryComponent {
-  constructor(public chat: ChatService, private electron: ElectronService) {}
+  messages: any[] = [];
+
+  constructor(public chat: ChatService, private electron: ElectronService, private changeDetectorRef: ChangeDetectorRef) {}
+
+  ngOnInit() {
+    this.chat.messages$.subscribe(data => {
+      this.messages = data;
+      this.changeDetectorRef.detectChanges();
+    });
+  }
 
   onCopy(event: any) {
     const node = event.target.parentElement.getElementsByClassName('content');

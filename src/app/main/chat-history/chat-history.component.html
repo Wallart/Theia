@@ -1,5 +1,5 @@
 <div id="chat-frame">
-  <div class="message" *ngFor="let message of chat.messages">
+  <div class="message" *ngFor="let message of messages">
     <div class="copy-button" (click)="onCopy($event)"></div>
     <div class="header">
       <div class="username {{message.role}}">{{message.username}}</div>

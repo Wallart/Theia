@@ -1,13 +1,21 @@
 import { Injectable } from '@angular/core';
 import { HyperionService } from './hyperion.service';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  messages;
+  private messages: any[] = [];
+  private messagesSubject = new BehaviorSubject<any[]>(this.messages);
+
+  public messages$: Observable<any[]> = this.messagesSubject.asObservable();
 
   constructor(private hyperion: HyperionService) {
+    // this.mockData();
+  }
+
+  mockData() {
     this.messages = [
       { username: 'Julien', role: 'user', date: new Date(), content: ['Yo ! Comment ça va la famille ?'] },
       { username: 'Hypérion', role: 'bot', date: new Date(), content: ['Salut ça va bien merci'] },
@@ -18,8 +26,10 @@ export class ChatService {
           'Je suis désolé, mais répondre par "ok" n\'est pas suffisant pour engager une conversation.',
           'Si vous voulez vraiment parler avec moi, merci de vous présenter et de me dire ce que vous attendez de cette conversation.'
         ]
-      },
+      }
     ];
+
+    this.messagesSubject.next(this.messages);
   }
 
   isLastSpeaker(username: string) {
@@ -32,6 +42,7 @@ export class ChatService {
 
   clear() {
     this.messages.splice(0);
+    this.messagesSubject.next(this.messages);
   }
 
   add(username: string, role: string, content: string[], date: any) {
@@ -42,6 +53,7 @@ export class ChatService {
     } else {
       this.messages.push({ username: username, role: role, date: date, content: content })
     }
+    this.messagesSubject.next(this.messages);
   }
 
   addUserMsg(username: string, content: string[], date: any) {

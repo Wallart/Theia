@@ -67,7 +67,9 @@ export class MediaService {
 
       const decodedData = {};
       this.hyperion.frameDecode(arrayBuffer, decodedData, (frame: any) => {
-        this.chat.addUserMsg(speaker, [frame['REQ']], frame['TIM']);
+        if (frame['IDX'] === 0) {
+          this.chat.addUserMsg(speaker, [frame['REQ']], frame['TIM']);
+        }
         this.chat.addBotMsg([frame['ANS']], frame['TIM']);
         this.sink.setBuffer(frame['PCM'], frame['TIM']);
       });
