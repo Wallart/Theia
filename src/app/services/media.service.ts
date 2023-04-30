@@ -1,43 +1,22 @@
 import { Injectable } from '@angular/core';
-import { MicVAD, utils, RealTimeVADOptions } from '@ricky0123/vad-web';
-import { HyperionService } from './hyperion.service';
-import {ChatService} from "./chat.service";
-import {AudioSinkService} from "./audio-sink.service";
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MediaService {
-  cameras: any;
-  speakers: any;
-  microphones: any;
+  cameras: any[] = [];
+  speakers: any[] = [];
+  microphones: any[] = [];
 
-  sampleRate: number = 16000;
-  chunkDuration: number = 512;
+  cameras$ = new BehaviorSubject<any[]>(this.microphones);
+  speakers$ = new BehaviorSubject<any[]>(this.speakers);
+  microphones$ = new BehaviorSubject<any[]>(this.cameras);
 
-  activityDetector: MicVAD | undefined;
-
-  constructor(private hyperion: HyperionService, private chat: ChatService, private sink: AudioSinkService) {
-    this.cameras = [];
-    this.speakers = [];
-    this.microphones = [];
-    this.enumerateDevices();
-
-    this.initVAD();
-  }
-
-  async initVAD() {
-    this.activityDetector = await MicVAD.new({
-      onSpeechStart: () => this.onSpeechStart(),
-      onSpeechEnd: (audio) => this.onSpeechEnd(audio),
-      onVADMisfire: () => this.onVADMisfire()
-    });
-  }
-
-  enumerateDevices() {
+  constructor() {
     navigator.mediaDevices.enumerateDevices()
       .then((devices) => {
-        devices.forEach((device) => {
+        for (const device of devices) {
           // console.log(device.kind + ': ' + device.label + ' id = ' + device.deviceId);
           if (device.kind === 'videoinput') {
             this.cameras.push(device);
@@ -46,62 +25,37 @@ export class MediaService {
           } else {
             this.speakers.push(device);
           }
-        });
-      });
-  }
-
-  onSpeechStart() {
-    console.log('Speech started.');
-  }
-
-  onSpeechEnd(audio: Float32Array) {
-    console.log('Speech ended.');
-    // console.log(audio);
-    for (let i = 0; i < audio.length; i++) {
-      audio[i] = audio[i] * 32768.0;
-    }
-    const pcmData = new Int16Array(audio);
-    this.hyperion.sendAudio(pcmData).subscribe((response: any) => {
-      const speaker = response.headers.get('speaker');
-      const arrayBuffer = response.body;
-
-      const decodedData = {};
-      this.hyperion.frameDecode(arrayBuffer, decodedData, (frame: any) => {
-        if (frame['IDX'] === 0) {
-          this.chat.addUserMsg(speaker, [frame['REQ']], frame['TIM']);
         }
-        this.chat.addBotMsg([frame['ANS']], frame['TIM']);
-        this.sink.setBuffer(frame['PCM'], frame['TIM']);
+
+        this.microphones$.next(this.microphones);
+        this.speakers$.next(this.speakers);
+        this.cameras$.next(this.cameras);
       });
-    });
   }
 
-  onVADMisfire() {
-    console.log('VAD is fired ?');
-  }
-
-  openMicrophone() {
-    if (this.activityDetector !== undefined) {
-      this.activityDetector.start();
+  getDeviceId(deviceName: string, deviceType: string) {
+    let devices: any;
+    if (deviceType === 'audioinput') {
+      devices = this.microphones;
+    } else if (deviceType === 'audiooutput') {
+      devices = this.speakers;
+    } else {
+      devices = this.cameras;
     }
-  }
-
-  closeMicrophone() {
-    if (this.activityDetector !== undefined) {
-      this.activityDetector.pause();
+    for(const device of devices) {
+      if (device.label === deviceName || deviceName.indexOf(device.label) > -1) {
+        if (device.deviceId === 'default') {
+          continue;
+        }
+        return device.deviceId;
+      }
     }
+    return null;
   }
 
-  // recordMicrophone() {
-  //   let mediaRecorder;
-  //   navigator.mediaDevices.getUserMedia({ audio: true })
-  //     .then((stream) => {
-  //       mediaRecorder = new MediaRecorder(stream, { audioBitsPerSecond: this.sampleRate});
-  //       mediaRecorder.addEventListener('dataavailable', (e) => {
-  //         debugger;
-  //       });
-  //       mediaRecorder.start(this.chunkDuration);
-  //     })
-  //     .catch((err) => console.error(err));
-  // }
+  getDeviceStream(deviceId: any, deviceType: string) {
+    const constraints: any = {};
+    constraints[deviceType] = { deviceId: deviceId };
+    return navigator.mediaDevices.getUserMedia(constraints);
+  }
 }

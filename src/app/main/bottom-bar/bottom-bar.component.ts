@@ -1,9 +1,10 @@
+import { Router } from '@angular/router';
 import { Component, ViewChild } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { ElectronService } from '../../services/electron.service';
 import { HyperionService } from '../../services/hyperion.service';
 import { AudioSinkService } from '../../services/audio-sink.service';
-import { MediaService } from '../../services/media.service';
+import { AudioInputService } from '../../services/audio-input.service';
 
 @Component({
   selector: 'bottom-bar',
@@ -14,35 +15,42 @@ export class BottomBarComponent {
   @ViewChild('message') message: any;
   @ViewChild('username') username: any;
 
-  microphoneMuted: boolean = true;
-  speakersMuted: boolean = false;
+  microphoneMuted: boolean;
+  speakersMuted: boolean;
 
   constructor(private electron: ElectronService, private chat: ChatService, private hyperion: HyperionService,
-              private sink: AudioSinkService, private media: MediaService) {}
+              private audioSink: AudioSinkService, private audioInput: AudioInputService, private router: Router) {
+    this.microphoneMuted = this.audioInput.muted;
+    this.speakersMuted = this.audioSink.muted;
+  }
 
   onClear() {
     this.chat.clear();
   }
 
   onGear() {
-    this.electron.send('open-settings');
+    if (this.electron.isElectronApp) {
+      this.electron.send('open-settings');
+    } else {
+      this.router.navigate(['/settings'])
+    }
   }
 
   toggleMic() {
     this.microphoneMuted = !this.microphoneMuted;
     if (!this.microphoneMuted) {
-      this.media.openMicrophone();
+      this.audioInput.openMicrophone();
     } else {
-      this.media.closeMicrophone();
+      this.audioInput.closeMicrophone();
     }
   }
 
   toggleSpeakers() {
     this.speakersMuted = !this.speakersMuted;
     if (this.speakersMuted) {
-      this.sink.mute();
+      this.audioSink.mute();
     } else {
-      this.sink.unmute();
+      this.audioSink.unmute();
     }
   }
 
@@ -60,7 +68,7 @@ export class BottomBarComponent {
       const decodedData = {};
       this.hyperion.frameDecode(arrayBuffer, decodedData, (frame: any) => {
         this.chat.addBotMsg([frame['ANS']], frame['TIM']);
-        this.sink.setBuffer(frame['PCM'], frame['TIM']);
+        this.audioSink.setBuffer(frame['PCM'], frame['TIM']);
       });
     });
   }

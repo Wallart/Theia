@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { MediaService } from './media.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,12 +11,19 @@ export class AudioSinkService {
   busy: boolean;
   muted: boolean = false;
   queue: any[];
+  selectedSpeakers: string = '';
 
-  constructor() {
+  constructor(private media: MediaService) {
     this.busy = false;
     this.queue = [];
     this.sampleRate = 24000;
     this.audioCtx = new window.AudioContext({ sampleRate: this.sampleRate });
+    this.media.speakers$.subscribe((data) => {
+      if (data.length > 0) {
+        this.selectedSpeakers = data[0].label;
+        // this.audioCtx.setSinkId(data[0].deviceId);
+      }
+    });
   }
 
   mute() {
@@ -76,5 +84,11 @@ export class AudioSinkService {
     this.source.connect(this.audioCtx.destination);
     this.source.onended = () => this.onPlaybackEnd();
     this.source.start();
+  }
+
+  set currSpeakers(speakersName: string) {
+    this.selectedSpeakers = speakersName;
+    const deviceId = this.media.getDeviceId(speakersName, 'audiooutput');
+    this.audioCtx.setSinkId(deviceId);
   }
 }
