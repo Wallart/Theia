@@ -26,34 +26,30 @@ input:focus {
 }
 
 .button {
+  /*border:1px solid white;*/
   cursor: pointer;
   border-radius: 5px;
   width: 31px;
+  display: table-cell;
   text-align: center;
+}
+
+.button:not(:last-child) {
+  margin-right: 2.5px;
+}
+
+.icon-aligner {
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
 }
 
 .button:hover {
   background-color: #313436;
 }
 
-#clear-button {
-  margin-left: 5px;
-  margin-right: 5px;
-}
-
 .button-icon {
-  /*border:1px solid crimson;*/
-  margin-top: 5px;
-  display: inline-block;
-  width: 21px;
-  height: 21px;
-  background-size: cover;
-}
-
-#clear-img {
-  background-image: url("../../../assets/trash.png");
-}
-
-#gear-img {
-  background-image: url("../../../assets/settings.png");
+  vertical-align: middle;
+  width: 24px;
+  height: 24px;
 }

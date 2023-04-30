@@ -5,8 +5,10 @@ import { Injectable } from '@angular/core';
 })
 export class AudioSinkService {
   audioCtx: any;
+  source: any | AudioBufferSourceNode;
   sampleRate: number;
   busy: boolean;
+  muted: boolean = false;
   queue: any[];
 
   constructor() {
@@ -14,6 +16,22 @@ export class AudioSinkService {
     this.queue = [];
     this.sampleRate = 24000;
     this.audioCtx = new window.AudioContext({ sampleRate: this.sampleRate });
+  }
+
+  mute() {
+    this.muted = true;
+    this.stop();
+  }
+
+  unmute() {
+    this.muted = false;
+  }
+
+  stop() {
+    this.queue.splice(0);
+    if (this.source !== undefined) {
+      this.source.stop();
+    }
   }
 
   onPlaybackEnd() {
@@ -25,6 +43,10 @@ export class AudioSinkService {
   }
 
   setBuffer(arrayBuffer: ArrayBuffer, date: Date) {
+    if (this.muted) {
+      return;
+    }
+
     if (this.busy) {
       this.queue.push([arrayBuffer, date]);
       return;
@@ -44,10 +66,10 @@ export class AudioSinkService {
     channelData.set(floatData);
 
     // Créer un nouveau BufferSource et le connecter au contexte audio
-    const source = this.audioCtx.createBufferSource();
-    source.buffer = audioBuffer;
-    source.connect(this.audioCtx.destination);
-    source.onended = () => this.onPlaybackEnd();
-    source.start();
+    this.source = this.audioCtx.createBufferSource();
+    this.source.buffer = audioBuffer;
+    this.source.connect(this.audioCtx.destination);
+    this.source.onended = () => this.onPlaybackEnd();
+    this.source.start();
   }
 }

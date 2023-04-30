@@ -16,7 +16,7 @@ const createWindow = () => {
   })
 
   mainWin.loadFile('dist/theia/index.html');
-  // mainWin.webContents.openDevTools();
+  mainWin.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {

@@ -50,7 +50,6 @@ export class ChatService {
 
   addBotMsg(content: string[], date: any) {
     this.hyperion.getName().subscribe((botName: string) => {
-      debugger;
       this.add(botName, 'bot', content, date);
     });
   }

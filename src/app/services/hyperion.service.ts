@@ -13,6 +13,7 @@ export class HyperionService {
   prompts: string[] = [];
   botName: string = '';
   targetUrl: string;
+  sid: string = 'toto';
 
   constructor(private http: HttpClient, private electron: ElectronService) {
     if (electron.isElectronApp) {
@@ -22,23 +23,33 @@ export class HyperionService {
     }
   }
 
-  send(user: string, message: string) {
-    const payload = new FormData();
-    payload.append('user', user);
-    payload.append('message', message);
-
-    // TODO Fix SID
-    const httpOptions = {
+  private getHttpOptions() {
+    return {
       responseType: 'arraybuffer',
+      observe: 'response',
       headers: new HttpHeaders({
-        SID: 'toto',
+        SID: this.sid,
         model: this.model,
         preprompt: this.prompt
       })
     };
+  }
+
+  sendChat(user: string, message: string) {
+    const payload = new FormData();
+    payload.append('user', user);
+    payload.append('message', message);
 
     // @ts-ignore
-    return this.http.post(`${this.targetUrl}/chat`, payload, httpOptions);
+    return this.http.post(`${this.targetUrl}/chat`, payload, this.getHttpOptions());
+  }
+
+  sendAudio(audio: Int16Array) {
+    const payload = new FormData();
+    payload.append('audio', new Blob([audio]));
+
+    // @ts-ignore
+    return this.http.post(`${this.targetUrl}/audio`, payload, this.getHttpOptions());
   }
 
   getState() {

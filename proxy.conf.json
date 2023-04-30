@@ -6,5 +6,53 @@
     "pathRewrite": {
       "^/api": ""
     }
+  },
+  "/vad.worklet.bundle.min.js": {
+    "target": "http://localhost:4200",
+    "secure": false,
+    "changeOrigin": false,
+    "pathRewrite": {
+      "^/vad.worklet.bundle.min.js": "/vad/vad.worklet.bundle.min.js"
+    }
+  },
+  "/silero_vad.onnx": {
+    "target": "http://localhost:4200",
+    "secure": false,
+    "changeOrigin": false,
+    "pathRewrite": {
+      "^/silero_vad.onnx": "/vad/silero_vad.onnx"
+    }
+  },
+  "/ort-wasm.wasm": {
+    "target": "http://localhost:4200",
+    "secure": false,
+    "changeOrigin": false,
+    "pathRewrite": {
+      "^/ort-wasm.wasm": "/vad/ort-wasm.wasm"
+    }
+  },
+  "/ort-wasm-simd.wasm": {
+    "target": "http://localhost:4200",
+    "secure": false,
+    "changeOrigin": false,
+    "pathRewrite": {
+      "^/ort-wasm-simd.wasm": "/vad/ort-wasm-simd.wasm"
+    }
+  },
+  "/ort-wasm-simd-threaded.wasm": {
+    "target": "http://localhost:4200",
+    "secure": false,
+    "changeOrigin": false,
+    "pathRewrite": {
+      "^/ort-wasm-simd-threaded.wasm": "/vad/ort-wasm-simd-threaded.wasm"
+    }
+  },
+  "/ort-wasm-threaded.wasm": {
+    "target": "http://localhost:4200",
+    "secure": false,
+    "changeOrigin": false,
+    "pathRewrite": {
+      "^/ort-wasm-threaded.wasm": "/vad/ort-wasm-threaded.wasm"
+    }
   }
 }

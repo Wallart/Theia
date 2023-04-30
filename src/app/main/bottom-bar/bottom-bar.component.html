@@ -1,11 +1,23 @@
 <div id="bottom-bar">
   <input id="username-input" type="text" placeholder="Username" #username>
   <input id="message-input" type="text" placeholder="Send a message..." (keydown.enter)="onSend($event)" #message>
-  <div class="button" id="clear-button" (click)="onClear()">
-    <div class="button-icon" id="clear-img"></div>
+  <div class="button" (click)="onClear()">
+    <div class="icon-aligner"></div>
+    <img class="button-icon" src="assets/trash.svg">
   </div>
-  <div class="button" id="gear-button" (click)="onGear()">
-    <div class="button-icon" id="gear-img"></div>
+  <div class="button" (click)="toggleMic()">
+    <div class="icon-aligner"></div>
+    <img *ngIf="!microphoneMuted" class="button-icon" src="assets/microphone.svg">
+    <img *ngIf="microphoneMuted" class="button-icon" src="assets/microphone-muted.svg">
+  </div>
+  <div class="button" (click)="toggleSpeakers()">
+    <div class="icon-aligner"></div>
+    <img *ngIf="!speakersMuted" class="button-icon" src="assets/speakers.svg">
+    <img *ngIf="speakersMuted" class="button-icon" src="assets/speakers-muted.svg">
+  </div>
+  <div class="button" (click)="onGear()">
+    <div class="icon-aligner"></div>
+    <img class="button-icon" src="assets/gears.svg">
   </div>
 </div>
 
