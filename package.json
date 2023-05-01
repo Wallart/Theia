@@ -8,7 +8,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "electron": "ng build && electron ."
+    "unpack-vad": "mv dist/theia/vad/* dist/theia/.; rm -r dist/theia/vad",
+    "electron": "ng build && yarn run unpack-vad && electron ."
   },
   "private": true,
   "dependencies": {
@@ -24,6 +25,7 @@
     "@types/electron": "^1.6.10",
     "onnxruntime-web": "^1.14.0",
     "rxjs": "~7.8.0",
+    "socket.io-client": "^4.6.1",
     "tslib": "^2.3.0",
     "zone.js": "~0.12.0"
   },
