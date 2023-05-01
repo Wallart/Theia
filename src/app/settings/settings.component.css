@@ -38,8 +38,14 @@
   cursor: pointer;
 }
 
+hr {
+  margin: 15px 0 15px 0;
+  height: 2px;
+  background-color: #7D7E7F;
+  border: none;
+}
+
 .option-row {
-  /*border: 1px solid crimson;*/
   margin-bottom: 7px;
   display: flex;
   justify-content: space-between;
@@ -47,9 +53,23 @@
 }
 
 .option-row:last-child {
-  /*border: 1px solid crimson;*/
   margin-top: 15px;
 }
+
 .option-row p {
   margin: 0;
+}
+
+#level {
+  width: 200px;
+  text-align: center;
+}
+
+#level span {
+  border-radius: 2px;
+  display: inline-block;
+  background-color: #7D7E7F;
+  width: 4%;
+  height: 20px;
+  margin: 0 2.5px 0 2.5px;
 }

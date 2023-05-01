@@ -28,7 +28,7 @@ ipcMain.on('open-settings', () => {
     settingsWin = new BrowserWindow({
       parent: mainWin,
       width: 344,
-      height: 200,
+      height: 240,
       resizable: false,
       webPreferences: {
         nodeIntegration: true,
