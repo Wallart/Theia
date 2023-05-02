@@ -8,7 +8,7 @@
     <div class="content">
       <span class="line" *ngFor="let sentence of message.content">
         <span class="text" *ngIf="!sentence.isCode">{{sentence.content}}</span>
-        <pre class="code" *ngIf="sentence.isCode"><div class="copy-button code-copy-button"></div><code [highlight]="sentence.content"></code></pre>
+        <pre class="code" *ngIf="sentence.isCode"><div class="copy-button code-copy-button" (click)="onCopy($event)"></div><code [highlight]="sentence.content"></code></pre>
       </span>
     </div>
   </div>

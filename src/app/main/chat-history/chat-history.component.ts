@@ -26,10 +26,14 @@ export class ChatHistoryComponent {
   }
 
   onCopy(event: any) {
-    const node = event.target.parentElement.getElementsByClassName('content');
-    if (node.length > 0) {
-      const text = node[0].innerText;
+    const contentNode = event.target.parentElement.getElementsByClassName('content');
+    const codeNode = event.target.parentElement.getElementsByTagName('code');
+    if (contentNode.length > 0) {
+      const text = contentNode[0].innerText;
       this.electron.writeToClipboard(text);
+    } else if (codeNode.length > 0) {
+      const code = codeNode[0].innerText;
+      this.electron.writeToClipboard(code);
     }
   }
 
