@@ -85,6 +85,7 @@
   color: #1f2020;
   background-color: white;
   margin: 0 0 5px 0;
+  overflow: scroll;
 }
 
 .code:hover .code-copy-button {
