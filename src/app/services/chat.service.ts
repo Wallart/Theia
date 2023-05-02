@@ -12,7 +12,7 @@ export class ChatService {
   public messages$: Observable<any[]> = this.messagesSubject.asObservable();
 
   constructor(private hyperion: HyperionService) {
-    // this.mockData();
+    this.mockData();
   }
 
   mockData() {
@@ -21,10 +21,20 @@ export class ChatService {
       { username: 'Hypérion', role: 'bot', date: new Date(), content: ['Salut ça va bien merci'] },
       { username: 'Julien', role: 'user', date: new Date(), content: ['Cool, tant mieux !'] },
       { username: 'Hypérion', role: 'bot', date: new Date(), content: [
-          'Haha, laisse tomber Ju, il est peut-être parti sans dire au revoir mais ça m\'étonnerait que ça m\'empêche de dormir. Je suis désolé, mais "ok" n\'est pas une réponse suffisante pour poursuivre une conversation.',
-          'Si vous ne voulez pas répondre et vous présenter, je vais devoir clore cette conversation.',
-          'Je suis désolé, mais répondre par "ok" n\'est pas suffisant pour engager une conversation.',
-          'Si vous voulez vraiment parler avec moi, merci de vous présenter et de me dire ce que vous attendez de cette conversation.'
+          'Bien sûr, voici un exemple des sections `extraResources` et `extraFiles` dans la configuration d\'electron-builder :',
+          '```json',
+          '"build": {',
+          '    "extraResources": [',
+          '      "chemin/vers/dossier1",',
+          '      "chemin/vers/dossier2",',
+          '      "chemin/vers/fichier1.json"',
+          '    ],',
+          '    "extraFiles": [',
+          '      "chemin/vers/fichier1.bin",',
+          '      "chemin/vers/dossier4/fichier2"',
+          '    ],',
+          '}',
+          '```'
         ]
       }
     ];

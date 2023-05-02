@@ -1,15 +1,16 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
+import { MainComponent } from './main/main.component';
+import { HttpClientModule } from '@angular/common/http';
+import { AppRoutingModule } from './app-routing.module';
+import { BrowserModule } from '@angular/platform-browser';
+import { SettingsComponent } from './settings/settings.component';
+import { TopBarComponent } from './main/top-bar/top-bar.component';
+import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
+import { BottomBarComponent } from './main/bottom-bar/bottom-bar.component';
 import { ChatHistoryComponent } from './main/chat-history/chat-history.component';
 import { ButtonsAreaComponent } from './main/buttons-area/buttons-area.component';
-import { TopBarComponent } from './main/top-bar/top-bar.component';
-import { BottomBarComponent } from './main/bottom-bar/bottom-bar.component';
-import { HttpClientModule } from '@angular/common/http';
-import { SettingsComponent } from './settings/settings.component';
-import { AppRoutingModule } from './app-routing.module';
-import { MainComponent } from './main/main.component';
-import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -25,9 +26,18 @@ import { FormsModule } from '@angular/forms';
       BrowserModule,
       HttpClientModule,
       AppRoutingModule,
-      FormsModule
+      FormsModule,
+      HighlightModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HIGHLIGHT_OPTIONS,
+      useValue: {
+        fullLibraryLoader: () => import('highlight.js'),
+        themePath: 'assets/styles/github.css'
+      }
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

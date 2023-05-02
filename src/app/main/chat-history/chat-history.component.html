@@ -1,12 +1,15 @@
 <div id="chat-frame">
   <div class="message" *ngFor="let message of messages">
-    <div class="copy-button" (click)="onCopy($event)"></div>
+    <div class="copy-button text-copy-button" (click)="onCopy($event)"></div>
     <div class="header">
       <div class="username {{message.role}}">{{message.username}}</div>
       <div class="timestamp">{{message.date | date:'MM/dd/yyyy H:mm'}}</div>
     </div>
     <div class="content">
-      <span class="typewriter" *ngFor="let sentence of message.content">{{sentence}}</span>
+      <span class="line" *ngFor="let sentence of message.content">
+        <span class="text" *ngIf="!sentence.isCode">{{sentence.content}}</span>
+        <pre class="code" *ngIf="sentence.isCode"><div class="copy-button code-copy-button"></div><code [highlight]="sentence.content"></code></pre>
+      </span>
     </div>
   </div>
 </div>
