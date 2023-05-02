@@ -44,13 +44,18 @@ export class ChatHistoryComponent {
       let sentence = message[i];
       const splittedSentence = sentence.split('```');
       if (splittedSentence.length > 1) {
-        isCode = !isCode;
+        // if (!isCode && splittedSentence[1].length > 0 && !splittedSentence[1].startsWith(' ')) {
+        //   console.log(`Detected language: ${splittedSentence[1]}`);
+        //   splittedSentence[1] = '';
+        // }
+
+        // isCode = !isCode;
         for (let j=0; j < splittedSentence.length; j++) {
           const chunk = splittedSentence[j];
           if (chunk === '') {
             continue;
           }
-          isCode = (j % 2 != 0);
+          isCode = (j % 2 != 0) ? !isCode : isCode;
           // chunks.push({ isCode: isCode, content: chunk});
           if (chunks.length === 0 || !isCode || !chunks[chunks.length - 1].isCode) {
             chunks.push({ isCode: isCode, content: chunk.trim()});
