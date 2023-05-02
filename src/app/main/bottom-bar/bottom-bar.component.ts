@@ -5,6 +5,7 @@ import { ElectronService } from '../../services/electron.service';
 import { HyperionService } from '../../services/hyperion.service';
 import { AudioSinkService } from '../../services/audio-sink.service';
 import { AudioInputService } from '../../services/audio-input.service';
+import {LocalStorageService} from "../../services/local-storage.service";
 
 @Component({
   selector: 'bottom-bar',
@@ -12,16 +13,33 @@ import { AudioInputService } from '../../services/audio-input.service';
   styleUrls: ['./bottom-bar.component.css']
 })
 export class BottomBarComponent {
-  @ViewChild('message') message: any;
-  @ViewChild('username') username: any;
+  message: string = '';
+  username: string = '';
 
   microphoneMuted: boolean;
   speakersMuted: boolean;
 
   constructor(private electron: ElectronService, private chat: ChatService, private hyperion: HyperionService,
-              private audioSink: AudioSinkService, private audioInput: AudioInputService, private router: Router) {
+              private audioSink: AudioSinkService, private audioInput: AudioInputService, private router: Router,
+              private store: LocalStorageService) {
     this.microphoneMuted = this.audioInput.muted;
     this.speakersMuted = this.audioSink.muted;
+  }
+
+  ngOnInit() {
+    let username = this.store.getItem('username');
+    if (username !== null && username.length > 0) {
+      this.username = username;
+    }
+  }
+
+  onUsernameChanged() {
+    if (this.username.length > 0) {
+      const regex = /[a-zA-Z0-9_-]{1,64}/g;
+      // @ts-ignore
+      this.username = this.username.match(regex).join('');
+    }
+    this.store.setItem('username', this.username);
   }
 
   onClear() {
@@ -54,14 +72,14 @@ export class BottomBarComponent {
     }
   }
 
-  onSend(event: any) {
-    let message = event.target.value;
-    let username = this.username.nativeElement.value;
+  onSend() {
+    let message = this.message;
+    let username = this.username;
     if (username === '') {
       username = 'Unknown';
     }
 
-    this.message.nativeElement.value = '';
+    this.message = '';
     this.chat.addUserMsg(username, [message], new Date());
     this.hyperion.sendChat(username, message).subscribe((response: any) => {
       const arrayBuffer = response.body;

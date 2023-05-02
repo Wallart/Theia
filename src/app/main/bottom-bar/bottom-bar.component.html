@@ -1,6 +1,6 @@
 <div id="bottom-bar">
-  <input id="username-input" type="text" placeholder="Username" #username>
-  <input id="message-input" type="text" placeholder="Send a message..." (keydown.enter)="onSend($event)" #message>
+  <input id="username-input" type="text" placeholder="Username" [(ngModel)]="username" (change)="onUsernameChanged()">
+  <input id="message-input" type="text" placeholder="Send a message..." [(ngModel)]="message" (keydown.enter)="onSend()">
   <div class="button" (click)="onClear()">
     <div class="icon-aligner"></div>
     <img class="button-icon" src="assets/trash.svg">
