@@ -1,4 +1,5 @@
 import { from } from 'rxjs';
+import { io } from 'socket.io-client';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ElectronService } from './electron.service';
@@ -7,13 +8,15 @@ import { ElectronService } from './electron.service';
   providedIn: 'root'
 })
 export class HyperionService {
+  socket: any;
+
   model: string = '';
   models: string[] = [];
   prompt: string = '';
   prompts: string[] = [];
   botName: string = '';
   targetUrl: string;
-  sid: string = 'toto';
+  sid: string = '';
 
   constructor(private http: HttpClient, private electron: ElectronService) {
     if (electron.isElectronApp) {
@@ -21,6 +24,29 @@ export class HyperionService {
     } else {
       this.targetUrl = 'http://localhost:4200/api';
     }
+
+    // this.socket = io('ws://deepbox:6450');
+    // this.socket.on('connect', () => this.onConnect());
+    // this.socket.on('disconnect', () => this.onDisconnect());
+    // this.socket.on('error', () => this.onError());
+    // this.socket.on('interrupt', () => this.onInterrupt());
+  }
+
+  onInterrupt() {
+    debugger;
+  }
+
+  onConnect() {
+    this.sid = this.socket.sid;
+    console.log(`WebSocket connected. ${this.sid}`);
+  }
+
+  onError() {
+    debugger;
+  }
+
+  onDisconnect() {
+    debugger;
   }
 
   private getHttpOptions() {
