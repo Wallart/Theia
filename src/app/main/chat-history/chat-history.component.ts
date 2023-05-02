@@ -52,7 +52,7 @@ export class ChatHistoryComponent {
 
         // isCode = !isCode;
         for (let j=0; j < splittedSentence.length; j++) {
-          isCode = (j % 2 != 0) ? !isCode : isCode;
+          isCode = (j % 2 != 0) ? !isCode : false;
           const chunk = splittedSentence[j];
           if (chunk === '') {
             continue;
