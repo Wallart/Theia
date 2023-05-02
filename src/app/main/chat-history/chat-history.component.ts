@@ -46,27 +46,28 @@ export class ChatHistoryComponent {
       if (splittedSentence.length > 1) {
         // if (!isCode && splittedSentence[1].length > 0 && !splittedSentence[1].startsWith(' ')) {
         //   console.log(`Detected language: ${splittedSentence[1]}`);
+        //   debugger;
         //   splittedSentence[1] = '';
         // }
 
         // isCode = !isCode;
         for (let j=0; j < splittedSentence.length; j++) {
+          isCode = (j % 2 != 0) ? !isCode : isCode;
           const chunk = splittedSentence[j];
           if (chunk === '') {
             continue;
           }
-          isCode = (j % 2 != 0) ? !isCode : isCode;
           // chunks.push({ isCode: isCode, content: chunk});
           if (chunks.length === 0 || !isCode || !chunks[chunks.length - 1].isCode) {
-            chunks.push({ isCode: isCode, content: chunk.trim()});
+            chunks.push({ isCode: isCode, content: chunk});
           } else {
-            chunks[chunks.length - 1].content += '\n' + chunk.trim();
+            chunks[chunks.length - 1].content += '\n' + chunk;
           }
         }
       } else {
         // chunks.push({ isCode: isCode, content: splittedSentence[0]});
         if (chunks.length === 0 || !isCode || !chunks[chunks.length - 1].isCode) {
-          chunks.push({ isCode: isCode, content: splittedSentence[0].trim()});
+          chunks.push({ isCode: isCode, content: splittedSentence[0]});
         } else {
           chunks[chunks.length - 1].content += '\n' + splittedSentence[0];
         }
