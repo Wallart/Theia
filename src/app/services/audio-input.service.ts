@@ -4,6 +4,7 @@ import { ChatService } from './chat.service';
 import { HyperionService } from './hyperion.service';
 import { AudioSinkService } from './audio-sink.service';
 import { MediaService } from './media.service';
+import { ElectronService } from './electron.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,15 @@ export class AudioInputService {
   muted: boolean = true;
   selectedMicrophone: string = '';
 
-  constructor(private hyperion: HyperionService, private chat: ChatService, private sink: AudioSinkService, private media: MediaService) {
+  constructor(private hyperion: HyperionService, private chat: ChatService, private sink: AudioSinkService,
+              private media: MediaService, private electron: ElectronService) {
+    if (this.electron.isElectronApp) {
+      const ort = require('onnxruntime-web');
+      const rootUrl = `${window.location.protocol}${window.location.pathname}`;
+      ort.env.wasm.wasmPaths = rootUrl;
+      // console.log(rootUrl);
+    }
+
     this.media.microphones$.subscribe((data) => {
       if (data.length > 0) {
         this.selectedMicrophone = data[0].label;
@@ -56,6 +65,9 @@ export class AudioInputService {
       audio[i] = audio[i] * 32768.0;
     }
     const pcmData = new Int16Array(audio);
+    const rms = this.computeRMS(pcmData);
+    const dbs = this.computeDBs(rms);
+    console.log(`RMS : ${rms} dBs : ${dbs}`);
     this.hyperion.sendAudio(pcmData).subscribe((response: any) => {
       const speaker = response.headers.get('speaker');
       const arrayBuffer = response.body;
@@ -97,6 +109,21 @@ export class AudioInputService {
     this.selectedMicrophone = microphoneName;
     this.initVADWithStream(this.media.getDeviceId(microphoneName, 'audioinput'), autostart);
     this.muted = !autostart;
+  }
+
+  computeRMS(array: Int16Array) {
+    let rms = 0;
+    for (let i=0; i < array.length; i += 1) {
+      rms += array[i] * array[i];
+    }
+    rms /= array.length;
+    rms = Math.sqrt(rms);
+    return rms;
+  }
+
+  computeDBs(rms: number) {
+    const db = 20 * Math.log10(rms);
+    return db;
   }
 }
 
