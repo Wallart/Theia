@@ -12,7 +12,7 @@ export class ChatService {
   public messages$: Observable<any[]> = this.messagesSubject.asObservable();
 
   constructor(private hyperion: HyperionService) {
-    this.mockData();
+    // this.mockData();
   }
 
   mockData() {
@@ -21,20 +21,13 @@ export class ChatService {
       { username: 'Hypérion', role: 'bot', date: new Date(), content: ['Salut ça va bien merci'] },
       { username: 'Julien', role: 'user', date: new Date(), content: ['Cool, tant mieux !'] },
       { username: 'Hypérion', role: 'bot', date: new Date(), content: [
-          'Bien sûr, voici un exemple des sections `extraResources` et `extraFiles` dans la configuration d\'electron-builder :',
-          '```json',
-          '"build": {',
-          '    "extraResources": [',
-          '      "chemin/vers/dossier1",',
-          '      "chemin/vers/dossier2",',
-          '      "chemin/vers/fichier1.json"',
-          '    ],',
-          '    "extraFiles": [',
-          '      "chemin/vers/fichier1.bin",',
-          '      "chemin/vers/dossier4/fichier2"',
-          '    ],',
-          '}',
-          '```'
+          "Très bien, merci pour ces informations.",
+          "Pour créer une application permettant de dessiner des lignes rouges à l'aide du doigt sur un ordinateur, nous devrons utiliser une bibliothèque graphique qui permet de tracer des lignes en utilisant la souris ou un stylet.",
+          "La bibliothèque JavaFX est une bibliothèque graphique pour Java qui est très utile pour créer des interfaces graphiques.",
+          "Voici un exemple de code qui crée une toile de dessin et affiche les lignes rouges tracées par l'utilisateur:\n\n```java\nimport javafx.application.Application;\nimport javafx.scene.Scene;\nimport javafx.scene.canvas.Canvas;\nimport javafx.scene.canvas.GraphicsContext;\nimport javafx.scene.layout.BorderPane;\nimport javafx.scene.paint.Color;\nimport javafx.stage.Stage;\n\npublic class DessinLignes extends Application {\n\n    double x = 0, y = 0; //Position actuelle du curseur\n    GraphicsContext gc; //Contexte graphique pour tracer les lignes\n    Color couleur = Color.RED; //Couleur des lignes\n\n    public void start(Stage primaryStage) {\n\n        //Création d'une toile de dessin \n        Canvas canvas = new Canvas(800, 600);\n\n        //Obtention du contexte graphique pour tracer sur la toile\n        gc = canvas.getGraphicsContext2D();\n\n        //Définition de la couleur initiale des lignes\n        gc.setStroke(couleur); \n\n        //Association de la méthode dessinerLigne à l'événement de survol de la souris\n        canvas.setOnMouseDragged(e -> dessinerLigne(e.getSceneX(), e.getSceneY()));\n\n        //Création d'une scène contenant la toile de dessin\n        BorderPane root = new BorderPane(canvas);\n        Scene scene = new Scene(root, 800, 600);\n\n        //Affichage de la scène\n        primaryStage.setScene(scene);\n        primaryStage.show();\n    }\n\n    //Fonction qui dessine une ligne à partir de la position actuelle du curseur\n    //jusqu'à la nouvelle position donnée en entrée\n    private void dessinerLigne(double newX, double newY) {\n        gc.strokeLine(x, y, newX, newY);\n        x = newX;\n        y = newY;\n    }\n\n}\n```\n\nCe code crée une simple toile de dessin JavaFX qui affiche toutes les lignes rouges tracées par l'utilisateur.",
+          "Le style de la ligne, comme sa largeur ou le type des extrémités peuvent être personnalisés.",
+          "Dans cet exemple, on a utilisé la méthode `setOnMouseDragged()` pour permettre à l'utilisateur de dessiner des lignes en utilisant le survol de la souris.",
+          "Toutefois, si vous souhaitez qu'on puisse utiliser la souris pour dessiner les lignes, il suffira de remplacer la ligne `canvas.setOnMouseDragged(e -> dessinerLigne(e.getSceneX(), e.getSceneY()));` en utilisant la méthode `setOnMousePressed()` et la méthode `setOnMouseDragged()`."
         ]
       }
     ];
