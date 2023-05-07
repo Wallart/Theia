@@ -15,8 +15,8 @@ const createWindow = () => {
     }
   })
 
-  mainWin.loadFile('dist/theia/index.html');
-  mainWin.webContents.openDevTools();
+  const url = path.join(__dirname, '../dist/theia/index.html');
+  mainWin.loadURL(`file://${url}`);
 }
 
 app.whenReady().then(() => {
@@ -24,7 +24,7 @@ app.whenReady().then(() => {
 })
 
 ipcMain.on('open-settings', () => {
-  if (settingsWin === null || settingsWin === undefined) {
+  if (settingsWin === null || settingsWin === undefined || settingsWin.isDestroyed()) {
     settingsWin = new BrowserWindow({
       parent: mainWin,
       width: 344,
@@ -37,9 +37,7 @@ ipcMain.on('open-settings', () => {
     });
     const popupUrl = path.join(__dirname, '../dist/theia/index.html#/settings');
     settingsWin.loadURL(`file://${popupUrl}`);
-    settingsWin.webContents.openDevTools();
   } else {
-    debugger;
     settingsWin.focus();
   }
 });
