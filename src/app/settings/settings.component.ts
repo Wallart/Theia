@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { Component, ViewChild } from '@angular/core';
 import { MediaService } from '../services/media.service';
 import { ElectronService } from '../services/electron.service';
-import { AudioInputService } from '../services/audio-input.service';
 import { AudioSinkService } from '../services/audio-sink.service';
+import { AudioInputService } from '../services/audio-input.service';
 
 @Component({
   selector: 'app-settings',
@@ -11,6 +11,8 @@ import { AudioSinkService } from '../services/audio-sink.service';
   styleUrls: ['./settings.component.css']
 })
 export class SettingsComponent {
+  @ViewChild('inputLevel') inputLevel: any;
+
   inDevices: any[] = [];
   outDevices: any[] = [];
   cameraDevices: any[] = [];
@@ -48,6 +50,21 @@ export class SettingsComponent {
         this.cameraDevices = data;
         if (this.selectedCamDevice === '') {
           this.selectedCamDevice = data[0].label;
+        }
+      }
+    });
+  }
+
+  ngAfterViewInit() {
+    this.audioInput.noiseLevel$.subscribe((dbs) => {
+      const maxDbs = 100;
+      const checks = this.inputLevel.nativeElement.getElementsByTagName('span');
+      const activeChecks = Math.min(dbs, maxDbs) * checks.length / maxDbs;
+      for (let i=0; i < checks.length; i++) {
+        if (i < activeChecks) {
+          checks[i].setAttribute('class', 'activeLevel');
+        } else {
+          checks[i].setAttribute('class', '');
         }
       }
     });

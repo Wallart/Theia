@@ -73,3 +73,7 @@ hr {
   height: 20px;
   margin: 0 2.5px 0 2.5px;
 }
+
+#level .activeLevel {
+  background-color: #BCBDBD;
+}

@@ -5,6 +5,7 @@ import { HyperionService } from './hyperion.service';
 import { AudioSinkService } from './audio-sink.service';
 import { MediaService } from './media.service';
 import { ElectronService } from './electron.service';
+import { BehaviorSubject, Observable } from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,10 @@ export class AudioInputService {
   activityDetector: MicVAD | undefined;
   muted: boolean = true;
   selectedMicrophone: string = '';
+
+  noiseLevel: number = 0;
+  noiseLevel$: BehaviorSubject<number> = new BehaviorSubject<number>(this.noiseLevel);
+  noiseTimeout: any = null;
 
   constructor(private hyperion: HyperionService, private chat: ChatService, private sink: AudioSinkService,
               private media: MediaService, private electron: ElectronService) {
@@ -67,8 +72,13 @@ export class AudioInputService {
     const pcmData = new Int16Array(audio);
     const rms = this.computeRMS(pcmData);
     const dbs = this.computeDBs(rms);
-    console.log(`RMS : ${rms} dBs : ${dbs}`);
+    this.updateNoiseLevel(dbs);
+
     this.hyperion.sendAudio(pcmData).subscribe((response: any) => {
+      if (response.status !== 200) {
+        return;
+      }
+
       const speaker = response.headers.get('speaker');
       const arrayBuffer = response.body;
 
@@ -81,6 +91,19 @@ export class AudioInputService {
         this.sink.setBuffer(frame['PCM'], frame['TIM']);
       });
     });
+  }
+
+  updateNoiseLevel(dbs: number) {
+    this.noiseLevel = dbs;
+    this.noiseLevel$.next(this.noiseLevel);
+    if (this.noiseTimeout !== null){
+      clearTimeout(this.noiseTimeout);
+    }
+    if (dbs > 0) {
+      setTimeout(() => {
+        this.updateNoiseLevel(0);
+      }, 1000);
+    }
   }
 
   onVADMisfire() {
