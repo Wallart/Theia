@@ -1,6 +1,17 @@
 <div id="bottom-bar">
-  <input id="username-input" type="text" placeholder="Username" [(ngModel)]="username" (change)="onUsernameChanged()">
-  <input id="message-input" type="text" placeholder="Send a message..." [(ngModel)]="message" (keydown.enter)="onSend()">
+  <div id="username-input">
+    <input type="text" placeholder="Username" [(ngModel)]="username" (change)="onUsernameChanged()">
+  </div>
+  <div id="message-input">
+    <input type="text" placeholder="Send a message..." [(ngModel)]="message" (keydown.enter)="onSend()">
+    <div id="speech-bars" class="hidden-bars" #speechBars>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+  </div>
   <div class="button" (click)="onClear()">
     <div class="icon-aligner"></div>
     <img class="button-icon" src="assets/trash.svg">

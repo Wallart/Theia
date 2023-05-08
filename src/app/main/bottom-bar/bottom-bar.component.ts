@@ -13,6 +13,8 @@ import {LocalStorageService} from "../../services/local-storage.service";
   styleUrls: ['./bottom-bar.component.css']
 })
 export class BottomBarComponent {
+  @ViewChild('speechBars') speechBars: any;
+
   message: string = '';
   username: string = '';
 
@@ -30,6 +32,19 @@ export class BottomBarComponent {
     let username = this.store.getItem('username');
     if (username !== null && username.length > 0) {
       this.username = username;
+    }
+  }
+
+  ngAfterViewInit() {
+    this.audioInput.speaking$.subscribe((event) => this.onSpeechEvent(event));
+  }
+
+  onSpeechEvent(speaking: boolean) {
+    const bars = this.speechBars.nativeElement;
+    if (speaking) {
+      bars.setAttribute('class', '');
+    } else {
+      bars.setAttribute('class', 'hidden-bars');
     }
   }
 

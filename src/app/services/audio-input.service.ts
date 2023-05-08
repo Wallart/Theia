@@ -21,6 +21,9 @@ export class AudioInputService {
   noiseThreshold: number = 30;
   noiseLevel: number = 0;
   noiseLevel$: BehaviorSubject<number> = new BehaviorSubject<number>(this.noiseLevel);
+  speaking = false;
+  speaking$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(this.speaking);
+
 
   constructor(private hyperion: HyperionService, private chat: ChatService, private sink: AudioSinkService,
               private media: MediaService, private electron: ElectronService) {
@@ -73,10 +76,15 @@ export class AudioInputService {
 
   onSpeechStart() {
     console.log('Speech started.');
+    this.speaking = true;
+    this.speaking$.next(this.speaking);
   }
 
   onSpeechEnd(audio: Float32Array) {
     console.log('Speech ended.');
+    this.speaking = false;
+    this.speaking$.next(this.speaking);
+
     const pcmData = this.convertToInt16(audio);
     const rms = this.computeRMS(pcmData);
     const dbs = this.computeDBs(rms);
