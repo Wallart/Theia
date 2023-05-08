@@ -20,7 +20,7 @@
   <hr/>
   <div class="option-row">
     <p class="option-label">Input volume : </p>
-    <input type="range" min="0" max="100" value="60" class="slider">
+    <input class="slider" type="range" min="0" [max]="maxDbs" [(ngModel)]="selectedNoiseThreshold" (change)="onThresholdChanged()">
   </div>
   <div class="option-row">
     <p class="option-label">Input level : </p>

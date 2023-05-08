@@ -21,12 +21,15 @@ export class SettingsComponent {
   selectedInDevice: string;
   selectedOutDevice: string;
   selectedCamDevice: string;
+  selectedNoiseThreshold: number;
+  maxDbs = 110;
 
   constructor(private media: MediaService, private audioInput: AudioInputService, private audioSink: AudioSinkService,
               private electron: ElectronService, private router: Router, private title: Title) {
     this.selectedInDevice = this.audioInput.selectedMicrophone;
     this.selectedOutDevice = this.audioSink.selectedSpeakers;
     this.selectedCamDevice = '';
+    this.selectedNoiseThreshold = this.audioInput.noiseThreshold;
   }
 
   ngOnInit() {
@@ -58,15 +61,18 @@ export class SettingsComponent {
   }
 
   ngAfterViewInit() {
-    if (!this.electron.isElectronApp) {
+    if (this.electron.isElectronApp) {
+      this.electron.bind('current-noise-changed', (event: Object, dbs: number) => {
+        this.onNoiseLevelChanged(dbs);
+      });
+    } else {
       this.audioInput.noiseLevel$.subscribe((dbs) => this.onNoiseLevelChanged(dbs));
     }
   }
 
   onNoiseLevelChanged(dbs: number) {
-    const maxDbs = 100;
     const checks = this.inputLevel.nativeElement.getElementsByTagName('span');
-    const activeChecks = Math.min(dbs, maxDbs) * checks.length / maxDbs;
+    const activeChecks = Math.min(dbs, this.maxDbs) * checks.length / this.maxDbs;
     for (let i=0; i < checks.length; i++) {
       if (i < activeChecks) {
         checks[i].setAttribute('class', 'activeLevel');
@@ -97,6 +103,15 @@ export class SettingsComponent {
   onCamChanged() {
     if (this.electron.isElectronApp) {
     } else {
+      this.router.navigate(['/']);
+    }
+  }
+
+  onThresholdChanged() {
+    if (this.electron.isElectronApp) {
+      this.electron.send('noise-threshold', this.selectedNoiseThreshold);
+    } else {
+      this.audioInput.noiseThreshold = this.selectedNoiseThreshold;
       this.router.navigate(['/']);
     }
   }

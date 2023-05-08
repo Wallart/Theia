@@ -5,7 +5,7 @@ import { HyperionService } from './hyperion.service';
 import { AudioSinkService } from './audio-sink.service';
 import { MediaService } from './media.service';
 import { ElectronService } from './electron.service';
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,13 +13,14 @@ import { BehaviorSubject, Observable } from "rxjs";
 export class AudioInputService {
 
   // sampleRate: number = 16000;
+  dbContext: AudioContext | undefined;
   activityDetector: MicVAD | undefined;
   muted: boolean = true;
   selectedMicrophone: string = '';
 
+  noiseThreshold: number = 30;
   noiseLevel: number = 0;
   noiseLevel$: BehaviorSubject<number> = new BehaviorSubject<number>(this.noiseLevel);
-  noiseTimeout: any = null;
 
   constructor(private hyperion: HyperionService, private chat: ChatService, private sink: AudioSinkService,
               private media: MediaService, private electron: ElectronService) {
@@ -41,6 +42,11 @@ export class AudioInputService {
       console.log(`Input device changed to ${device}`);
       this.currMicrophone = device;
     });
+
+    this.electron.bind('noise-threshold-changed', (event: Object, dBValue: number) => {
+      console.log(`Noise threshold changed to ${dBValue}`);
+      this.noiseThreshold = dBValue;
+    });
   }
 
   async initVAD(stream: MediaStream) {
@@ -55,6 +61,7 @@ export class AudioInputService {
   initVADWithStream(deviceId: string, autostart: boolean) {
     this.media.getDeviceStream(deviceId, 'audio')
       .then((stream) => {
+        this.createDbMeter(stream);
         this.initVAD(stream).then(() => {
           if (autostart) {
             this.activityDetector?.start();
@@ -70,14 +77,13 @@ export class AudioInputService {
 
   onSpeechEnd(audio: Float32Array) {
     console.log('Speech ended.');
-    // console.log(audio);
-    for (let i = 0; i < audio.length; i++) {
-      audio[i] = audio[i] * 32768.0;
-    }
-    const pcmData = new Int16Array(audio);
+    const pcmData = this.convertToInt16(audio);
     const rms = this.computeRMS(pcmData);
     const dbs = this.computeDBs(rms);
-    this.updateNoiseLevel(dbs);
+
+    if (dbs < this.noiseThreshold) {
+      return;
+    }
 
     this.hyperion.sendAudio(pcmData).subscribe((response: any) => {
       if (response.status !== 200) {
@@ -100,14 +106,10 @@ export class AudioInputService {
 
   updateNoiseLevel(dbs: number) {
     this.noiseLevel = dbs;
-    this.noiseLevel$.next(this.noiseLevel);
-    if (this.noiseTimeout !== null){
-      clearTimeout(this.noiseTimeout);
-    }
-    if (dbs > 0) {
-      setTimeout(() => {
-        this.updateNoiseLevel(0);
-      }, 1000);
+    if (this.electron.isElectronApp) {
+      this.electron.send('current-noise', this.noiseLevel);
+    } else {
+      this.noiseLevel$.next(this.noiseLevel);
     }
   }
 
@@ -138,6 +140,12 @@ export class AudioInputService {
     this.initVADWithStream(this.media.getDeviceId(microphoneName, 'audioinput'), autostart);
     this.muted = !autostart;
   }
+  convertToInt16(audio: Float32Array) {
+    for (let i = 0; i < audio.length; i++) {
+      audio[i] = audio[i] * 32768.0;
+    }
+    return new Int16Array(audio);
+  }
 
   computeRMS(array: Int16Array) {
     let rms = 0;
@@ -150,8 +158,44 @@ export class AudioInputService {
   }
 
   computeDBs(rms: number) {
-    const db = 20 * Math.log10(rms);
-    return db;
+    let dbs = 0;
+    if (rms > 0) {
+      dbs = 20 * Math.log10(rms);
+    }
+    return dbs;
+  }
+
+  createDbMeter(stream: MediaStream) {
+    if (this.dbContext !== undefined) {
+      this.dbContext
+        .close()
+        .then(() => this.startDbMeter(stream));
+    } else {
+      this.startDbMeter(stream);
+    }
+  }
+
+  startDbMeter(stream: MediaStream) {
+    this.dbContext = new AudioContext();
+    const source = this.dbContext.createMediaStreamSource(stream);
+    const analyser = this.dbContext.createAnalyser();
+    analyser.smoothingTimeConstant = 0.8;
+    analyser.fftSize = 8192;
+
+    this.dbContext.audioWorklet.addModule('worklets/db-meter.js')
+      .then(() => {
+        // @ts-ignore
+        let dbMeter = new AudioWorkletNode(this.dbContext, 'db-meter-processor');
+        dbMeter.port.onmessage = (event) => {
+          // Handling data from the processor.
+          // console.log(event.data);
+          this.updateNoiseLevel(event.data);
+        };
+
+        // @ts-ignore
+        source.connect(analyser).connect(dbMeter).connect(this.dbContext.destination);
+      })
+      .catch(console.error);
   }
 }
 

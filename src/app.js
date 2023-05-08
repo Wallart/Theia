@@ -72,13 +72,18 @@ ipcMain.on('open-settings', () => {
 });
 
 ipcMain.on('in-device', (event, args) => {
-  console.log(event);
-  console.log(args);
   mainWin.webContents.send('in-device-changed', args);
 });
 
 ipcMain.on('out-device', (event, args) => {
-  console.log(event);
-  console.log(args);
   mainWin.webContents.send('out-device-changed', args);
 });
+
+ipcMain.on('noise-threshold', (event, args) => {
+  mainWin.webContents.send('noise-threshold-changed', args);
+});
+
+ipcMain.on('current-noise', (event, args) => {
+  settingsWin.webContents.send('current-noise-changed', args);
+});
+
