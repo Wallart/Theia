@@ -6,6 +6,7 @@ import { AudioSinkService } from './audio-sink.service';
 import { MediaService } from './media.service';
 import { ElectronService } from './electron.service';
 import { BehaviorSubject } from 'rxjs';
+import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,7 @@ export class AudioInputService {
   muted: boolean = true;
   selectedMicrophone: string = '';
 
-  noiseThreshold: number = 30;
+  noiseThreshold: number;
   noiseLevel: number = 0;
   noiseLevel$: BehaviorSubject<number> = new BehaviorSubject<number>(this.noiseLevel);
   speaking = false;
@@ -26,7 +27,7 @@ export class AudioInputService {
 
 
   constructor(private hyperion: HyperionService, private chat: ChatService, private sink: AudioSinkService,
-              private media: MediaService, private electron: ElectronService) {
+              private media: MediaService, private electron: ElectronService, private store: LocalStorageService) {
     if (this.electron.isElectronApp) {
       const ort = require('onnxruntime-web');
       const rootUrl = `${window.location.protocol}${window.location.pathname}`;
@@ -48,8 +49,10 @@ export class AudioInputService {
 
     this.electron.bind('noise-threshold-changed', (event: Object, dBValue: number) => {
       console.log(`Noise threshold changed to ${dBValue}`);
-      this.noiseThreshold = dBValue;
+      this.currThreshold = dBValue;
     });
+
+    this.noiseThreshold = this.store.getItem('dbThreshold') | 30;
   }
 
   async initVAD(stream: MediaStream) {
@@ -148,6 +151,12 @@ export class AudioInputService {
     this.initVADWithStream(this.media.getDeviceId(microphoneName, 'audioinput'), autostart);
     this.muted = !autostart;
   }
+
+  set currThreshold(thresh: number) {
+    this.noiseThreshold = thresh;
+    this.store.setItem('dbThreshold', thresh);
+  }
+
   convertToInt16(audio: Float32Array) {
     for (let i = 0; i < audio.length; i++) {
       audio[i] = audio[i] * 32768.0;

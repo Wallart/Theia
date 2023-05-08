@@ -111,7 +111,7 @@ export class SettingsComponent {
     if (this.electron.isElectronApp) {
       this.electron.send('noise-threshold', this.selectedNoiseThreshold);
     } else {
-      this.audioInput.noiseThreshold = this.selectedNoiseThreshold;
+      this.audioInput.currThreshold = this.selectedNoiseThreshold;
       this.router.navigate(['/']);
     }
   }
