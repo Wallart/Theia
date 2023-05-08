@@ -9,7 +9,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "unpack-vad": "mv dist/theia/vad/* dist/theia/.; rm -r dist/theia/vad",
-    "electron": "ng build && yarn run unpack-vad && electron .",
+    "electron": "ng build --configuration development && yarn run unpack-vad && electron . --remote-debugging-port=5858",
     "forge-start": "electron-forge start",
     "forge-package": "electron-forge package",
     "forge-make": "electron-forge make"
