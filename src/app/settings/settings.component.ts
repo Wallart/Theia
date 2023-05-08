@@ -1,4 +1,5 @@
 import { Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { Component, ViewChild } from '@angular/core';
 import { MediaService } from '../services/media.service';
 import { ElectronService } from '../services/electron.service';
@@ -22,13 +23,14 @@ export class SettingsComponent {
   selectedCamDevice: string;
 
   constructor(private media: MediaService, private audioInput: AudioInputService, private audioSink: AudioSinkService,
-              private electron: ElectronService, private router: Router) {
+              private electron: ElectronService, private router: Router, private title: Title) {
     this.selectedInDevice = this.audioInput.selectedMicrophone;
     this.selectedOutDevice = this.audioSink.selectedSpeakers;
     this.selectedCamDevice = '';
   }
 
   ngOnInit() {
+    this.title.setTitle('Settings');
     this.media.microphones$.subscribe((data) => {
       if (data.length > 0) {
         this.inDevices = data;
@@ -56,36 +58,45 @@ export class SettingsComponent {
   }
 
   ngAfterViewInit() {
-    this.audioInput.noiseLevel$.subscribe((dbs) => {
-      const maxDbs = 100;
-      const checks = this.inputLevel.nativeElement.getElementsByTagName('span');
-      const activeChecks = Math.min(dbs, maxDbs) * checks.length / maxDbs;
-      for (let i=0; i < checks.length; i++) {
-        if (i < activeChecks) {
-          checks[i].setAttribute('class', 'activeLevel');
-        } else {
-          checks[i].setAttribute('class', '');
-        }
+    if (!this.electron.isElectronApp) {
+      this.audioInput.noiseLevel$.subscribe((dbs) => this.onNoiseLevelChanged(dbs));
+    }
+  }
+
+  onNoiseLevelChanged(dbs: number) {
+    const maxDbs = 100;
+    const checks = this.inputLevel.nativeElement.getElementsByTagName('span');
+    const activeChecks = Math.min(dbs, maxDbs) * checks.length / maxDbs;
+    for (let i=0; i < checks.length; i++) {
+      if (i < activeChecks) {
+        checks[i].setAttribute('class', 'activeLevel');
+      } else {
+        checks[i].setAttribute('class', '');
       }
-    });
+    }
   }
 
   onInDeviceChanged() {
-    this.audioInput.currMicrophone = this.selectedInDevice;
-    if (!this.electron.isElectronApp) {
+    if (this.electron.isElectronApp) {
+      this.electron.send('in-device', this.selectedInDevice);
+    } else {
+      this.audioInput.currMicrophone = this.selectedInDevice;
       this.router.navigate(['/']);
     }
   }
 
   onOutDeviceChanged() {
-    this.audioSink.currSpeakers = this.selectedOutDevice;
-    if (!this.electron.isElectronApp) {
+    if (this.electron.isElectronApp) {
+      this.electron.send('out-device', this.selectedOutDevice);
+    } else {
+      this.audioSink.currSpeakers = this.selectedOutDevice;
       this.router.navigate(['/']);
     }
   }
 
   onCamChanged() {
-    if (!this.electron.isElectronApp) {
+    if (this.electron.isElectronApp) {
+    } else {
       this.router.navigate(['/']);
     }
   }

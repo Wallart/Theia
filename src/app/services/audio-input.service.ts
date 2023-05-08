@@ -36,6 +36,11 @@ export class AudioInputService {
         this.initVADWithStream(data[0].deviceId, !this.muted);
       }
     });
+
+    this.electron.bind('in-device-changed', (event: Object, device: string) => {
+      console.log(`Input device changed to ${device}`);
+      this.currMicrophone = device;
+    });
   }
 
   async initVAD(stream: MediaStream) {

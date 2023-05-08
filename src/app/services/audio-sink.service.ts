@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MediaService } from './media.service';
+import { ElectronService } from './electron.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class AudioSinkService {
   queue: any[];
   selectedSpeakers: string = '';
 
-  constructor(private media: MediaService) {
+  constructor(private media: MediaService, private electron: ElectronService) {
     this.busy = false;
     this.queue = [];
     this.sampleRate = 24000;
@@ -23,6 +24,11 @@ export class AudioSinkService {
         this.selectedSpeakers = data[0].label;
         // this.audioCtx.setSinkId(data[0].deviceId);
       }
+    });
+
+    this.electron.bind('out-device-changed', (event: Object, device: string) => {
+      console.log(`Output device changed to ${device}`);
+      this.currSpeakers = device;
     });
   }
 

@@ -27,6 +27,13 @@ export class ElectronService {
     this.ipc.send(channel, ...args);
   }
 
+  public bind(eventName: string, func: any) {
+    if (!this.ipc) {
+      return;
+    }
+    this.ipc.on(eventName, func);
+  }
+
   public writeToClipboard(text: string) {
     if (!this.clipboard) {
       return;
