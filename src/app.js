@@ -4,6 +4,7 @@ const url = require('url');
 
 let mainWin = null;
 let settingsWin = null;
+let feedbackWin = null;
 
 const createMainWindow = () => {
   if (mainWin === null || mainWin.isDestroyed()) {
@@ -43,9 +44,30 @@ const createSettingsWindow = () => {
   }
 }
 
+const createFeedbackWindow = () => {
+  if (feedbackWin === null || feedbackWin.isDestroyed()) {
+    feedbackWin = new BrowserWindow({
+      parent: mainWin,
+      width: 640,
+      height: 480,
+      resizable: false,
+      fullscreen: false,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+      }
+    });
+    const popupUrl = path.join(__dirname, '../dist/theia/index.html#/video');
+    feedbackWin.on('closed', () => createFeedbackWindow());
+    feedbackWin.loadURL(`file://${popupUrl}`);
+    feedbackWin.hide();
+  }
+}
+
 const createWindows = () => {
   createMainWindow();
   createSettingsWindow();
+  createFeedbackWindow();
 }
 
 
@@ -71,12 +93,28 @@ ipcMain.on('open-settings', () => {
   }
 });
 
+ipcMain.on('open-video', () => {
+  if (feedbackWin.isVisible()) {
+    feedbackWin.focus();
+  } else {
+    feedbackWin.show();
+  }
+});
+
 ipcMain.on('in-device', (event, args) => {
   mainWin.webContents.send('in-device-changed', args);
 });
 
 ipcMain.on('out-device', (event, args) => {
   mainWin.webContents.send('out-device-changed', args);
+});
+
+ipcMain.on('cam-device', (event, args) => {
+  mainWin.webContents.send('cam-device-changed', args);
+});
+
+ipcMain.on('video-stream', (event, args) => {
+  feedbackWin.webContents.send('video-stream-received', args);
 });
 
 ipcMain.on('noise-threshold', (event, args) => {

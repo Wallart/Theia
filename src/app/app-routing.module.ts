@@ -2,11 +2,13 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MainComponent } from './main/main.component';
 import { SettingsComponent } from './settings/settings.component';
+import { VideoFeedbackComponent } from './video-feedback/video-feedback.component';
 
 
 export const ROUTES: Routes = [
   {path: '', component: MainComponent},
-  {path: 'settings', component: SettingsComponent}
+  {path: 'settings', component: SettingsComponent},
+  {path: 'video', component: VideoFeedbackComponent}
 ];
 
 @NgModule({

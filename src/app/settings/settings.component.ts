@@ -5,6 +5,7 @@ import { MediaService } from '../services/media.service';
 import { ElectronService } from '../services/electron.service';
 import { AudioSinkService } from '../services/audio-sink.service';
 import { AudioInputService } from '../services/audio-input.service';
+import { VideoInputService } from '../services/video-input.service';
 
 @Component({
   selector: 'app-settings',
@@ -25,10 +26,11 @@ export class SettingsComponent {
   maxDbs = 110;
 
   constructor(private media: MediaService, private audioInput: AudioInputService, private audioSink: AudioSinkService,
-              private electron: ElectronService, private router: Router, private title: Title) {
+              private electron: ElectronService, private router: Router, private title: Title,
+              private videoInput: VideoInputService) {
     this.selectedInDevice = this.audioInput.selectedMicrophone;
     this.selectedOutDevice = this.audioSink.selectedSpeakers;
-    this.selectedCamDevice = '';
+    this.selectedCamDevice = this.videoInput.selectedCamera;
     this.selectedNoiseThreshold = this.audioInput.noiseThreshold;
   }
 
@@ -102,7 +104,9 @@ export class SettingsComponent {
 
   onCamChanged() {
     if (this.electron.isElectronApp) {
+      this.electron.send('cam-device', this.selectedCamDevice);
     } else {
+      this.videoInput.currCamera = this.selectedCamDevice;
       this.router.navigate(['/']);
     }
   }

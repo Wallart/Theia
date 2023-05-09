@@ -11,6 +11,7 @@ import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
 import { BottomBarComponent } from './main/bottom-bar/bottom-bar.component';
 import { ChatHistoryComponent } from './main/chat-history/chat-history.component';
 import { ButtonsAreaComponent } from './main/buttons-area/buttons-area.component';
+import { VideoFeedbackComponent } from './video-feedback/video-feedback.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { ButtonsAreaComponent } from './main/buttons-area/buttons-area.component
     TopBarComponent,
     BottomBarComponent,
     SettingsComponent,
-    MainComponent
+    MainComponent,
+    VideoFeedbackComponent
   ],
   imports: [
       BrowserModule,

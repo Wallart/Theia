@@ -5,7 +5,8 @@ import { ElectronService } from '../../services/electron.service';
 import { HyperionService } from '../../services/hyperion.service';
 import { AudioSinkService } from '../../services/audio-sink.service';
 import { AudioInputService } from '../../services/audio-input.service';
-import {LocalStorageService} from "../../services/local-storage.service";
+import { LocalStorageService } from '../../services/local-storage.service';
+import { VideoInputService } from '../../services/video-input.service';
 
 @Component({
   selector: 'bottom-bar',
@@ -18,14 +19,16 @@ export class BottomBarComponent {
   message: string = '';
   username: string = '';
 
+  cameraMuted: boolean;
   microphoneMuted: boolean;
   speakersMuted: boolean;
 
   constructor(private electron: ElectronService, private chat: ChatService, private hyperion: HyperionService,
               private audioSink: AudioSinkService, private audioInput: AudioInputService, private router: Router,
-              private store: LocalStorageService) {
+              private store: LocalStorageService, private videoInput: VideoInputService) {
     this.microphoneMuted = this.audioInput.muted;
     this.speakersMuted = this.audioSink.muted;
+    this.cameraMuted = this.videoInput.muted;
   }
 
   ngOnInit() {
@@ -84,6 +87,20 @@ export class BottomBarComponent {
       this.audioSink.mute();
     } else {
       this.audioSink.unmute();
+    }
+  }
+
+  toggleCam() {
+    this.cameraMuted = !this.cameraMuted;
+    if (this.cameraMuted) {
+      this.videoInput.closeCamera();
+    } else {
+      if (this.electron.isElectronApp) {
+        this.electron.send('open-video');
+      } else {
+        this.router.navigate(['/video']);
+      }
+      this.videoInput.openCamera();
     }
   }
 

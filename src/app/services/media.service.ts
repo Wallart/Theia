@@ -58,4 +58,9 @@ export class MediaService {
     constraints[deviceType] = { deviceId: deviceId };
     return navigator.mediaDevices.getUserMedia(constraints);
   }
+
+  getVideoStream(streamId: any) {
+    const constraints: any = { video: { mediaSource: streamId }, audio: false };
+    return navigator.mediaDevices.getUserMedia(constraints);
+  }
 }
