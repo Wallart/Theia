@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { MediaService } from '../services/media.service';
 import { ElectronService } from '../services/electron.service';
 import { VideoInputService } from '../services/video-input.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-video-feedback',
@@ -11,7 +12,12 @@ import { VideoInputService } from '../services/video-input.service';
 export class VideoFeedbackComponent {
   @ViewChild('video') videoElement: any;
 
-  constructor(private videoInput: VideoInputService, private electron: ElectronService, private media: MediaService) {}
+  constructor(private videoInput: VideoInputService, private electron: ElectronService, private media: MediaService,
+              private title: Title) {}
+
+  ngOnInit() {
+    this.title.setTitle('Video feedback');
+  }
 
   ngAfterViewInit() {
     if (this.electron.isElectronApp) {
