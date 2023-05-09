@@ -50,7 +50,7 @@ const createFeedbackWindow = () => {
       parent: mainWin,
       width: 640,
       height: 480,
-      resizable: false,
+      resizable: true,
       fullscreen: false,
       webPreferences: {
         nodeIntegration: true,
