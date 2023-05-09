@@ -77,6 +77,12 @@ export class AudioInputService {
       .catch(console.error);
   }
 
+  onVADMisfire() {
+    console.log('VAD is fired ?');
+    this.speaking = false;
+    this.speaking$.next(this.speaking);
+  }
+
   onSpeechStart() {
     console.log('Speech started.');
     this.speaking = true;
@@ -124,10 +130,6 @@ export class AudioInputService {
     }
   }
 
-  onVADMisfire() {
-    console.log('VAD is fired ?');
-  }
-
   openMicrophone() {
     this.muted = false;
     if (this.activityDetector !== undefined) {
@@ -140,6 +142,9 @@ export class AudioInputService {
     if (this.activityDetector !== undefined) {
       this.activityDetector.pause();
     }
+
+    this.speaking = false;
+    this.speaking$.next(this.speaking);
   }
 
   set currMicrophone(microphoneName: string) {
