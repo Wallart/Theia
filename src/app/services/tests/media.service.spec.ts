@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { HyperionService } from './hyperion.service';
+import { MediaService } from '../media.service';
 
-describe('HyperionService', () => {
-  let service: HyperionService;
+describe('MediaService', () => {
+  let service: MediaService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(HyperionService);
+    service = TestBed.inject(MediaService);
   });
 
   it('should be created', () => {

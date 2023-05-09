@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { VideoInputService } from './video-input.service';
+import { ElectronService } from '../electron.service';
 
-describe('VideoInputService', () => {
-  let service: VideoInputService;
+describe('ElectronService', () => {
+  let service: ElectronService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(VideoInputService);
+    service = TestBed.inject(ElectronService);
   });
 
   it('should be created', () => {

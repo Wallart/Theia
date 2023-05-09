@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { AudioInputService } from './audio-input.service';
+import { LocalStorageService } from '../local-storage.service';
 
-describe('AudioInputService', () => {
-  let service: AudioInputService;
+describe('LocalStorageService', () => {
+  let service: LocalStorageService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(AudioInputService);
+    service = TestBed.inject(LocalStorageService);
   });
 
   it('should be created', () => {

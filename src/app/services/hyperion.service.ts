@@ -70,6 +70,18 @@ export class HyperionService {
     return this.http.post(`${this.targetUrl}/chat`, payload, this.getHttpOptions());
   }
 
+  sendImage(image: Blob, width: number, height: number) {
+    const payload = new FormData();
+    // @ts-ignore
+    payload.append('frame', image);
+    const options: any = this.getHttpOptions();
+    options.headers = options.headers.set('framewidth', `${width}`);
+    options.headers = options.headers.set('frameheight', `${height}`);
+    options.headers = options.headers.set('framechannels', '3');
+
+    return this.http.post(`${this.targetUrl}/video`, payload, options);
+  }
+
   sendAudio(audio: Int16Array) {
     const payload = new FormData();
     payload.append('audio', new Blob([audio]));
