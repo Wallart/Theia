@@ -94,6 +94,9 @@ export class BottomBarComponent {
     this.cameraMuted = !this.cameraMuted;
     if (this.cameraMuted) {
       this.videoInput.closeCamera();
+      if (this.electron.isElectronApp) {
+        this.electron.send('close-video');
+      }
     } else {
       if (this.electron.isElectronApp) {
         this.electron.send('open-video');

@@ -101,6 +101,12 @@ ipcMain.on('open-video', () => {
   }
 });
 
+ipcMain.on('close-video', () => {
+  if (feedbackWin !== null) {
+    feedbackWin.close();
+  }
+});
+
 ipcMain.on('in-device', (event, args) => {
   mainWin.webContents.send('in-device-changed', args);
 });
