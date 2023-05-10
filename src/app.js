@@ -1,10 +1,21 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, systemPreferences, globalShortcut } = require('electron')
 const path = require('path');
 const url = require('url');
 
+let running = true;
 let mainWin = null;
 let settingsWin = null;
 let feedbackWin = null;
+
+if (systemPreferences.getMediaAccessStatus('microphone') !== 'granted') {
+  systemPreferences.askForMediaAccess('microphone')
+    .then((res) => console.log(`Microphone access granted: ${res}`));
+}
+
+if (systemPreferences.getMediaAccessStatus('camera') !== 'granted') {
+  systemPreferences.askForMediaAccess('camera')
+    .then((res) => console.log(`Camera access granted: ${res}`));
+}
 
 const createMainWindow = () => {
   if (mainWin === null || mainWin.isDestroyed()) {
@@ -18,7 +29,9 @@ const createMainWindow = () => {
     })
 
     const url = path.join(__dirname, '../dist/theia/index.html');
-    mainWin.on('closed', () => createMainWindow());
+    mainWin.on('closed', () => {
+      if (running) createMainWindow();
+    });
     mainWin.loadURL(`file://${url}`);
     mainWin.hide();
   }
@@ -38,7 +51,9 @@ const createSettingsWindow = () => {
       }
     });
     const popupUrl = path.join(__dirname, '../dist/theia/index.html#/settings');
-    settingsWin.on('closed', () => createSettingsWindow());
+    settingsWin.on('closed', () => {
+      if (running) createSettingsWindow();
+    });
     settingsWin.loadURL(`file://${popupUrl}`);
     settingsWin.hide();
   }
@@ -58,7 +73,9 @@ const createFeedbackWindow = () => {
       }
     });
     const popupUrl = path.join(__dirname, '../dist/theia/index.html#/video');
-    feedbackWin.on('closed', () => createFeedbackWindow());
+    feedbackWin.on('closed', () => {
+      if (running) createFeedbackWindow();
+    });
     feedbackWin.loadURL(`file://${popupUrl}`);
     feedbackWin.hide();
   }
@@ -83,6 +100,13 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('before-quit', () => {
+  running = false;
+  mainWin.destroy();
+  feedbackWin.destroy();
+  settingsWin.destroy();
 });
 
 ipcMain.on('open-settings', () => {
@@ -128,6 +152,8 @@ ipcMain.on('noise-threshold', (event, args) => {
 });
 
 ipcMain.on('current-noise', (event, args) => {
-  settingsWin.webContents.send('current-noise-changed', args);
+  if (running) {
+    settingsWin.webContents.send('current-noise-changed', args);
+  }
 });
 
