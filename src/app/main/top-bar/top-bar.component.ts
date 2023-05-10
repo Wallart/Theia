@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { HyperionService } from '../../services/hyperion.service';
+import { LocalStorageService } from '../../services/local-storage.service';
 
 
 @Component({
@@ -14,9 +15,13 @@ export class TopBarComponent {
   selectedPrompt: string;
   state: string;
 
-  constructor(public hyperion: HyperionService) {
-    this.selectedModel = '';
-    this.selectedPrompt = '';
+  constructor(public hyperion: HyperionService, private store: LocalStorageService) {
+    this.selectedModel = this.store.getItem('model') !== null ? this.store.getItem('model') : '';
+    this.hyperion.model = this.selectedModel;
+
+    this.selectedPrompt = this.store.getItem('prompt') !== null ? this.store.getItem('prompt') : '';
+    this.hyperion.prompt = this.selectedPrompt;
+
     this.models = [];
     this.prompts = [];
     this.state = 'offline';
@@ -24,18 +29,28 @@ export class TopBarComponent {
 
   ngOnInit() {
     this.hyperion.getModels().subscribe((res) => this.models = res);
-    this.hyperion.getModel().subscribe((res) => this.selectedModel = res as string);
+    this.hyperion.getModel().subscribe((res) => {
+      if (this.selectedModel === '') {
+        this.selectedModel = res as string;
+      }
+    });
 
     this.hyperion.getPrompts().subscribe((res) => this.prompts = res);
-    this.hyperion.getPrompt().subscribe((res) => this.selectedPrompt = res as string);
+    this.hyperion.getPrompt().subscribe((res) => {
+      if (this.selectedPrompt === '') {
+        this.selectedPrompt = res as string;
+      }
+    });
     this.hyperion.getState().subscribe((res) => this.state = 'online');
   }
 
   onModelChanged() {
     this.hyperion.model = this.selectedModel;
+    this.store.setItem('model', this.selectedModel);
   }
 
   onPromptChanged() {
     this.hyperion.prompt = this.selectedPrompt;
+    this.store.setItem('prompt', this.selectedPrompt);
   }
 }
