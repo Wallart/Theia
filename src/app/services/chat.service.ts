@@ -1,6 +1,8 @@
+import { v4 as uuidv4 } from 'uuid';
 import { Injectable } from '@angular/core';
 import { HyperionService } from './hyperion.service';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,10 +11,47 @@ export class ChatService {
   private messages: any[] = [];
   private messagesSubject = new BehaviorSubject<any[]>(this.messages);
 
+  public activeUuid: string = '';
+  public messagesGroups: {[key:string]: [string, any[]]} = {};
   public messages$: Observable<any[]> = this.messagesSubject.asObservable();
 
-  constructor(private hyperion: HyperionService) {
-    // this.mockData();
+  constructor(private hyperion: HyperionService, private store: LocalStorageService) {
+    let uuid: string;
+    const chatHistory = this.store.getItem('chat');
+    if (chatHistory === null) {
+      uuid = this.newChat();
+    } else {
+      this.messagesGroups = JSON.parse(chatHistory);
+      uuid = this.store.getItem('activeChat');
+      if (uuid === null) {
+        uuid = Object.keys(this.messagesGroups)[0];
+      }
+    }
+    this.activeChat = uuid;
+  }
+
+  rename(uuid: string, name: string) {
+    this.messagesGroups[uuid][0] = name;
+    this.save();
+  }
+
+  newChat(): string {
+    const uuid = uuidv4();
+    this.messagesGroups[uuid] = ['New view', []];
+    this.save()
+    return uuid;
+  }
+
+  removeChat(uuid: string) {
+    delete this.messagesGroups[uuid];
+    this.save()
+  }
+
+  set activeChat(uuid: string) {
+    this.activeUuid = uuid;
+    this.messages = this.messagesGroups[uuid][1];
+    this.messagesSubject.next(this.messages);
+    this.store.setItem('activeChat', this.activeUuid);
   }
 
   mockData() {
@@ -46,6 +85,7 @@ export class ChatService {
   clear() {
     this.messages.splice(0);
     this.messagesSubject.next(this.messages);
+    this.save()
   }
 
   add(username: string, role: string, content: string[], date: any) {
@@ -57,6 +97,7 @@ export class ChatService {
       this.messages.push({ username: username, role: role, date: date, content: content })
     }
     this.messagesSubject.next(this.messages);
+    this.save()
   }
 
   addUserMsg(username: string, content: string[], date: any) {
@@ -67,5 +108,10 @@ export class ChatService {
     this.hyperion.getName().subscribe((botName: string) => {
       this.add(botName, 'bot', content, date);
     });
+  }
+
+  save() {
+    this.store.setItem('chat', JSON.stringify(this.messagesGroups));
+    this.store.setItem('activeChat', this.activeUuid);
   }
 }

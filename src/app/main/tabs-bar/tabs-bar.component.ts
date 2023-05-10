@@ -1,0 +1,74 @@
+import { Component } from '@angular/core';
+import { ChatService } from '../../services/chat.service';
+
+@Component({
+  selector: 'tabs-bar',
+  templateUrl: './tabs-bar.component.html',
+  styleUrls: ['./tabs-bar.component.css']
+})
+export class TabsBarComponent {
+
+  tabs: any[] = [];
+
+  constructor(private chat: ChatService) {
+    // @ts-ignore
+    for (let key in this.chat.messagesGroups) {
+      const group = this.chat.messagesGroups[key];
+      const active = key === this.chat.activeUuid;
+      this.tabs.push({ uuid: key, name: group[0], active: active});
+    }
+  }
+
+  activeTab(uuid: string) {
+    for (const tab of this.tabs) {
+      tab.active = tab.uuid === uuid;
+    }
+  }
+
+  onNewTab() {
+    const uuid = this.chat.newChat();
+    this.chat.activeChat = uuid;
+    const chat = this.chat.messagesGroups[uuid];
+    this.tabs.push({ uuid: uuid, name: chat[0], active: true});
+    this.activeTab(uuid);
+  }
+
+  onTabClose(uuid: string) {
+    if (this.tabs.length < 2) return;
+
+    let changeRequired = false;
+    for (let i=0; i < this.tabs.length; i++) {
+      const tab = this.tabs[i];
+      if (tab.uuid === uuid) {
+        if (tab.active) changeRequired = true;
+        this.tabs.splice(i, 1);
+        this.chat.removeChat(tab.uuid);
+        break;
+      }
+    }
+
+    if (changeRequired) {
+      this.tabs[0].active = true;
+      this.chat.activeChat = this.tabs[0].uuid;
+    }
+  }
+
+  onClick(uuid: string) {
+    this.activeTab(uuid);
+    this.chat.activeChat = uuid;
+  }
+
+  onDblClick(event: any) {
+    event.target.removeAttribute('readonly');
+  }
+
+  onFocusOut(event: any, uuid:string) {
+    event.target.setAttribute('readonly', '');
+    if (event.target.value !== '') {
+      const name = event.target.value;
+      this.chat.rename(uuid, name);
+      event.target.placeholder = name;
+      event.target.value = '';
+    }
+  }
+}

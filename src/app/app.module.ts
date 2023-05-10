@@ -12,6 +12,7 @@ import { BottomBarComponent } from './main/bottom-bar/bottom-bar.component';
 import { ChatHistoryComponent } from './main/chat-history/chat-history.component';
 import { ButtonsAreaComponent } from './main/buttons-area/buttons-area.component';
 import { VideoFeedbackComponent } from './video-feedback/video-feedback.component';
+import { TabsBarComponent } from './main/tabs-bar/tabs-bar.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { VideoFeedbackComponent } from './video-feedback/video-feedback.componen
     BottomBarComponent,
     SettingsComponent,
     MainComponent,
-    VideoFeedbackComponent
+    VideoFeedbackComponent,
+    TabsBarComponent
   ],
   imports: [
       BrowserModule,

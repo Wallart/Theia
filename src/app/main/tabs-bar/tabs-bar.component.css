@@ -1,0 +1,89 @@
+#tabs-bar {
+  margin-top: 10px;
+  display: flex;
+}
+
+#new-tab, #tabs-container {
+  height: 30px;
+  /*border: 1px solid yellowgreen;*/
+  display: inline-block;
+}
+
+.vertical-sep {
+  /*width: 2px;*/
+  background-color: #7D7E7F;
+  /*border: 1px solid crimson;*/
+  margin: 0 10px 0 5px;
+}
+
+#tabs-container {
+  flex: 1;
+  white-space: nowrap;
+  overflow-x: scroll;
+}
+
+.icon-aligner {
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+}
+
+.button {
+  /*border:1px solid white;*/
+  cursor: pointer;
+  border-radius: 5px;
+  width: 31px;
+  display: table-cell;
+  text-align: center;
+}
+
+.button:hover {
+  background-color: #313436;
+}
+
+.button-icon {
+  vertical-align: middle;
+  width: 24px;
+  height: 24px;
+}
+
+.tab {
+  width: 120px;
+  margin-right: 5px;
+  border: 2px #7D7E7F solid;
+  border-radius: 5px;
+  background-color: #2c2d30;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center; /*vertical align flexed elements*/
+  /*overflow: hidden;*/
+}
+
+.tab-selected {
+  border: 2px white solid;
+}
+
+.tab-selected input::placeholder {
+  color: white;
+}
+
+.tab .button {
+  display: inline-block;
+}
+
+input {
+  cursor: default;
+  display: inline-block;
+  flex: 1;
+  width: 90%;
+  height: 100%;
+  padding: 0 0 0 5px;
+  border: 0;
+  background-color: #2c2d30;
+  color: white;
+  text-overflow: ellipsis;
+}
+
+input:focus {
+  outline: none;
+}
