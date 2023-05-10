@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MediaService } from './media.service';
 import { ElectronService } from './electron.service';
+import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,11 +11,11 @@ export class AudioSinkService {
   source: any | AudioBufferSourceNode;
   sampleRate: number;
   busy: boolean;
-  muted: boolean = false;
+  muted: boolean;
   queue: any[];
   selectedSpeakers: string = '';
 
-  constructor(private media: MediaService, private electron: ElectronService) {
+  constructor(private media: MediaService, private electron: ElectronService, private store: LocalStorageService) {
     this.busy = false;
     this.queue = [];
     this.sampleRate = 24000;
@@ -30,15 +31,19 @@ export class AudioSinkService {
       console.log(`Output device changed to ${device}`);
       this.currSpeakers = device;
     });
+
+    this.muted = this.store.getItem('speakersMuted') !== null ? JSON.parse(this.store.getItem('speakersMuted')) : false;
   }
 
   mute() {
     this.muted = true;
+    this.store.setItem('speakersMuted', JSON.stringify(this.muted));
     this.stop();
   }
 
   unmute() {
     this.muted = false;
+    this.store.setItem('speakersMuted', JSON.stringify(this.muted));
   }
 
   stop() {

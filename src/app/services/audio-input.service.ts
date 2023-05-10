@@ -16,7 +16,7 @@ export class AudioInputService {
   // sampleRate: number = 16000;
   dbContext: AudioContext | undefined;
   activityDetector: MicVAD | undefined;
-  muted: boolean = true;
+  muted: boolean;
   selectedMicrophone: string = '';
 
   noiseThreshold: number;
@@ -53,6 +53,7 @@ export class AudioInputService {
     });
 
     this.noiseThreshold = this.store.getItem('dbThreshold') | 30;
+    this.muted = this.store.getItem('micMuted') !== null ? JSON.parse(this.store.getItem('micMuted')) : true;
   }
 
   async initVAD(stream: MediaStream) {
@@ -132,6 +133,7 @@ export class AudioInputService {
 
   openMicrophone() {
     this.muted = false;
+    this.store.setItem('micMuted', JSON.stringify(this.muted));
     if (this.activityDetector !== undefined) {
       this.activityDetector.start();
     }
@@ -139,6 +141,7 @@ export class AudioInputService {
 
   closeMicrophone() {
     this.muted = true;
+    this.store.setItem('micMuted', JSON.stringify(this.muted));
     if (this.activityDetector !== undefined) {
       this.activityDetector.pause();
     }
