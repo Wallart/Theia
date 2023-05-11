@@ -3,6 +3,7 @@ import { io } from 'socket.io-client';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ElectronService } from './electron.service';
+import { AudioSinkService } from './audio-sink.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,35 +19,35 @@ export class HyperionService {
   targetUrl: string;
   sid: string = '';
 
-  constructor(private http: HttpClient, private electron: ElectronService) {
+  constructor(private http: HttpClient, private electron: ElectronService, private sink: AudioSinkService) {
     if (electron.isElectronApp) {
       this.targetUrl = 'http://deepbox:6450';
     } else {
       this.targetUrl = 'http://localhost:4200/api';
     }
 
-    // this.socket = io('ws://deepbox:6450');
-    // this.socket.on('connect', () => this.onConnect());
-    // this.socket.on('disconnect', () => this.onDisconnect());
-    // this.socket.on('error', () => this.onError());
-    // this.socket.on('interrupt', () => this.onInterrupt());
+    this.socket = io('ws://deepbox:6450');
+    this.socket.on('connect', () => this.onConnect());
+    this.socket.on('disconnect', () => this.onDisconnect());
+    this.socket.on('error', (err: any) => this.onError(err));
+    this.socket.on('interrupt', (timestamp: number) => this.onInterrupt(timestamp));
   }
 
-  onInterrupt() {
-    debugger;
+  onInterrupt(timestamp: number) {
+    this.sink.interrupt(new Date(timestamp * 1000));
   }
 
   onConnect() {
-    this.sid = this.socket.sid;
-    console.log(`WebSocket connected. ${this.sid}`);
+    this.sid = this.socket.id;
+    console.log(`WebSocket connected with sid : ${this.sid}`);
   }
 
-  onError() {
-    debugger;
+  onError(err: any) {
+    console.error(err);
   }
 
   onDisconnect() {
-    debugger;
+    console.warn('WebSocket connection lost');
   }
 
   private getHttpOptions() {

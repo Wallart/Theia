@@ -14,6 +14,7 @@ export class AudioSinkService {
   muted: boolean;
   queue: any[];
   selectedSpeakers: string = '';
+  interruptStamp: Date = new Date(Date.now());
 
   constructor(private media: MediaService, private electron: ElectronService, private store: LocalStorageService) {
     this.busy = false;
@@ -53,6 +54,11 @@ export class AudioSinkService {
     }
   }
 
+  interrupt(date : Date) {
+    this.interruptStamp = date;
+    this.stop();
+  }
+
   onPlaybackEnd() {
     this.busy = false;
     if (this.queue.length > 0) {
@@ -63,6 +69,10 @@ export class AudioSinkService {
 
   setBuffer(arrayBuffer: ArrayBuffer, date: Date) {
     if (this.muted) {
+      return;
+    }
+
+    if (date < this.interruptStamp) {
       return;
     }
 
