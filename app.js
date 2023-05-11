@@ -152,7 +152,7 @@ ipcMain.on('noise-threshold', (event, args) => {
 });
 
 ipcMain.on('current-noise', (event, args) => {
-  if (running) {
+  if (running && settingsWin.isVisible()) {
     settingsWin.webContents.send('current-noise-changed', args);
   }
 });
