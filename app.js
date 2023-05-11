@@ -72,7 +72,7 @@ const createFeedbackWindow = () => {
         contextIsolation: false,
       }
     });
-    const popupUrl = path.join(__dirname, '../dist/theia/index.html#/video');
+    const popupUrl = path.join(__dirname, 'dist/theia/index.html#/video');
     feedbackWin.on('closed', () => {
       if (running) createFeedbackWindow();
     });
