@@ -52,7 +52,7 @@ export class AudioInputService {
       this.currThreshold = dBValue;
     });
 
-    this.noiseThreshold = this.store.getItem('dbThreshold') | 30;
+    this.noiseThreshold = this.store.getItem('dbThreshold') !== null ? this.store.getItem('dbThreshold') : 30;
     this.muted = this.store.getItem('micMuted') !== null ? JSON.parse(this.store.getItem('micMuted')) : true;
   }
 
