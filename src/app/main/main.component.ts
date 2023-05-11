@@ -18,7 +18,7 @@ export class MainComponent {
       this.lastHeight = element.scrollHeight;
       if (this.initialScrollDone) {
         const scrollHeight = element.scrollHeight;
-        const percentPos = element.scrollTop / scrollHeight;
+        const percentPos = (element.getBoundingClientRect().height + element.scrollTop) / scrollHeight;
         if (percentPos >= this.stickyPos) {
           element.scrollTop = scrollHeight;
         }
