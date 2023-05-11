@@ -1,6 +1,15 @@
 module.exports = {
   packagerConfig: {
-    icon: 'src/assets/icon'
+    icon: 'src/assets/icon',
+    ignore: [
+      '^/.angular$',
+      '^/.vscode$',
+      '^/node_modules$',
+      '^/(angular|proxy.conf|tsconfig|tsconfig.app|tsconfig.spec).json$',
+      '^/forge.config.js$',
+      '^/README.md$',
+      '^/src$'
+    ]
   },
   rebuildConfig: {},
   makers: [

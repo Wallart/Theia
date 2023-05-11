@@ -1,7 +1,7 @@
 {
-  "name": "theia",
+  "name": "Theia",
   "version": "0.0.0",
-  "main": "src/app.js",
+  "main": "app.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json",

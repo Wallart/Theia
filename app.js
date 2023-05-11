@@ -28,7 +28,7 @@ const createMainWindow = () => {
       }
     })
 
-    const url = path.join(__dirname, '../dist/theia/index.html');
+    const url = path.join(__dirname, 'dist/theia/index.html');
     mainWin.on('closed', () => {
       if (running) createMainWindow();
     });
@@ -50,7 +50,7 @@ const createSettingsWindow = () => {
         contextIsolation: false,
       }
     });
-    const popupUrl = path.join(__dirname, '../dist/theia/index.html#/settings');
+    const popupUrl = path.join(__dirname, 'dist/theia/index.html#/settings');
     settingsWin.on('closed', () => {
       if (running) createSettingsWindow();
     });
