@@ -4,6 +4,7 @@
 }
 
 .option-label {
+  user-select: none;
   color: whitesmoke;
   font-family: ".AppleSystemUIFont", serif;
   display: inline-block;
@@ -11,6 +12,7 @@
 }
 
 .device-selector {
+  user-select: none;
   width: 200px;
   text-overflow: ellipsis;
   display: inline-block;

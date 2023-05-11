@@ -4,6 +4,7 @@
 }
 
 input {
+  user-select: none;
   width: 100%;
   height: 100%;
   /*padding: 0 0 0 5px;*/
@@ -37,6 +38,7 @@ input:focus {
 }
 
 .button {
+  user-select: none;
   /*border:1px solid white;*/
   cursor: pointer;
   border-radius: 5px;

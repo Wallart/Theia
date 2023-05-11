@@ -5,6 +5,7 @@
 }
 
 #status-indicator {
+  user-select: none;
   color: whitesmoke;
   font-family: ".AppleSystemUIFont", serif;
 }
@@ -16,6 +17,10 @@
 
 #label {
   margin-right: 5px;
+}
+
+#option-selectors {
+  user-select: none;
 }
 
 #models-selector {

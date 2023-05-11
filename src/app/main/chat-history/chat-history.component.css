@@ -1,5 +1,6 @@
 #chat-frame {
   overflow: scroll;
+  user-select: none;
 }
 
 .copy-button {
@@ -44,7 +45,7 @@
 }
 
 .user {
-  color: #2969d9;
+  color: #4b86f8;
 }
 
 .bot {

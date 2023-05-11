@@ -29,6 +29,7 @@
 }
 
 .button {
+  user-select: none;
   /*border:1px solid white;*/
   cursor: pointer;
   border-radius: 5px;
@@ -72,6 +73,7 @@
 }
 
 input {
+  user-select: none;
   cursor: default;
   display: inline-block;
   flex: 1;
