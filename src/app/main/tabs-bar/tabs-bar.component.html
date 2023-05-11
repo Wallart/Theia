@@ -9,7 +9,8 @@
       <input placeholder="{{ tab.name }}" readonly (click)="onClick(tab.uuid)" (dblclick)="onDblClick($event)" (focusout)="onFocusOut($event, tab.uuid)">
       <div class="button" (click)="onTabClose(tab.uuid)">
         <div class="icon-aligner"></div>
-        <img class="button-icon" src="assets/xmark.svg">
+        <img *ngIf="!tab.active" class="button-icon" src="assets/xmark.svg">
+        <img *ngIf="tab.active" class="button-icon" src="assets/xmark-active.svg">
       </div>
     </div>
   </div>
