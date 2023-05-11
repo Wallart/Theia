@@ -2,6 +2,8 @@ const { app, BrowserWindow, ipcMain, systemPreferences, globalShortcut } = requi
 const path = require('path');
 const url = require('url');
 
+const bounceId = app.dock.bounce('critical');
+
 let running = true;
 let mainWin = null;
 let settingsWin = null;
@@ -22,6 +24,7 @@ const createMainWindow = () => {
     mainWin = new BrowserWindow({
       width: 800,
       height: 600,
+      acceptFirstMouse: true,
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
@@ -43,6 +46,7 @@ const createSettingsWindow = () => {
       parent: mainWin,
       width: 344,
       height: 240,
+      acceptFirstMouse: true,
       resizable: false,
       fullscreen: false,
       webPreferences: {
@@ -65,6 +69,7 @@ const createFeedbackWindow = () => {
       parent: mainWin,
       width: 640,
       height: 480,
+      acceptFirstMouse: true,
       resizable: true,
       fullscreen: false,
       webPreferences: {
@@ -90,14 +95,10 @@ const createWindows = () => {
 
 app.whenReady().then(() => {
   createWindows();
-  mainWin.show();
-
-  app.on('activate', () => {
-    mainWin.show();
-    // if (BrowserWindow.getAllWindows().length === 0) createWindows();
-  });
+  mainWin.webContents.on('did-finish-load', () => mainWin.show());
 });
 
+app.on('activate', () => mainWin.show());
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
