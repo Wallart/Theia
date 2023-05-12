@@ -36,29 +36,26 @@ export class SettingsComponent {
 
   ngOnInit() {
     this.title.setTitle('Settings');
+
     this.media.microphones$.subscribe((data) => {
-      if (data.length > 0) {
-        this.inDevices = data;
-        if (this.selectedInDevice === '') {
-          this.selectedInDevice = data[0].label;
-        }
-      }
+      if (data.length > 0) this.inDevices = data;
     });
+    this.audioInput.selectedMicrophone$.subscribe((data) => {
+      this.selectedInDevice = data;
+    });
+
     this.media.speakers$.subscribe((data) => {
-      if (data.length > 0) {
-        this.outDevices = data;
-        if (this.selectedOutDevice === '') {
-          this.selectedOutDevice = data[0].label;
-        }
-      }
+      if (data.length > 0) this.outDevices = data;
     });
+    this.audioSink.selectedSpeakers$.subscribe((data) => {
+      this.selectedOutDevice = data;
+    });
+
     this.media.cameras$.subscribe((data) => {
-      if (data.length > 0) {
-        this.cameraDevices = data;
-        if (this.selectedCamDevice === '') {
-          this.selectedCamDevice = data[0].label;
-        }
-      }
+      if (data.length > 0) this.cameraDevices = data;
+    });
+    this.videoInput.selectedCamera$.subscribe((data) => {
+      this.selectedCamDevice = data;
     });
   }
 

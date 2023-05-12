@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { MediaService } from './media.service';
 import { ElectronService } from './electron.service';
 import { HyperionService } from './hyperion.service';
+import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,12 +16,25 @@ export class VideoInputService {
   captureTimeout: any;
   timeout = 1000;
   selectedCamera: string = '';
+  selectedCamera$: BehaviorSubject<string> = new BehaviorSubject<string>(this.selectedCamera);
   stream$: BehaviorSubject<any> = new BehaviorSubject<any>(this.stream);
 
-  constructor(private media: MediaService, private electron: ElectronService, private hyperion: HyperionService) {
+  constructor(private media: MediaService, private electron: ElectronService, private hyperion: HyperionService,
+              private store: LocalStorageService) {
     this.media.cameras$.subscribe((data) => {
       if (data.length > 0) {
-        this.selectedCamera = data[0].label;
+        let label = data[0].label;
+        let deviceId = data[0].deviceId;
+        if (this.store.getItem('camera') !== null) {
+          label = this.store.getItem('camera');
+          deviceId = this.media.getDeviceId(label, 'videoinput');
+          if (deviceId === null) label = data[0].label;
+        }
+
+        if (this.selectedCamera !== label) {
+          this.selectedCamera = label;
+          this.selectedCamera$.next(label);
+        }
       }
     });
 
@@ -66,7 +80,7 @@ export class VideoInputService {
           this.hyperion
             .sendImage(imageBlob, width, height)
             .subscribe((res: any) => {
-              this.captureTimeout = setTimeout(() => this.captureFrame(), 1000);
+              this.captureTimeout = setTimeout(() => this.captureFrame(), this.timeout);
             });
         })
         .catch(console.error);
@@ -79,6 +93,7 @@ export class VideoInputService {
     delete this.stream;
 
     this.selectedCamera = cameraName;
+    this.store.setItem('camera', cameraName);
     if (autostart) {
       this.openCamera();
     }

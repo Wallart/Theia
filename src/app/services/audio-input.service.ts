@@ -18,6 +18,7 @@ export class AudioInputService {
   activityDetector: MicVAD | undefined;
   muted: boolean;
   selectedMicrophone: string = '';
+  selectedMicrophone$: BehaviorSubject<string> = new BehaviorSubject<string>(this.selectedMicrophone);
 
   noiseThreshold: number;
   noiseLevel: number = 0;
@@ -37,8 +38,22 @@ export class AudioInputService {
 
     this.media.microphones$.subscribe((data) => {
       if (data.length > 0) {
-        this.selectedMicrophone = data[0].label;
-        this.initVADWithStream(data[0].deviceId, !this.muted);
+        let label = data[0].label;
+        let deviceId = data[0].deviceId;
+        if (this.store.getItem('microphone') !== null) {
+          label = this.store.getItem('microphone');
+          deviceId = this.media.getDeviceId(label, 'audioinput');
+          if (deviceId === null) {
+            label = data[0].label;
+            deviceId = data[0].deviceId;
+          }
+        }
+
+        if (this.selectedMicrophone !== label) {
+          this.selectedMicrophone = label;
+          this.selectedMicrophone$.next(label);
+          this.initVADWithStream(deviceId, !this.muted);
+        }
       }
     });
 
@@ -156,6 +171,7 @@ export class AudioInputService {
     delete this.activityDetector;
 
     this.selectedMicrophone = microphoneName;
+    this.store.setItem('microphone', microphoneName);
     this.initVADWithStream(this.media.getDeviceId(microphoneName, 'audioinput'), autostart);
     this.muted = !autostart;
   }

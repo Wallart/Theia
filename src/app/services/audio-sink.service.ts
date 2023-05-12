@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { MediaService } from './media.service';
 import { ElectronService } from './electron.service';
 import { LocalStorageService } from './local-storage.service';
+import {BehaviorSubject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,7 @@ export class AudioSinkService {
   muted: boolean;
   queue: any[];
   selectedSpeakers: string = '';
+  selectedSpeakers$: BehaviorSubject<string> = new BehaviorSubject<string>(this.selectedSpeakers);
   interruptStamp: Date = new Date(Date.now());
 
   constructor(private media: MediaService, private electron: ElectronService, private store: LocalStorageService) {
@@ -23,8 +25,22 @@ export class AudioSinkService {
     this.audioCtx = new window.AudioContext({ sampleRate: this.sampleRate });
     this.media.speakers$.subscribe((data) => {
       if (data.length > 0) {
-        this.selectedSpeakers = data[0].label;
-        // this.audioCtx.setSinkId(data[0].deviceId);
+        let label = data[0].label;
+        let deviceId = data[0].deviceId;
+        if (this.store.getItem('speakers') !== null) {
+          label = this.store.getItem('speakers');
+          deviceId = this.media.getDeviceId(label, 'audiooutput');
+          if (deviceId === null) {
+            label = data[0].label;
+            deviceId = data[0].deviceId;
+          }
+        }
+
+        if (this.selectedSpeakers !== label) {
+          this.selectedSpeakers = label;
+          this.selectedSpeakers$.next(label);
+          this.audioCtx.setSinkId(deviceId);
+        }
       }
     });
 
@@ -109,6 +125,7 @@ export class AudioSinkService {
 
   set currSpeakers(speakersName: string) {
     this.selectedSpeakers = speakersName;
+    this.store.setItem('speakers', speakersName);
     const deviceId = this.media.getDeviceId(speakersName, 'audiooutput');
     this.audioCtx.setSinkId(deviceId);
   }
