@@ -1,11 +1,12 @@
+import { BehaviorSubject } from 'rxjs';
+import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { MicVAD } from '@ricky0123/vad-web';
 import { ChatService } from './chat.service';
-import { HyperionService } from './hyperion.service';
-import { AudioSinkService } from './audio-sink.service';
 import { MediaService } from './media.service';
 import { ElectronService } from './electron.service';
-import { BehaviorSubject } from 'rxjs';
+import { HyperionService } from './hyperion.service';
+import { AudioSinkService } from './audio-sink.service';
 import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
@@ -28,8 +29,9 @@ export class AudioInputService {
 
 
   constructor(private hyperion: HyperionService, private chat: ChatService, private sink: AudioSinkService,
-              private media: MediaService, private electron: ElectronService, private store: LocalStorageService) {
-    if (this.electron.isElectronApp) {
+              private media: MediaService, private electron: ElectronService, private store: LocalStorageService,
+              private router: Router) {
+    if (this.electron.isElectronApp && this.router.url === '/') {
       const ort = require('onnxruntime-web');
       const rootUrl = `${window.location.protocol}${window.location.pathname}`;
       ort.env.wasm.wasmPaths = rootUrl;
@@ -81,6 +83,8 @@ export class AudioInputService {
   }
 
   initVADWithStream(deviceId: string, autostart: boolean) {
+    if (this.electron.isElectronApp && this.router.url !== '/') return;
+
     this.media.getDeviceStream(deviceId, 'audio')
       .then((stream) => {
         this.createDbMeter(stream);

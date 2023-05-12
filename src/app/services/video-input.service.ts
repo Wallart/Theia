@@ -1,4 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
+import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { MediaService } from './media.service';
 import { ElectronService } from './electron.service';
@@ -20,7 +21,7 @@ export class VideoInputService {
   stream$: BehaviorSubject<any> = new BehaviorSubject<any>(this.stream);
 
   constructor(private media: MediaService, private electron: ElectronService, private hyperion: HyperionService,
-              private store: LocalStorageService) {
+              private store: LocalStorageService, private router: Router) {
     this.media.cameras$.subscribe((data) => {
       if (data.length > 0) {
         let label = data[0].label;
@@ -45,6 +46,8 @@ export class VideoInputService {
   }
 
   openCamera() {
+    if (this.electron.isElectronApp && this.router.url !== '/') return;
+
     this.muted = false;
     const deviceId = this.media.getDeviceId(this.selectedCamera, 'videoinput')
     this.media.getDeviceStream(deviceId, 'video')

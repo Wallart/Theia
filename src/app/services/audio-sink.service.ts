@@ -1,8 +1,9 @@
+import { BehaviorSubject } from 'rxjs';
+import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { MediaService } from './media.service';
 import { ElectronService } from './electron.service';
 import { LocalStorageService } from './local-storage.service';
-import {BehaviorSubject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -18,11 +19,17 @@ export class AudioSinkService {
   selectedSpeakers$: BehaviorSubject<string> = new BehaviorSubject<string>(this.selectedSpeakers);
   interruptStamp: Date = new Date(Date.now());
 
-  constructor(private media: MediaService, private electron: ElectronService, private store: LocalStorageService) {
+  constructor(private media: MediaService, private electron: ElectronService, private store: LocalStorageService,
+              private router: Router) {
     this.busy = false;
     this.queue = [];
     this.sampleRate = 24000;
-    this.audioCtx = new window.AudioContext({ sampleRate: this.sampleRate });
+
+    this.audioCtx = null;
+    if (!this.electron.isElectronApp || this.router.url === '/') {
+      this.audioCtx = new window.AudioContext({sampleRate: this.sampleRate});
+    }
+
     this.media.speakers$.subscribe((data) => {
       if (data.length > 0) {
         let label = data[0].label;
@@ -39,7 +46,7 @@ export class AudioSinkService {
         if (this.selectedSpeakers !== label) {
           this.selectedSpeakers = label;
           this.selectedSpeakers$.next(label);
-          this.audioCtx.setSinkId(deviceId);
+          this.audioCtx?.setSinkId(deviceId);
         }
       }
     });
