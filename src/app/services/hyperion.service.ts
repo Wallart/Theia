@@ -1,5 +1,6 @@
 import { from } from 'rxjs';
 import { io } from 'socket.io-client';
+import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ElectronService } from './electron.service';
@@ -19,18 +20,21 @@ export class HyperionService {
   targetUrl: string;
   sid: string = '';
 
-  constructor(private http: HttpClient, private electron: ElectronService, private sink: AudioSinkService) {
+  constructor(private http: HttpClient, private electron: ElectronService,
+              private sink: AudioSinkService, private router: Router) {
     if (electron.isElectronApp) {
       this.targetUrl = 'http://deepbox:6450';
     } else {
       this.targetUrl = 'http://localhost:4200/api';
     }
 
-    this.socket = io('ws://deepbox:6450');
-    this.socket.on('connect', () => this.onConnect());
-    this.socket.on('disconnect', () => this.onDisconnect());
-    this.socket.on('error', (err: any) => this.onError(err));
-    this.socket.on('interrupt', (timestamp: number) => this.onInterrupt(timestamp));
+    if (!this.electron.isElectronApp || this.router.url === '/') {
+      this.socket = io('ws://deepbox:6450');
+      this.socket.on('connect', () => this.onConnect());
+      this.socket.on('disconnect', () => this.onDisconnect());
+      this.socket.on('error', (err: any) => this.onError(err));
+      this.socket.on('interrupt', (timestamp: number) => this.onInterrupt(timestamp));
+    }
   }
 
   onInterrupt(timestamp: number) {
