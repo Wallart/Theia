@@ -38,10 +38,13 @@ export class AudioInputService {
       // console.log(rootUrl);
     }
 
+    this.noiseThreshold = this.store.getItem('dbThreshold') !== null ? this.store.getItem('dbThreshold') : 30;
+    this.muted = this.store.getItem('micMuted') !== null ? JSON.parse(this.store.getItem('micMuted')) : true;
+
     this.media.microphones$.subscribe((data) => {
       if (data.length > 0) {
         let label = data[0].label;
-        let deviceId = data[0].deviceId;
+        let deviceId = data[0].deviceId === 'default' ? this.media.getDeviceId(label, 'audioinput') : data[0].deviceId;
         if (this.store.getItem('microphone') !== null) {
           label = this.store.getItem('microphone');
           deviceId = this.media.getDeviceId(label, 'audioinput');
@@ -68,9 +71,6 @@ export class AudioInputService {
       console.log(`Noise threshold changed to ${dBValue}`);
       this.currThreshold = dBValue;
     });
-
-    this.noiseThreshold = this.store.getItem('dbThreshold') !== null ? this.store.getItem('dbThreshold') : 30;
-    this.muted = this.store.getItem('micMuted') !== null ? JSON.parse(this.store.getItem('micMuted')) : true;
   }
 
   async initVAD(stream: MediaStream) {
