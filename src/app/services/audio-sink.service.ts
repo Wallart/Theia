@@ -43,6 +43,7 @@ export class AudioSinkService {
           }
         }
 
+        deviceId = (deviceId === 'default' ? this.media.getDeviceId(label, 'audiooutput') : deviceId);
         if (this.selectedSpeakers !== label) {
           this.selectedSpeakers = label;
           this.selectedSpeakers$.next(label);

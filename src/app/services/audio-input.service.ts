@@ -44,7 +44,7 @@ export class AudioInputService {
     this.media.microphones$.subscribe((data) => {
       if (data.length > 0) {
         let label = data[0].label;
-        let deviceId = data[0].deviceId === 'default' ? this.media.getDeviceId(label, 'audioinput') : data[0].deviceId;
+        let deviceId = data[0].deviceId;
         if (this.store.getItem('microphone') !== null) {
           label = this.store.getItem('microphone');
           deviceId = this.media.getDeviceId(label, 'audioinput');
@@ -54,6 +54,7 @@ export class AudioInputService {
           }
         }
 
+        deviceId = (deviceId === 'default' ? this.media.getDeviceId(label, 'audioinput') : deviceId);
         if (this.selectedMicrophone !== label) {
           this.selectedMicrophone = label;
           this.selectedMicrophone$.next(label);
