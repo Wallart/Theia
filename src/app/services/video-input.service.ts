@@ -45,26 +45,40 @@ export class VideoInputService {
     });
   }
 
-  openCamera() {
-    if (this.electron.isElectronApp && this.router.url !== '/') return;
+  openCamera(): Promise<MediaStream> | undefined {
+    if (this.electron.isElectronApp && this.router.url !== '/video') return;
 
     this.muted = false;
-    const deviceId = this.media.getDeviceId(this.selectedCamera, 'videoinput')
-    this.media.getDeviceStream(deviceId, 'video')
-      .then((stream) => {
-        this.stream = stream;
-        const track = stream.getVideoTracks()[0];
-        // @ts-ignore
-        this.capture = new ImageCapture(track);
-        this.captureTimeout = setTimeout(() => this.captureFrame(), 1000);
+    const deviceId = this.media.getDeviceId(this.selectedCamera, 'videoinput');
 
-        if (this.electron.isElectronApp) {
-          this.electron.send('video-stream', deviceId);
-        } else {
+    if (this.electron.isElectronApp) {
+      return new Promise((resolve, reject) => {
+        this.media.getDeviceStream(deviceId, 'video')
+          .then((stream) => {
+            this.stream = stream;
+            resolve(stream);
+
+            const track = stream.getVideoTracks()[0];
+            // @ts-ignore
+            this.capture = new ImageCapture(track);
+            this.captureTimeout = setTimeout(() => this.captureFrame(), this.timeout);
+          })
+          .catch((err) => reject(err));
+      });
+    } else {
+      this.media.getDeviceStream(deviceId, 'video')
+        .then((stream) => {
+          this.stream = stream;
           this.stream$.next(this.stream);
-        }
-      })
-      .catch(console.error);
+
+          const track = stream.getVideoTracks()[0];
+          // @ts-ignore
+          this.capture = new ImageCapture(track);
+          this.captureTimeout = setTimeout(() => this.captureFrame(), this.timeout);
+        })
+        .catch(console.error);
+      return;
+    }
   }
 
   closeCamera() {
@@ -122,7 +136,8 @@ export class VideoInputService {
     this.selectedCamera = cameraName;
     this.store.setItem('camera', cameraName);
     if (autostart) {
-      this.openCamera();
+      this.openCamera()
+        ?.then((stream) => this.stream$.next(this.stream));
     }
     this.muted = !autostart;
   }

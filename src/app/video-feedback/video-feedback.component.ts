@@ -21,19 +21,22 @@ export class VideoFeedbackComponent {
 
   ngAfterViewInit() {
     if (this.electron.isElectronApp) {
-      this.electron.bind('video-stream-received', (event: Object, deviceId: string) => {
-        this.media.getDeviceStream(deviceId, 'video')
-          .then((stream) => {
-              this.videoElement.nativeElement.srcObject = null;
-              this.videoElement.nativeElement.srcObject = stream;
-          });
+      this.electron.bind('open-camera', (event: Object) => {
+        this.videoInput.openCamera()
+          ?.then((stream: MediaStream) => {
+            this.videoElement.nativeElement.srcObject = null;
+            this.videoElement.nativeElement.srcObject = stream;
+          })
+          .catch(console.error);
       });
-    } else {
-      this.videoInput.stream$.subscribe((stream) => {
-        if (stream !== undefined) {
-          this.videoElement.nativeElement.srcObject = stream;
-        }
-      });
+      this.electron.bind('close-camera', (event: Object) => this.videoInput.closeCamera());
     }
+
+    this.videoInput.stream$.subscribe((stream) => {
+      if (stream !== undefined) {
+        this.videoElement.nativeElement.srcObject = null;
+        this.videoElement.nativeElement.srcObject = stream;
+      }
+    });
   }
 }

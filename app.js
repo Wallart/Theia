@@ -124,10 +124,12 @@ ipcMain.on('open-video', () => {
   } else {
     feedbackWin.show();
   }
+  feedbackWin.webContents.send('open-camera');
 });
 
 ipcMain.on('close-video', () => {
   if (feedbackWin !== null) {
+    feedbackWin.webContents.send('close-camera');
     feedbackWin.close();
   }
 });
@@ -141,11 +143,7 @@ ipcMain.on('out-device', (event, args) => {
 });
 
 ipcMain.on('cam-device', (event, args) => {
-  mainWin.webContents.send('cam-device-changed', args);
-});
-
-ipcMain.on('video-stream', (event, args) => {
-  feedbackWin.webContents.send('video-stream-received', args);
+  feedbackWin.webContents.send('cam-device-changed', args);
 });
 
 ipcMain.on('noise-threshold', (event, args) => {
