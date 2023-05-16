@@ -74,16 +74,40 @@ export class VideoInputService {
     }
   }
 
+  // captureFrame() {
+  //   if (this.stream !== undefined && this.stream?.active) {
+  //     this.capture.takePhoto()
+  //       .then((imageBlob: Blob) => {
+  //         const width = this.capture.track.getSettings().width;
+  //         const height = this.capture.track.getSettings().height;
+  //         this.hyperion
+  //           .sendImage(imageBlob, width, height)
+  //           .subscribe((res: any) => {
+  //             this.captureTimeout = setTimeout(() => this.captureFrame(), this.timeout);
+  //           });
+  //       })
+  //       .catch(console.error);
+  //   }
+  // }
+
   captureFrame() {
     if (this.stream !== undefined && this.stream?.active) {
-      this.capture.takePhoto()
-        .then((imageBlob: Blob) => {
+      this.capture.grabFrame()
+        .then((imageBitmap: ImageBitmap) => {
           const width = this.capture.track.getSettings().width;
           const height = this.capture.track.getSettings().height;
-          this.hyperion
-            .sendImage(imageBlob, width, height)
-            .subscribe((res: any) => {
-              this.captureTimeout = setTimeout(() => this.captureFrame(), this.timeout);
+
+          let canvas = new OffscreenCanvas(width, height);
+          // @ts-ignore
+          canvas.getContext('bitmaprenderer').transferFromImageBitmap(imageBitmap);
+          // @ts-ignore
+          canvas.convertToBlob({type: 'image/jpeg', quality: 1.0})
+            .then((imageBlob: Blob) => {
+              this.hyperion
+                .sendImage(imageBlob, width, height)
+                .subscribe((res: any) => {
+                  this.captureTimeout = setTimeout(() => this.captureFrame(), this.timeout);
+                });
             });
         })
         .catch(console.error);
