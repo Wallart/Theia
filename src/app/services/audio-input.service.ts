@@ -123,18 +123,10 @@ export class AudioInputService {
       return;
     }
 
-    this.hyperion.sendAudio(pcmData).subscribe((response: any) => {
-      if (response.status !== 200) {
-        return;
-      }
-
-      const speaker = response.headers.get('speaker');
-      const arrayBuffer = response.body;
-
-      const decodedData = {};
-      this.hyperion.frameDecode(arrayBuffer, decodedData, (frame: any) => {
+    this.hyperion.sendAudio(pcmData).then((subject: any) => {
+      subject.subscribe((frame: any) => {
         if (frame['IDX'] === 0) {
-          this.chat.addUserMsg(speaker, [frame['REQ']], frame['TIM']);
+          this.chat.addUserMsg(frame['SPK'], [frame['REQ']], frame['TIM']);
         }
         this.chat.addBotMsg([frame['ANS']], frame['TIM']);
         this.sink.setBuffer(frame['PCM'], frame['TIM']);

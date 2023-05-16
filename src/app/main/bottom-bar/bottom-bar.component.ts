@@ -117,13 +117,12 @@ export class BottomBarComponent {
 
     this.message = '';
     this.chat.addUserMsg(username, [message], new Date());
-    this.hyperion.sendChat(username, message).subscribe((response: any) => {
-      const arrayBuffer = response.body;
-      const decodedData = {};
-      this.hyperion.frameDecode(arrayBuffer, decodedData, (frame: any) => {
-        this.chat.addBotMsg([frame['ANS']], frame['TIM']);
-        this.audioSink.setBuffer(frame['PCM'], frame['TIM']);
+    this.hyperion.sendChat(username, message)
+      .then(subject => {
+        subject.subscribe((frame) => {
+          this.chat.addBotMsg([frame['ANS']], frame['TIM']);
+          this.audioSink.setBuffer(frame['PCM'], frame['TIM']);
+        });
       });
-    });
   }
 }

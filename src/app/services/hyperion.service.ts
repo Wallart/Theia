@@ -1,10 +1,10 @@
-import { from } from 'rxjs';
+import { from, Subject } from 'rxjs';
 import { io } from 'socket.io-client';
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ElectronService } from './electron.service';
 import { AudioSinkService } from './audio-sink.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -54,16 +54,35 @@ export class HyperionService {
     console.warn('WebSocket connection lost');
   }
 
-  private getHttpOptions() {
+  private getHttpHeaders() {
     return {
-      responseType: 'arraybuffer',
-      observe: 'response',
-      headers: new HttpHeaders({
-        SID: this.sid,
-        model: this.model,
-        preprompt: this.prompt
-      })
+      SID: this.sid,
+      model: this.model,
+      preprompt: this.prompt
     };
+  }
+
+  drainStream(reader: any, additional?: any) {
+    const subject = new Subject<any>();
+    let buffer = new Uint8Array(0).buffer;
+    let decodedData = {};
+    const pump = (data: any) => {
+      const {done, value} = data;
+      if (done) return;
+
+      buffer = this.concatenateArrayBuffers(buffer, value.buffer);
+      buffer = this.frameDecode(buffer, decodedData, (frame: any) => {
+        if (additional !== undefined) {
+          frame['SPK'] = additional;
+        }
+        subject.next(frame);
+      });
+
+      reader?.read().then(pump);
+    };
+
+    reader?.read().then(pump);
+    return subject;
   }
 
   sendChat(user: string, message: string) {
@@ -71,28 +90,41 @@ export class HyperionService {
     payload.append('user', user);
     payload.append('message', message);
 
-    // @ts-ignore
-    return this.http.post(`${this.targetUrl}/chat`, payload, this.getHttpOptions());
-  }
+    const options: any = {
+      method: 'POST',
+      body: payload,
+      headers: this.getHttpHeaders()
+    }
 
-  sendImage(image: Blob, width: number, height: number) {
-    const payload = new FormData();
-    // @ts-ignore
-    payload.append('frame', image);
-    const options: any = this.getHttpOptions();
-    options.headers = options.headers.set('framewidth', `${width}`);
-    options.headers = options.headers.set('frameheight', `${height}`);
-    options.headers = options.headers.set('framechannels', '3');
-
-    return this.http.post(`${this.targetUrl}/video`, payload, options);
+    return fetch(`${this.targetUrl}/chat`, options)
+      .then(res => this.drainStream(res.body?.getReader()));
   }
 
   sendAudio(audio: Int16Array) {
     const payload = new FormData();
     payload.append('audio', new Blob([audio]));
 
+    const options: any = {
+      method: 'POST',
+      body: payload,
+      headers: this.getHttpHeaders()
+    }
+
+    return fetch(`${this.targetUrl}/audio`, options)
+      .then(res => this.drainStream(res.body?.getReader(), res.headers.get('speaker')));
+  }
+
+  sendImage(image: Blob, width: number, height: number) {
+    const payload = new FormData();
     // @ts-ignore
-    return this.http.post(`${this.targetUrl}/audio`, payload, this.getHttpOptions());
+    payload.append('frame', image);
+    let headers: any = this.getHttpHeaders();
+    headers['framewidth'] = `${width}`;
+    headers['frameheight'] = `${height}`;
+    headers['framechannels'] = '3';
+
+    const options: any = { responseType: 'text', headers: new HttpHeaders(headers) };
+    return this.http.post(`${this.targetUrl}/video`, payload, options);
   }
 
   getState() {
@@ -192,5 +224,12 @@ export class HyperionService {
       }
     }
     return buffer;
+  }
+
+  concatenateArrayBuffers(buffer1: ArrayBuffer, buffer2: ArrayBuffer) {
+    const tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+    tmp.set(new Uint8Array(buffer1), 0);
+    tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+    return tmp.buffer;
   }
 }
