@@ -13,6 +13,7 @@ import { ChatHistoryComponent } from './main/chat-history/chat-history.component
 import { ButtonsAreaComponent } from './main/buttons-area/buttons-area.component';
 import { VideoFeedbackComponent } from './video-feedback/video-feedback.component';
 import { TabsBarComponent } from './main/tabs-bar/tabs-bar.component';
+import { MathjaxModule } from 'mathjax-angular';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,10 @@ import { TabsBarComponent } from './main/tabs-bar/tabs-bar.component';
       HttpClientModule,
       AppRoutingModule,
       FormsModule,
-      HighlightModule
+      HighlightModule,
+      MathjaxModule.forRoot({
+        'src': `assets/mathjax/es5/startup.js`
+      })
   ],
   providers: [
     {

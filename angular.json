@@ -24,7 +24,12 @@
               "src/favicon.ico",
               "src/assets",
               "src/vad",
-              "src/worklets"
+              "src/worklets",
+              {
+                "glob": "**/*",
+                "input": "./node_modules/mathjax",
+                "output": "/assets/mathjax"
+              }
             ],
             "styles": [
               "src/styles.css"

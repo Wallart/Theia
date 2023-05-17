@@ -35,7 +35,7 @@ export class AudioInputService {
       const ort = require('onnxruntime-web');
       const rootUrl = `${window.location.protocol}${window.location.pathname}`;
       ort.env.wasm.wasmPaths = rootUrl;
-      // console.log(rootUrl);
+      console.log(rootUrl);
     }
 
     this.noiseThreshold = this.store.getItem('dbThreshold') !== null ? this.store.getItem('dbThreshold') : 30;
