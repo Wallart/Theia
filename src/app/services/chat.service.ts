@@ -88,23 +88,29 @@ export class ChatService {
     this.save()
   }
 
-  add(username: string, role: string, content: string[], date: any) {
+  add(username: string, role: string, content: string, date: any) {
     if (this.isLastSpeaker(username)) {
       let last = this.messages.pop();
-      // @ts-ignore
-      this.messages.push({ username: last.username, role: last.role, date: date, content: last.content.concat(content)});
+      let newContent = last.content;
+      let splittedContent = content.split('\n');
+
+      newContent[newContent.length - 1] = newContent.at(-1) + ' ' + splittedContent[0];
+      if (splittedContent.length > 1) {
+        newContent = last.content.concat(splittedContent.slice(1));
+      }
+      this.messages.push({ username: last.username, role: last.role, date: date, content: newContent});
     } else {
-      this.messages.push({ username: username, role: role, date: date, content: content })
+      this.messages.push({ username: username, role: role, date: date, content: content.split('\n') })
     }
     this.messagesSubject.next(this.messages);
     this.save()
   }
 
-  addUserMsg(username: string, content: string[], date: any) {
+  addUserMsg(username: string, content: string, date: any) {
     this.add(username, 'user', content, date);
   }
 
-  addBotMsg(content: string[], date: any) {
+  addBotMsg(content: string, date: any) {
     this.hyperion.getName().subscribe((botName: string) => {
       this.add(botName, 'bot', content, date);
     });

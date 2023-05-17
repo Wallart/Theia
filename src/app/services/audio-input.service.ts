@@ -126,9 +126,9 @@ export class AudioInputService {
     this.hyperion.sendAudio(pcmData).then((subject: any) => {
       subject.subscribe((frame: any) => {
         if (frame['IDX'] === 0) {
-          this.chat.addUserMsg(frame['SPK'], [frame['REQ']], frame['TIM']);
+          this.chat.addUserMsg(frame['SPK'], frame['REQ'], frame['TIM']);
         }
-        this.chat.addBotMsg([frame['ANS']], frame['TIM']);
+        this.chat.addBotMsg(frame['ANS'], frame['TIM']);
         this.sink.setBuffer(frame['PCM'], frame['TIM']);
       });
     });
