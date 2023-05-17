@@ -22,14 +22,17 @@ export class HyperionService {
 
   constructor(private http: HttpClient, private electron: ElectronService,
               private sink: AudioSinkService, private router: Router) {
+    let rootUrl;
     if (electron.isElectronApp) {
-      this.targetUrl = 'http://deepbox:6450';
+      rootUrl = 'deepbox:6450';
+      this.targetUrl = `http://${rootUrl}`;
     } else {
-      this.targetUrl = 'http://localhost:4200/api';
+      rootUrl = 'localhost:4200';
+      this.targetUrl = `http://${rootUrl}/api`;
     }
 
     if (!this.electron.isElectronApp || this.router.url === '/') {
-      this.socket = io('ws://deepbox:6450');
+      this.socket = io(`ws://${rootUrl}`);
       this.socket.on('connect', () => this.onConnect());
       this.socket.on('disconnect', () => this.onDisconnect());
       this.socket.on('error', (err: any) => this.onError(err));
@@ -58,7 +61,8 @@ export class HyperionService {
     return {
       SID: this.sid,
       model: this.model,
-      preprompt: this.prompt
+      preprompt: this.prompt,
+      silent: this.sink.muted.toString()
     };
   }
 
