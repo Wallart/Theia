@@ -82,6 +82,20 @@ export class ChatService {
     return false;
   }
 
+  getLastUserMsg() {
+    for (let i=this.messages.length - 1; i > -1; i--) {
+      if (this.messages.at(i).role === 'user') {
+        return this.messages.at(i);
+      }
+    }
+    return null;
+  }
+
+  formatAnswerWithRequest(answer: string, request: string) {
+    if (this.getLastUserMsg().content.at(-1) === request) return answer + '\n';
+    return answer;
+  }
+
   clear() {
     this.messages.splice(0);
     this.messagesSubject.next(this.messages);
@@ -97,7 +111,8 @@ export class ChatService {
       if (role === 'user') {
         newContent = last.content.concat([content]);
       } else {
-        newContent[newContent.length - 1] = newContent.at(-1) + ' ' + splittedContent[0];
+        let sep = newContent.at(-1).length === 0 ? '' : ' ';
+        newContent[newContent.length - 1] = newContent.at(-1) + sep + splittedContent[0];
         if (splittedContent.length > 1) {
           newContent = last.content.concat(splittedContent.slice(1));
         }

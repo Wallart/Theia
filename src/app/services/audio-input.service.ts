@@ -128,7 +128,9 @@ export class AudioInputService {
         if (frame['IDX'] === 0) {
           this.chat.addUserMsg(frame['SPK'], frame['REQ'], frame['TIM']);
         }
-        this.chat.addBotMsg(frame['ANS'], frame['TIM']);
+
+        let answer = this.chat.formatAnswerWithRequest(frame['ANS'], frame['REQ']);
+        this.chat.addBotMsg(answer, frame['TIM']);
         this.sink.setBuffer(frame['PCM'], frame['TIM']);
       });
     });

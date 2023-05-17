@@ -120,7 +120,8 @@ export class BottomBarComponent {
     this.hyperion.sendChat(username, message)
       .then(subject => {
         subject.subscribe((frame) => {
-          this.chat.addBotMsg(frame['ANS'], frame['TIM']);
+          let answer = this.chat.formatAnswerWithRequest(frame['ANS'], frame['REQ']);
+          this.chat.addBotMsg(answer, frame['TIM']);
           this.audioSink.setBuffer(frame['PCM'], frame['TIM']);
         });
       });
