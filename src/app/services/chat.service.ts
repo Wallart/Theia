@@ -94,9 +94,13 @@ export class ChatService {
       let newContent = last.content;
       let splittedContent = content.split('\n');
 
-      newContent[newContent.length - 1] = newContent.at(-1) + ' ' + splittedContent[0];
-      if (splittedContent.length > 1) {
-        newContent = last.content.concat(splittedContent.slice(1));
+      if (role === 'user') {
+        newContent = last.content.concat([content]);
+      } else {
+        newContent[newContent.length - 1] = newContent.at(-1) + ' ' + splittedContent[0];
+        if (splittedContent.length > 1) {
+          newContent = last.content.concat(splittedContent.slice(1));
+        }
       }
       this.messages.push({ username: last.username, role: last.role, date: date, content: newContent});
     } else {
