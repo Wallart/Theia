@@ -21,8 +21,8 @@ chat-history {
   flex: 1;
   overflow: scroll;
   margin-top: 10px;
-  border: 2px #7D7E7F solid;
-  border-radius: 5px;
+  border: thin solid #7D7E7F;
+  border-radius: 4px;
   background-color: #2c2d30;
   color: white;
 }

@@ -10,15 +10,16 @@ input {
   /*padding: 0 0 0 5px;*/
   padding: 0;
   border: 0;
+  border-radius: 4px;
   background-color: #2c2d30;
   color: white;
 }
 
 #username-input, #message-input {
   margin-right: 5px;
-  border: 2px #7D7E7F solid;
-  border-radius: 5px;
-  height: 25px;
+  border: thin #7D7E7F solid;
+  border-radius: 4px;
+  height: 28px;
   padding-left: 5px;
   background-color: #2c2d30;
   /*overflow: hidden;*/
@@ -42,7 +43,7 @@ input:focus {
   /*border:1px solid white;*/
   cursor: pointer;
   border-radius: 5px;
-  width: 31px;
+  width: 30px;
   display: table-cell;
   text-align: center;
 }

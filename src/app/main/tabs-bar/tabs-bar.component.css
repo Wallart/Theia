@@ -33,7 +33,7 @@
   /*border:1px solid white;*/
   cursor: pointer;
   border-radius: 5px;
-  width: 31px;
+  width: 30px;
   display: table-cell;
   text-align: center;
 }
@@ -44,15 +44,17 @@
 
 .button-icon {
   vertical-align: middle;
-  width: 24px;
-  height: 24px;
+  width: 25px;
+  height: 25px;
 }
 
 .tab {
   width: 120px;
+  height: 28px;
+  /*margin-top: 1px;*/
   margin-right: 5px;
-  border: 2px #7D7E7F solid;
-  border-radius: 5px;
+  border: thin #7D7E7F solid;
+  border-radius: 4px;
   background-color: #2c2d30;
   display: inline-flex;
   justify-content: space-between;
@@ -61,7 +63,7 @@
 }
 
 .tab-selected {
-  border: 2px white solid;
+  border: thin white solid;
 }
 
 .tab-selected input::placeholder {
@@ -81,6 +83,7 @@ input {
   height: 100%;
   padding: 0 0 0 5px;
   border: 0;
+  border-radius: 4px;
   background-color: #2c2d30;
   color: white;
   text-overflow: ellipsis;

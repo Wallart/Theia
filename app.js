@@ -45,7 +45,7 @@ const createSettingsWindow = () => {
     settingsWin = new BrowserWindow({
       parent: mainWin,
       width: 344,
-      height: 310,
+      height: 320,
       acceptFirstMouse: true,
       resizable: false,
       fullscreen: false,

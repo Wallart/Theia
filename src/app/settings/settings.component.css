@@ -1,6 +1,7 @@
 .container {
   /*border: 1px solid crimson;*/
-  margin: 10px 10px 0 10px;
+  margin: 0 10px 0 10px;
+  padding-top: 10px;
 }
 
 .option-label {
@@ -17,8 +18,8 @@
 
 input[type=text] {
   outline: none;
-  border: 2px #7D7E7F solid;
-  border-radius: 5px;
+  border: thin #7D7E7F solid;
+  border-radius: 4px;
   background-color: #2c2d30;
   color: white;
   height: 25px;
@@ -46,7 +47,6 @@ input[type=text] {
 .device-selector {
   user-select: none;
   width: 200px;
-  text-overflow: ellipsis;
   display: inline-block;
 }
 
@@ -55,7 +55,7 @@ input[type=text] {
   -webkit-appearance: none;
   height: 7px;
   border-radius: 5px;
-  /*background: #acb0b5;*/
+  background: #7D7E7F;
   outline: none;
   opacity: 0.7;
   -webkit-transition: .2s;
@@ -68,7 +68,8 @@ input[type=text] {
   width: 12px;
   height: 27px;
   border-radius: 25%;
-  background: #2667a8;
+  background: #BCBDBD;
+  border:1px solid white;
   cursor: pointer;
 }
 
