@@ -15,8 +15,73 @@
   display: inline-block;
 }
 
+#avatar {
+  /*border: 1px solid;*/
+  position: relative;
+}
+
+[data-initials]:before {
+  background: grey;
+  color: white;
+  opacity: 1;
+  content: attr(data-initials);
+  display: inline-block;
+  font-weight: bold;
+  border-radius: 50%;
+  vertical-align: middle;
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  text-align: center;
+}
+
+.dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  border: 1px solid white;
+  /*vertical-align: middle;*/
+  /*display: inline-block;*/
+  /*margin-left: 10px;*/
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #7D7E7F;
+}
+
+.green {
+  background-color: #6be051;
+}
+
+.red {
+  background-color: red;
+}
+
+.orange {
+  background-color: orange;
+}
+
 #label {
+  /*border: 1px solid;*/
+  margin-left: 0.8em;
   margin-right: 5px;
+  vertical-align: middle;
+}
+
+#label span {
+  /*border: 1px solid crimson;*/
+  display: block;
+}
+
+#botname {
+  font-size: 0.9em;
+  font-weight: normal;
+}
+
+#state {
+  color: #cbcaca;
+  font-size: 0.9em;
+  font-weight: lighter;
 }
 
 #option-selectors {

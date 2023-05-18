@@ -1,7 +1,13 @@
 <div id="top-bar">
   <div id="status-indicator">
-    <div id="label">Status :</div>
-    <div id="state">{{state}}</div>
+    <div id="avatar">
+      <div [attr.data-initials]="bot[0]"></div>
+      <div class="dot" #indicator></div>
+    </div>
+    <div id="label">
+      <span id="botname">{{bot}}</span>
+      <span id="state">{{state}}</span>
+    </div>
   </div>
   <div id="option-selectors">
     <select name="models" id="models-selector" [(ngModel)]="selectedModel" (change)="onModelChanged()">
