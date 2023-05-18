@@ -2,6 +2,7 @@ import { from, Subject } from 'rxjs';
 import { io } from 'socket.io-client';
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
+import { StatusService } from './status.service';
 import { ElectronService } from './electron.service';
 import { AudioSinkService } from './audio-sink.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -21,7 +22,7 @@ export class HyperionService {
   sid: string = '';
 
   constructor(private http: HttpClient, private electron: ElectronService,
-              private sink: AudioSinkService, private router: Router) {
+              private sink: AudioSinkService, private router: Router, private status: StatusService) {
     let rootUrl;
     if (electron.isElectronApp) {
       rootUrl = 'deepbox:6450';
@@ -67,12 +68,16 @@ export class HyperionService {
   }
 
   drainStream(reader: any, additional?: any) {
+    this.status.addPendingResponse();
     const subject = new Subject<any>();
     let buffer = new Uint8Array(0).buffer;
     let decodedData = {};
     const pump = (data: any) => {
       const {done, value} = data;
-      if (done) return;
+      if (done) {
+        this.status.removePendingResponse();
+        return;
+      }
 
       buffer = this.concatenateArrayBuffers(buffer, value.buffer);
       buffer = this.frameDecode(buffer, decodedData, (frame: any) => {

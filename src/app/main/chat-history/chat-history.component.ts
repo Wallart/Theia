@@ -1,6 +1,8 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
+import { StatusService } from '../../services/status.service';
 import { ElectronService } from '../../services/electron.service';
+import { HyperionService } from '../../services/hyperion.service';
+import { Component, ChangeDetectorRef, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'chat-history',
@@ -8,9 +10,13 @@ import { ElectronService } from '../../services/electron.service';
   styleUrls: ['./chat-history.component.css']
 })
 export class ChatHistoryComponent {
+  @ViewChild('typing') typing: any;
+
+  bot = '';
   messages: any[] = [];
 
-  constructor(public chat: ChatService, private electron: ElectronService, private changeDetectorRef: ChangeDetectorRef) {}
+  constructor(public chat: ChatService, private electron: ElectronService, private status: StatusService,
+              private hyperion: HyperionService, private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.chat.messages$.subscribe(data => {
@@ -22,6 +28,17 @@ export class ChatHistoryComponent {
       }
       this.messages = newData;
       this.changeDetectorRef.detectChanges();
+    });
+    this.hyperion.getName().subscribe((name) => this.bot = name);
+  }
+
+  ngAfterViewInit() {
+    this.status.typing$.subscribe((typing) => {
+      if (typing) {
+        this.typing.nativeElement.setAttribute('class', '');
+      } else {
+        this.typing.nativeElement.setAttribute('class', 'hidden-indicator');
+      }
     });
   }
 
@@ -44,20 +61,19 @@ export class ChatHistoryComponent {
       let sentence = message[i];
       const splittedSentence = sentence.split('```');
       if (splittedSentence.length > 1) {
-        // if (!isCode && splittedSentence[1].length > 0 && !splittedSentence[1].startsWith(' ')) {
-        //   console.log(`Detected language: ${splittedSentence[1]}`);
-        //   debugger;
-        //   splittedSentence[1] = '';
-        // }
-
-        // isCode = !isCode;
         for (let j=0; j < splittedSentence.length; j++) {
-          isCode = (j % 2 != 0) ? !isCode : false;
           const chunk = splittedSentence[j];
+          if (j % 2 === 0) {
+            isCode = false;
+          } else if (chunk === '') {
+            isCode = false;
+          } else {
+            isCode = !isCode;
+          }
           if (chunk === '') {
             continue;
           }
-          // chunks.push({ isCode: isCode, content: chunk});
+
           if (chunks.length === 0 || !isCode || !chunks[chunks.length - 1].isCode) {
             chunks.push({ isCode: isCode, content: chunk});
           } else {
@@ -65,7 +81,6 @@ export class ChatHistoryComponent {
           }
         }
       } else {
-        // chunks.push({ isCode: isCode, content: splittedSentence[0]});
         if (chunks.length === 0 || !isCode || !chunks[chunks.length - 1].isCode) {
           chunks.push({ isCode: isCode, content: splittedSentence[0]});
         } else {
