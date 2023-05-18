@@ -98,7 +98,12 @@ app.whenReady().then(() => {
   mainWin.webContents.on('did-finish-load', () => mainWin.show());
 });
 
-app.on('activate', () => mainWin.show());
+app.on('activate', () => {
+  mainWin.show();
+  // change parent window to avoid crashes
+  settingsWin.setParentWindow(mainWin);
+  feedbackWin.setParentWindow(mainWin);
+});
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
