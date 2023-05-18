@@ -8,8 +8,25 @@ export class StatusService {
 
   pendingResponses: number = 0;
   typing$ = new BehaviorSubject<boolean>(false);
+  state$ = new BehaviorSubject<string>('offline');
 
   constructor() {}
+
+  online() {
+    this.state$.next('online');
+  }
+
+  offline() {
+    this.state$.next('offline');
+  }
+
+  sleeping() {
+    this.state$.next('sleeping');
+  }
+
+  unknown(code: number) {
+    this.state$.next(`Unknown ${code}`);
+  }
 
   addPendingResponse() {
     this.pendingResponses++;

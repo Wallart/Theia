@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { StatusService } from '../../services/status.service';
 import { HyperionService } from '../../services/hyperion.service';
 import { LocalStorageService } from '../../services/local-storage.service';
 
@@ -13,9 +14,9 @@ export class TopBarComponent {
   selectedModel: string;
   prompts: any;
   selectedPrompt: string;
-  state: string;
+  state: string = '';
 
-  constructor(public hyperion: HyperionService, private store: LocalStorageService) {
+  constructor(public hyperion: HyperionService, private store: LocalStorageService, private status: StatusService) {
     this.selectedModel = this.store.getItem('model') !== null ? this.store.getItem('model') : '';
     this.hyperion.model = this.selectedModel;
 
@@ -24,7 +25,7 @@ export class TopBarComponent {
 
     this.models = [];
     this.prompts = [];
-    this.state = 'offline';
+    this.status.state$.subscribe((state) => this.state = state);
   }
 
   ngOnInit() {
@@ -41,7 +42,6 @@ export class TopBarComponent {
         this.selectedPrompt = res as string;
       }
     });
-    this.hyperion.getState().subscribe((res) => this.state = 'online');
   }
 
   onModelChanged() {

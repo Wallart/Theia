@@ -39,6 +39,8 @@ export class HyperionService {
       this.socket.on('error', (err: any) => this.onError(err));
       this.socket.on('interrupt', (timestamp: number) => this.onInterrupt(timestamp));
     }
+
+    this.getState().subscribe((res) => this.status.online());
   }
 
   onInterrupt(timestamp: number) {
@@ -48,6 +50,7 @@ export class HyperionService {
   onConnect() {
     this.sid = this.socket.id;
     console.log(`WebSocket connected with sid : ${this.sid}`);
+    this.status.online();
   }
 
   onError(err: any) {
@@ -56,6 +59,7 @@ export class HyperionService {
 
   onDisconnect() {
     console.warn('WebSocket connection lost');
+    this.status.offline();
   }
 
   private getHttpHeaders() {
@@ -67,30 +71,38 @@ export class HyperionService {
     };
   }
 
-  drainStream(reader: any, additional?: any) {
-    this.status.addPendingResponse();
+  drainStream(status: number, reader: any, additional?: any) {
     const subject = new Subject<any>();
-    let buffer = new Uint8Array(0).buffer;
-    let decodedData = {};
-    const pump = (data: any) => {
-      const {done, value} = data;
-      if (done) {
-        this.status.removePendingResponse();
-        return;
-      }
-
-      buffer = this.concatenateArrayBuffers(buffer, value.buffer);
-      buffer = this.frameDecode(buffer, decodedData, (frame: any) => {
-        if (additional !== undefined) {
-          frame['SPK'] = additional;
+    if (status === 200) {
+      this.status.online();
+      this.status.addPendingResponse();
+      let buffer = new Uint8Array(0).buffer;
+      let decodedData = {};
+      const pump = (data: any) => {
+        const {done, value} = data;
+        if (done) {
+          this.status.removePendingResponse();
+          return;
         }
-        subject.next(frame);
-      });
+
+        buffer = this.concatenateArrayBuffers(buffer, value.buffer);
+        buffer = this.frameDecode(buffer, decodedData, (frame: any) => {
+          if (additional !== undefined) {
+            frame['SPK'] = additional;
+          }
+          subject.next(frame);
+        });
+
+        reader?.read().then(pump);
+      };
 
       reader?.read().then(pump);
-    };
+    } else if (status === 418) {
+      this.status.sleeping();
+    } else {
+      this.status.unknown(status);
+    }
 
-    reader?.read().then(pump);
     return subject;
   }
 
@@ -106,7 +118,7 @@ export class HyperionService {
     }
 
     return fetch(`${this.targetUrl}/chat`, options)
-      .then(res => this.drainStream(res.body?.getReader()));
+      .then(res => this.drainStream(res.status, res.body?.getReader()));
   }
 
   sendAudio(audio: Int16Array) {
@@ -120,7 +132,7 @@ export class HyperionService {
     }
 
     return fetch(`${this.targetUrl}/audio`, options)
-      .then(res => this.drainStream(res.body?.getReader(), res.headers.get('speaker')));
+      .then(res => this.drainStream(res.status, res.body?.getReader(), res.headers.get('speaker')));
   }
 
   sendImage(image: Blob, width: number, height: number) {
