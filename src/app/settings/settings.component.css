@@ -11,6 +11,38 @@
   margin-right: 10px;
 }
 
+#input-wrapper {
+  /*border:1px solid green;*/
+}
+
+input[type=text] {
+  outline: none;
+  border: 2px #7D7E7F solid;
+  border-radius: 5px;
+  background-color: #2c2d30;
+  color: white;
+  height: 25px;
+  padding-left: 5px;
+}
+
+.dot {
+  vertical-align: middle;
+  display: inline-block;
+  margin-left: 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #7D7E7F;
+}
+
+.valid-input {
+  background-color: #6be051;
+}
+
+.invalid-input {
+  background-color: red;
+}
+
 .device-selector {
   user-select: none;
   width: 200px;

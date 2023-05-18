@@ -1,5 +1,13 @@
 <div class="container">
   <div class="option-row">
+    <p class="option-label">Server address : </p>
+    <div id="input-wrapper">
+      <input type="text" [(ngModel)]="serverAddress" (change)="onAddressChanged()">
+      <div class="dot" #urlIndicator></div>
+    </div>
+  </div>
+  <hr/>
+  <div class="option-row">
     <p class="option-label">Input device : </p>
     <select class="device-selector" id="indevice-selector" name="indevice" [(ngModel)]="selectedInDevice" (change)="onInDeviceChanged()">
       <option *ngFor="let device of inDevices" [value]="device.label">{{device.label}}</option>

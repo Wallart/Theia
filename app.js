@@ -45,7 +45,7 @@ const createSettingsWindow = () => {
     settingsWin = new BrowserWindow({
       parent: mainWin,
       width: 344,
-      height: 240,
+      height: 310,
       acceptFirstMouse: true,
       resizable: false,
       fullscreen: false,
@@ -161,3 +161,10 @@ ipcMain.on('current-noise', (event, args) => {
   }
 });
 
+ipcMain.on('state-change', (event, args) => {
+  settingsWin.webContents.send('state-changed', args);
+});
+
+ipcMain.on('address-change', (event, args) => {
+  mainWin.webContents.send('address-changed', args);
+});

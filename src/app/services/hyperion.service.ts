@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import { StatusService } from './status.service';
 import { ElectronService } from './electron.service';
 import { AudioSinkService } from './audio-sink.service';
+import { LocalStorageService } from './local-storage.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
@@ -18,29 +19,45 @@ export class HyperionService {
   prompt: string = '';
   prompts: string[] = [];
   botName: string = '';
-  targetUrl: string;
+  rootUrl: string = '';
+  targetUrl: string = '';
+  socketUrl: string = '';
   sid: string = '';
 
-  constructor(private http: HttpClient, private electron: ElectronService,
-              private sink: AudioSinkService, private router: Router, private status: StatusService) {
-    let rootUrl;
-    if (electron.isElectronApp) {
-      rootUrl = 'deepbox:6450';
-      this.targetUrl = `http://${rootUrl}`;
-    } else {
-      rootUrl = 'localhost:4200';
-      this.targetUrl = `http://${rootUrl}/api`;
-    }
-
+  constructor(private http: HttpClient, private electron: ElectronService, private sink: AudioSinkService,
+              private router: Router, private status: StatusService, private store: LocalStorageService) {
+    this.address = this.store.getItem('serverAddress') === null ? 'localhost:6450' : this.store.getItem('serverAddress');
     if (!this.electron.isElectronApp || this.router.url === '/') {
-      this.socket = io(`ws://${rootUrl}`);
-      this.socket.on('connect', () => this.onConnect());
-      this.socket.on('disconnect', () => this.onDisconnect());
-      this.socket.on('error', (err: any) => this.onError(err));
-      this.socket.on('interrupt', (timestamp: number) => this.onInterrupt(timestamp));
+      this.connectSocket();
     }
 
-    this.getState().subscribe((res) => this.status.online());
+    // this.getState().subscribe((res) => this.status.online());
+    this.electron.bind('address-changed', (event: Object, address: string) => {
+      this.disconnectSocket();
+      this.address = address;
+      this.connectSocket();
+    });
+  }
+
+  set address(rootUrl: string) {
+    this.rootUrl = rootUrl;
+    this.targetUrl = `http://${this.rootUrl}`;
+    this.socketUrl = `ws://${this.rootUrl}`;
+    this.store.setItem('serverAddress', rootUrl);
+  }
+
+  connectSocket() {
+    this.socket = io(this.socketUrl);
+    this.socket.on('connect', () => this.onConnect());
+    this.socket.on('disconnect', (reason: string) => this.onDisconnect(reason));
+    this.socket.on('error', (err: any) => this.onError(err));
+    this.socket.on('interrupt', (timestamp: number) => this.onInterrupt(timestamp));
+  }
+
+  disconnectSocket() {
+    if (this.socket !== undefined) {
+      this.socket.disconnect();
+    }
   }
 
   onInterrupt(timestamp: number) {
@@ -57,8 +74,8 @@ export class HyperionService {
     console.error(err);
   }
 
-  onDisconnect() {
-    console.warn('WebSocket connection lost');
+  onDisconnect(reason: string) {
+    console.warn(`WebSocket connection closed : ${reason}`);
     this.status.offline();
   }
 

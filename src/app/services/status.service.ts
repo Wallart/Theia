@@ -1,5 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import { Injectable } from '@angular/core';
+import { ElectronService } from './electron.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,22 +11,27 @@ export class StatusService {
   typing$ = new BehaviorSubject<boolean>(false);
   state$ = new BehaviorSubject<string>('offline');
 
-  constructor() {}
+  constructor(private electron: ElectronService) {}
+
+  private notify(value: string) {
+    this.state$.next(value);
+    this.electron.send('state-change', value);
+  }
 
   online() {
-    this.state$.next('online');
+    this.notify('online');
   }
 
   offline() {
-    this.state$.next('offline');
+    this.notify('offline');
   }
 
   sleeping() {
-    this.state$.next('sleeping');
+    this.notify('sleeping');
   }
 
   unknown(code: number) {
-    this.state$.next(`Unknown ${code}`);
+    this.notify(`Unknown ${code}`);
   }
 
   addPendingResponse() {

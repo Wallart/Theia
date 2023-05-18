@@ -1,12 +1,4 @@
 {
-  "/api": {
-    "target": "http://deepbox:6450",
-    "secure": false,
-    "changeOrigin": true,
-    "pathRewrite": {
-      "^/api": ""
-    }
-  },
   "/vad.worklet.bundle.min.js": {
     "target": "http://localhost:4200",
     "secure": false,

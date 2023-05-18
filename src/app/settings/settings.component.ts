@@ -2,6 +2,8 @@ import { Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { Component, ViewChild } from '@angular/core';
 import { MediaService } from '../services/media.service';
+import { StatusService } from '../services/status.service';
+import { HyperionService } from '../services/hyperion.service';
 import { ElectronService } from '../services/electron.service';
 import { AudioSinkService } from '../services/audio-sink.service';
 import { AudioInputService } from '../services/audio-input.service';
@@ -13,12 +15,14 @@ import { VideoInputService } from '../services/video-input.service';
   styleUrls: ['./settings.component.css']
 })
 export class SettingsComponent {
+  @ViewChild('urlIndicator') urlIndicator: any;
   @ViewChild('inputLevel') inputLevel: any;
 
   inDevices: any[] = [];
   outDevices: any[] = [];
   cameraDevices: any[] = [];
 
+  serverAddress: string;
   selectedInDevice: string;
   selectedOutDevice: string;
   selectedCamDevice: string;
@@ -27,7 +31,8 @@ export class SettingsComponent {
 
   constructor(private media: MediaService, private audioInput: AudioInputService, private audioSink: AudioSinkService,
               private electron: ElectronService, private router: Router, private title: Title,
-              private videoInput: VideoInputService) {
+              private videoInput: VideoInputService, private hyperion: HyperionService, private status: StatusService) {
+    this.serverAddress = this.hyperion.rootUrl;
     this.selectedInDevice = this.audioInput.selectedMicrophone;
     this.selectedOutDevice = this.audioSink.selectedSpeakers;
     this.selectedCamDevice = this.videoInput.selectedCamera;
@@ -61,11 +66,22 @@ export class SettingsComponent {
 
   ngAfterViewInit() {
     if (this.electron.isElectronApp) {
-      this.electron.bind('current-noise-changed', (event: Object, dbs: number) => {
-        this.onNoiseLevelChanged(dbs);
-      });
+      this.electron
+        .bind('current-noise-changed', (event: Object, dbs: number) => this.onNoiseLevelChanged(dbs));
+      this.electron
+        .bind('state-changed', (event: Object, status: string) => this.onStatusChanged(status));
     } else {
       this.audioInput.noiseLevel$.subscribe((dbs) => this.onNoiseLevelChanged(dbs));
+      this.status.state$.subscribe((status) => this.onStatusChanged(status));
+    }
+  }
+
+
+  onStatusChanged(status: string) {
+    if (status === 'offline') {
+      this.urlIndicator.nativeElement.setAttribute('class', 'dot invalid-input');
+    } else {
+      this.urlIndicator.nativeElement.setAttribute('class', 'dot valid-input');
     }
   }
 
@@ -114,6 +130,16 @@ export class SettingsComponent {
     } else {
       this.audioInput.currThreshold = this.selectedNoiseThreshold;
       this.router.navigate(['/']);
+    }
+  }
+
+  onAddressChanged() {
+    if (this.electron.isElectronApp) {
+      this.electron.send('address-change', this.serverAddress);
+    } else {
+      this.hyperion.disconnectSocket();
+      this.hyperion.address = this.serverAddress;
+      this.hyperion.connectSocket();
     }
   }
 }
