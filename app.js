@@ -161,6 +161,10 @@ ipcMain.on('current-noise', (event, args) => {
   }
 });
 
+ipcMain.on('request-state', (event, args) => {
+  mainWin.webContents.send('state-requested', args);
+});
+
 ipcMain.on('state-change', (event, args) => {
   settingsWin.webContents.send('state-changed', args);
 });

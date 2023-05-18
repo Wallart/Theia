@@ -66,6 +66,7 @@ export class SettingsComponent {
 
   ngAfterViewInit() {
     if (this.electron.isElectronApp) {
+      this.electron.send('request-state');
       this.electron
         .bind('current-noise-changed', (event: Object, dbs: number) => this.onNoiseLevelChanged(dbs));
       this.electron

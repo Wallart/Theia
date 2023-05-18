@@ -7,15 +7,21 @@ import { ElectronService } from './electron.service';
 })
 export class StatusService {
 
+  currentState = 'offline';
   pendingResponses: number = 0;
   typing$ = new BehaviorSubject<boolean>(false);
-  state$ = new BehaviorSubject<string>('offline');
+  state$ = new BehaviorSubject<string>(this.currentState);
 
-  constructor(private electron: ElectronService) {}
+  constructor(private electron: ElectronService) {
+    this.electron.bind('state-requested', (event: Object) => {
+      this.electron.send('state-change', this.currentState);
+    });
+  }
 
   private notify(value: string) {
-    this.state$.next(value);
-    this.electron.send('state-change', value);
+    this.currentState = value;
+    this.state$.next(this.currentState);
+    this.electron.send('state-change', this.currentState);
   }
 
   online() {
