@@ -92,7 +92,7 @@ export class ChatService {
   }
 
   formatAnswerWithRequest(answer: string, request: string) {
-    if (this.getLastUserMsg().content.at(-1) === request) return answer + '\n';
+    if (this.getLastUserMsg().content.at(-1) !== request) return '\n' + answer;
     return answer;
   }
 
@@ -119,7 +119,10 @@ export class ChatService {
       }
       this.messages.push({ username: last.username, role: last.role, date: date, content: newContent});
     } else {
-      this.messages.push({ username: username, role: role, date: date, content: content.split('\n') })
+      let newContent = content.split('\n');
+      if (newContent.length > 1 && newContent[0] === '') newContent = newContent.slice(1);
+
+      this.messages.push({ username: username, role: role, date: date, content: newContent })
     }
     this.messagesSubject.next(this.messages);
     this.save()
