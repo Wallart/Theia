@@ -17,7 +17,7 @@ export class TopBarComponent {
   prompts: any;
   selectedPrompt: string;
   state: string = '';
-  bot: string = '';
+  bot: string = 'Unknown';
 
   constructor(public hyperion: HyperionService, private store: LocalStorageService, private status: StatusService) {
     this.selectedModel = this.store.getItem('model') !== null ? this.store.getItem('model') : '';
@@ -43,7 +43,9 @@ export class TopBarComponent {
       }
     });
 
-    this.hyperion.botName$.subscribe((res) => this.bot = res);
+    this.hyperion.botName$.subscribe((res) => {
+      if (res !== '') this.bot = res;
+    });
 
     this.hyperion.models$.subscribe((res) => this.models = res);
     this.hyperion.model$.subscribe((res) => this.selectedModel = res as string);
