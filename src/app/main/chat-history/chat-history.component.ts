@@ -29,7 +29,7 @@ export class ChatHistoryComponent {
       this.messages = newData;
       this.changeDetectorRef.detectChanges();
     });
-    this.hyperion.getName().subscribe((name) => this.bot = name);
+    this.hyperion.botName$.subscribe((name) => this.bot = name);
   }
 
   ngAfterViewInit() {

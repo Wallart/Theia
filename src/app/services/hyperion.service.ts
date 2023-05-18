@@ -1,4 +1,4 @@
-import { from, Subject } from 'rxjs';
+import {BehaviorSubject, from, Subject} from 'rxjs';
 import { io } from 'socket.io-client';
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
@@ -14,11 +14,17 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class HyperionService {
   socket: any;
 
+  pollInterval: any;
   model: string = '';
+  model$: BehaviorSubject<string> = new BehaviorSubject<string>(this.model);
   models: string[] = [];
+  models$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(this.models);
   prompt: string = '';
+  prompt$: BehaviorSubject<string> = new BehaviorSubject<string>(this.prompt);
   prompts: string[] = [];
+  prompts$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(this.prompts);
   botName: string = '';
+  botName$: BehaviorSubject<string> = new BehaviorSubject<string>(this.botName);
   rootUrl: string = '';
   targetUrl: string = '';
   socketUrl: string = '';
@@ -37,6 +43,12 @@ export class HyperionService {
       this.address = address;
       this.connectSocket();
     });
+  }
+
+  pollChanges() {
+    this.getModels();
+    this.getPrompts();
+    this.pollInterval = setTimeout(() => this.pollChanges(), 60 * 1000);
   }
 
   set address(rootUrl: string) {
@@ -68,6 +80,12 @@ export class HyperionService {
     this.sid = this.socket.id;
     console.log(`WebSocket connected with sid : ${this.sid}`);
     this.status.online();
+    this.getPrompt();
+    this.getPrompts();
+    this.getModel();
+    this.getModels();
+    this.getName();
+    this.pollChanges();
   }
 
   onError(err: any) {
@@ -77,6 +95,7 @@ export class HyperionService {
   onDisconnect(reason: string) {
     console.warn(`WebSocket connection closed : ${reason}`);
     this.status.offline();
+    clearTimeout(this.pollInterval);
   }
 
   private getHttpHeaders() {
@@ -169,57 +188,50 @@ export class HyperionService {
     return this.http.get(`${this.targetUrl}/state`, {responseType: 'text'});
   }
 
-  getName() {
-    if (this.botName === '') {
-      const req = this.http.get(`${this.targetUrl}/name`, {responseType: 'text'});
-      req.subscribe((res) => this.botName = res);
-      return from(req);
-    } else {
-      return from([this.botName]);
-    }
-  }
-
-  getPrompt() {
-    if (this.prompt === '') {
-      const req = this.http.get(`${this.targetUrl}/prompt`, {responseType: 'text'});
-      req.subscribe((res) => this.prompt = res);
-      return from(req);
-    } else {
-      return from([this.prompt]);
-    }
-  }
-
-  getPrompts() {
-    if (this.prompts.length === 0) {
-      const req = this.http.get(`${this.targetUrl}/prompts`);
-      req.subscribe((res) => this.prompts = res as string[]);
-      return from(req);
-    } else {
-      return from([this.prompts]);
-    }
-  }
-
-  getModel() {
-    if (this.model === '') {
-      const req = this.http.get(`${this.targetUrl}/model`, {responseType: 'text'});
-      req.subscribe((res) => {
-        // debugger;
-        this.model = res;
+  private getName() {
+    this.http.get(`${this.targetUrl}/name`, {responseType: 'text'})
+      .subscribe((res) => {
+        this.botName = res;
+        this.botName$.next(this.botName);
       });
-      return from(req);
-    } else {
-      return from([this.model]);
-    }
   }
 
-  getModels() {
-    if (this.models.length === 0) {
-      const req = this.http.get(`${this.targetUrl}/models`);
-      req.subscribe((res) => this.models = res as string[]);
-      return from(req);
-    } else {
-      return from([this.models]);
-    }
+  private getPrompt() {
+    this.http.get(`${this.targetUrl}/prompt`, {responseType: 'text'})
+      .subscribe((res) => {
+        this.prompt = res;
+        this.prompt$.next(this.prompt);
+      });
+  }
+
+  private getPrompts() {
+    this.http.get(`${this.targetUrl}/prompts`)
+      .subscribe((res) => {
+        let prompts = res as string[];
+        if (JSON.stringify(this.prompts) !== JSON.stringify(prompts)) {
+          this.prompts = prompts;
+          this.prompts$.next(this.prompts);
+        }
+      });
+  }
+
+  private getModel() {
+    this.http.get(`${this.targetUrl}/model`, {responseType: 'text'})
+      .subscribe((res) => {
+        this.model = res;
+        this.model$.next(this.model);
+      });
+  }
+
+  private getModels() {
+    this.http.get(`${this.targetUrl}/models`)
+      .subscribe((res) => {
+        let models = res as string[];
+        if (JSON.stringify(this.prompts) !== JSON.stringify(models)) {
+          this.models = models;
+          this.models$.next(this.models);
+        }
+      });
   }
 
   frameDecode(buffer: ArrayBuffer, decodedData: any, callback: Function) {

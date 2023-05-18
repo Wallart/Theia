@@ -8,6 +8,7 @@ import { LocalStorageService } from './local-storage.service';
   providedIn: 'root'
 })
 export class ChatService {
+  private botName: string = '';
   private messages: any[] = [];
   private messagesSubject = new BehaviorSubject<any[]>(this.messages);
 
@@ -16,6 +17,7 @@ export class ChatService {
   public messages$: Observable<any[]> = this.messagesSubject.asObservable();
 
   constructor(private hyperion: HyperionService, private store: LocalStorageService) {
+    this.hyperion.botName$.subscribe((botName: string) => this.botName = botName);
     let uuid: string;
     const chatHistory = this.store.getItem('chat');
     if (chatHistory === null) {
@@ -133,9 +135,7 @@ export class ChatService {
   }
 
   addBotMsg(content: string, date: any) {
-    this.hyperion.getName().subscribe((botName: string) => {
-      this.add(botName, 'bot', content, date);
-    });
+    this.add(this.botName, 'bot', content, date);
   }
 
   save() {

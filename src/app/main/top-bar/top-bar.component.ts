@@ -29,19 +29,11 @@ export class TopBarComponent {
   }
 
   ngOnInit() {
-    this.hyperion.getModels().subscribe((res) => this.models = res);
-    this.hyperion.getModel().subscribe((res) => {
-      if (this.selectedModel === '') {
-        this.selectedModel = res as string;
-      }
-    });
+    this.hyperion.models$.subscribe((res) => this.models = res);
+    this.hyperion.model$.subscribe((res) => this.selectedModel = res as string);
 
-    this.hyperion.getPrompts().subscribe((res) => this.prompts = res);
-    this.hyperion.getPrompt().subscribe((res) => {
-      if (this.selectedPrompt === '') {
-        this.selectedPrompt = res as string;
-      }
-    });
+    this.hyperion.prompts$.subscribe((res) => this.prompts = res);
+    this.hyperion.prompt$.subscribe((res) => this.selectedPrompt = res as string);
   }
 
   onModelChanged() {
