@@ -36,6 +36,10 @@ export class StatusService {
     this.notify('sleeping');
   }
 
+  confused() {
+    this.notify('confused');
+  }
+
   unknown(code: number) {
     this.notify(`Unknown ${code}`);
   }

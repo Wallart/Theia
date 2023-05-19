@@ -38,6 +38,8 @@ export class TopBarComponent {
         el.setAttribute('class', 'dot green');
       } else if (this.state === 'sleeping') {
         el.setAttribute('class', 'dot orange');
+      } else if (this.state === 'confused') {
+        el.setAttribute('class', 'dot blue');
       } else {
         el.setAttribute('class', 'dot red');
       }

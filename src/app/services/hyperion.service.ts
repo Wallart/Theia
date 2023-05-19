@@ -107,7 +107,7 @@ export class HyperionService {
     };
   }
 
-  drainStream(status: number, reader: any, additional?: any) {
+  drainStream(status: number, reader: any) {
     const subject = new Subject<any>();
     if (status === 200) {
       this.status.online();
@@ -122,12 +122,7 @@ export class HyperionService {
         }
 
         buffer = this.concatenateArrayBuffers(buffer, value.buffer);
-        buffer = this.frameDecode(buffer, decodedData, (frame: any) => {
-          if (additional !== undefined) {
-            frame['SPK'] = additional;
-          }
-          subject.next(frame);
-        });
+        buffer = this.frameDecode(buffer, decodedData, (frame: any) => subject.next(frame));
 
         reader?.read().then(pump);
       };
@@ -135,6 +130,8 @@ export class HyperionService {
       reader?.read().then(pump);
     } else if (status === 418) {
       this.status.sleeping();
+    } else if(status === 204) {
+      this.status.confused();
     } else {
       this.status.unknown(status);
     }
@@ -168,7 +165,7 @@ export class HyperionService {
     }
 
     return fetch(`${this.targetUrl}/audio`, options)
-      .then(res => this.drainStream(res.status, res.body?.getReader(), res.headers.get('speaker')));
+      .then(res => this.drainStream(res.status, res.body?.getReader()));
   }
 
   sendImage(image: Blob, width: number, height: number) {
@@ -238,7 +235,7 @@ export class HyperionService {
     while (buffer.byteLength > 0) {
       try {
         let chunkHeader = new TextDecoder().decode(buffer.slice(0, 3));
-        if (chunkHeader !== 'TIM' && chunkHeader !== 'REQ' && chunkHeader !== 'ANS' && chunkHeader !== 'PCM') {
+        if (['TIM', 'SPK', 'REQ', 'ANS', 'PCM'].indexOf(chunkHeader) === -1) {
           break;
         }
 
@@ -256,7 +253,8 @@ export class HyperionService {
             buffer = buffer.slice(7 + chunkSize);
           }
 
-          if (chunkHeader === 'REQ') {
+          // @ts-ignore
+          if (chunkHeader === 'REQ' || chunkHeader === 'SPK') {
             chunkContent = new TextDecoder().decode(chunkContent);
             decodedData[chunkHeader] = chunkContent;
           } else if(chunkHeader === 'ANS') {
