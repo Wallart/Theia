@@ -10,6 +10,7 @@ import { LocalStorageService } from './local-storage.service';
 })
 export class AudioSinkService {
   audioCtx: any;
+  gainNode: any;
   source: any | AudioBufferSourceNode;
   sampleRate: number;
   busy: boolean;
@@ -125,9 +126,13 @@ export class AudioSinkService {
 
     // Créer un nouveau BufferSource et le connecter au contexte audio
     this.source = this.audioCtx.createBufferSource();
+    this.gainNode = this.audioCtx.createGain();
     this.source.buffer = audioBuffer;
     this.source.connect(this.audioCtx.destination);
     this.source.onended = () => this.onPlaybackEnd();
+    // Avoid abrupt noise interruption causing clicking sounds.
+    this.gainNode.gain.setValueAtTime(this.gainNode.gain.value, this.audioCtx.currentTime);
+    this.gainNode.gain.exponentialRampToValueAtTime(0.0001, this.audioCtx.currentTime + 0.03);
     this.source.start();
   }
 
