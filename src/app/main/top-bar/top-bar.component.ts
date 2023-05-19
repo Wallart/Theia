@@ -10,13 +10,12 @@ import { LocalStorageService } from '../../services/local-storage.service';
   styleUrls: ['./top-bar.component.css']
 })
 export class TopBarComponent {
-  @ViewChild('indicator') indicator: any;
-
   models: any;
   selectedModel: string;
   prompts: any;
   selectedPrompt: string;
   state: string = '';
+  stateClass: string = '';
   bot: string = 'Unknown';
 
   constructor(public hyperion: HyperionService, private store: LocalStorageService, private status: StatusService) {
@@ -40,20 +39,19 @@ export class TopBarComponent {
     this.hyperion.prompt$.subscribe((res) => this.selectedPrompt = res as string);
   }
 
-  ngAfterViewInit() {
+  ngAfterContentInit() {
     this.status.state$.subscribe((state) => {
       this.state = state;
-      const el = this.indicator.nativeElement;
       if (this.state === 'offline') {
-        el.setAttribute('class', 'dot');
+        this.stateClass = 'dot';
       } else if (this.state === 'online') {
-        el.setAttribute('class', 'dot green');
+        this.stateClass = 'dot green';
       } else if (this.state === 'sleeping') {
-        el.setAttribute('class', 'dot orange');
+        this.stateClass = 'dot orange';
       } else if (this.state === 'confused') {
-        el.setAttribute('class', 'dot blue');
+        this.stateClass = 'dot blue';
       } else {
-        el.setAttribute('class', 'dot red');
+        this.stateClass = 'dot red';
       }
     });
   }

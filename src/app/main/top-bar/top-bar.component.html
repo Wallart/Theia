@@ -2,7 +2,7 @@
   <div id="status-indicator">
     <div id="avatar">
       <div [attr.data-initials]="bot[0]"></div>
-      <div class="dot" #indicator></div>
+      <div [class]="stateClass"></div>
     </div>
     <div id="label">
       <span id="botname">{{bot}}</span>
