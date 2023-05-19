@@ -39,9 +39,6 @@ const createMainWindow = () => {
         app.quit();
       }
     });
-    mainWin.on('ready-to-show', () => {
-      mainWin.show();
-    });
     mainWin.loadURL(`file://${url}`);
     mainWin.setMenu(null);
   }
@@ -137,10 +134,8 @@ ipcMain.on('open-video', () => {
 });
 
 ipcMain.on('close-video', () => {
-  if (feedbackWin !== null) {
-    feedbackWin.webContents.send('close-camera');
-    feedbackWin.close();
-  }
+  feedbackWin.webContents.send('close-camera');
+  feedbackWin.close();
 });
 
 ipcMain.on('in-device', (event, args) => {
