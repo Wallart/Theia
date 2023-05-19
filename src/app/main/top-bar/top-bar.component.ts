@@ -29,6 +29,18 @@ export class TopBarComponent {
     this.models = [];
     this.prompts = [];
 
+    this.hyperion.botName$.subscribe((res) => {
+      if (res !== '') this.bot = res;
+    });
+
+    this.hyperion.models$.subscribe((res) => this.models = res);
+    this.hyperion.model$.subscribe((res) => this.selectedModel = res as string);
+
+    this.hyperion.prompts$.subscribe((res) => this.prompts = res);
+    this.hyperion.prompt$.subscribe((res) => this.selectedPrompt = res as string);
+  }
+
+  ngAfterViewInit() {
     this.status.state$.subscribe((state) => {
       this.state = state;
       const el = this.indicator.nativeElement;
@@ -44,16 +56,6 @@ export class TopBarComponent {
         el.setAttribute('class', 'dot red');
       }
     });
-
-    this.hyperion.botName$.subscribe((res) => {
-      if (res !== '') this.bot = res;
-    });
-
-    this.hyperion.models$.subscribe((res) => this.models = res);
-    this.hyperion.model$.subscribe((res) => this.selectedModel = res as string);
-
-    this.hyperion.prompts$.subscribe((res) => this.prompts = res);
-    this.hyperion.prompt$.subscribe((res) => this.selectedPrompt = res as string);
   }
 
   onModelChanged() {
