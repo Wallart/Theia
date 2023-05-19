@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { StatusService } from '../../services/status.service';
 import { HyperionService } from '../../services/hyperion.service';
 import { LocalStorageService } from '../../services/local-storage.service';
