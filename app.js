@@ -1,10 +1,8 @@
-const { app, BrowserWindow, ipcMain, systemPreferences, globalShortcut } = require('electron')
+const { app, BrowserWindow, ipcMain, systemPreferences } = require('electron')
 const path = require('path');
-const url = require('url');
 
 const bounceId = process.platform === 'darwin' ? app.dock.bounce('critical') : null;
 
-let running = true;
 let mainWin = null;
 let settingsWin = null;
 let feedbackWin = null;
@@ -24,6 +22,7 @@ const createMainWindow = () => {
     mainWin = new BrowserWindow({
       width: 800,
       height: 600,
+      show: false,
       acceptFirstMouse: true,
       webPreferences: {
         nodeIntegration: true,
@@ -32,12 +31,19 @@ const createMainWindow = () => {
     })
 
     const url = path.join(__dirname, 'dist/theia/index.html');
-    mainWin.on('closed', () => {
-      if (running && process.platform === 'darwin') createMainWindow();
+    mainWin.on('close', (e) => {
+      if (process.platform === 'darwin') {
+        e.preventDefault();
+        mainWin.hide();
+      } else {
+        app.quit();
+      }
+    });
+    mainWin.on('ready-to-show', () => {
+      mainWin.show();
     });
     mainWin.loadURL(`file://${url}`);
     mainWin.setMenu(null);
-    mainWin.hide();
   }
 }
 
@@ -47,6 +53,7 @@ const createSettingsWindow = () => {
       parent: mainWin,
       width: 344,
       height: 320,
+      show: false,
       acceptFirstMouse: true,
       resizable: false,
       fullscreen: false,
@@ -56,12 +63,12 @@ const createSettingsWindow = () => {
       }
     });
     const popupUrl = path.join(__dirname, 'dist/theia/index.html');
-    settingsWin.on('closed', () => {
-      if (running) createSettingsWindow();
+    settingsWin.on('close', (e) => {
+      e.preventDefault();
+      settingsWin.hide();
     });
     settingsWin.loadURL(`file://${popupUrl}#/settings`);
     settingsWin.setMenu(null);
-    settingsWin.hide();
   }
 }
 
@@ -71,6 +78,7 @@ const createFeedbackWindow = () => {
       parent: mainWin,
       width: 640,
       height: 480,
+      show: false,
       acceptFirstMouse: true,
       resizable: true,
       fullscreen: false,
@@ -80,12 +88,12 @@ const createFeedbackWindow = () => {
       }
     });
     const popupUrl = path.join(__dirname, 'dist/theia/index.html');
-    feedbackWin.on('closed', () => {
-      if (running) createFeedbackWindow();
+    feedbackWin.on('close', (e) => {
+      e.preventDefault();
+      feedbackWin.hide();
     });
     feedbackWin.loadURL(`file://${popupUrl}#/video`);
     feedbackWin.setMenu(null);
-    feedbackWin.hide();
   }
 }
 
@@ -103,16 +111,9 @@ app.whenReady().then(() => {
 
 app.on('activate', () => {
   mainWin.show();
-  // change parent window to avoid crashes
-  settingsWin.setParentWindow(mainWin);
-  feedbackWin.setParentWindow(mainWin);
-});
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
 });
 
 app.on('before-quit', () => {
-  running = false;
   mainWin.destroy();
   feedbackWin.destroy();
   settingsWin.destroy();
@@ -159,7 +160,7 @@ ipcMain.on('noise-threshold', (event, args) => {
 });
 
 ipcMain.on('current-noise', (event, args) => {
-  if (running && settingsWin.isVisible()) {
+  if (!settingsWin.isDestroyed() && settingsWin.isVisible()) {
     settingsWin.webContents.send('current-noise-changed', args);
   }
 });
