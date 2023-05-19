@@ -7,7 +7,7 @@
 .option-label {
   user-select: none;
   color: whitesmoke;
-  font-family: ".AppleSystemUIFont", serif;
+  font-family: "Helvetica", serif;
   display: inline-block;
   margin-right: 10px;
 }
