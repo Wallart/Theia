@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain, systemPreferences, globalShortcut } = requi
 const path = require('path');
 const url = require('url');
 
-const bounceId = app.dock.bounce('critical');
+const bounceId = process.platform === 'darwin' ? app.dock.bounce('critical') : null;
 
 let running = true;
 let mainWin = null;
@@ -33,7 +33,7 @@ const createMainWindow = () => {
 
     const url = path.join(__dirname, 'dist/theia/index.html');
     mainWin.on('closed', () => {
-      if (running) createMainWindow();
+      if (running && process.platform === 'darwin') createMainWindow();
     });
     mainWin.loadURL(`file://${url}`);
     mainWin.hide();

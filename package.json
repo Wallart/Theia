@@ -11,7 +11,7 @@
     "unpack-vad": "mv dist/theia/vad/* dist/theia/.; rm -r dist/theia/vad",
     "electron": "ng build --configuration development && yarn run unpack-vad && electron . --remote-debugging-port=5858",
     "forge-start": "electron-forge start",
-    "forge-package": "yarn run build && yarn run unpack-vad && electron-forge package",
+    "forge-package": "yarn run build && yarn run unpack-vad && electron-forge package --platform=all",
     "forge-make": "electron-forge make"
   },
   "private": true,
