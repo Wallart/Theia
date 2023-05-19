@@ -36,6 +36,7 @@ const createMainWindow = () => {
       if (running && process.platform === 'darwin') createMainWindow();
     });
     mainWin.loadURL(`file://${url}`);
+    mainWin.setMenu(null);
     mainWin.hide();
   }
 }
@@ -54,11 +55,12 @@ const createSettingsWindow = () => {
         contextIsolation: false,
       }
     });
-    const popupUrl = path.join(__dirname, 'dist/theia/index.html#/settings');
+    const popupUrl = path.join(__dirname, 'dist/theia/index.html');
     settingsWin.on('closed', () => {
       if (running) createSettingsWindow();
     });
-    settingsWin.loadURL(`file://${popupUrl}`);
+    settingsWin.loadURL(`file://${popupUrl}#/settings`);
+    settingsWin.setMenu(null);
     settingsWin.hide();
   }
 }
@@ -77,11 +79,12 @@ const createFeedbackWindow = () => {
         contextIsolation: false,
       }
     });
-    const popupUrl = path.join(__dirname, 'dist/theia/index.html#/video');
+    const popupUrl = path.join(__dirname, 'dist/theia/index.html');
     feedbackWin.on('closed', () => {
       if (running) createFeedbackWindow();
     });
-    feedbackWin.loadURL(`file://${popupUrl}`);
+    feedbackWin.loadURL(`file://${popupUrl}#/video`);
+    feedbackWin.setMenu(null);
     feedbackWin.hide();
   }
 }
