@@ -100,6 +100,11 @@ const createWindows = () => {
   createFeedbackWindow();
 }
 
+app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+  // Authorize self-signed certificates
+  event.preventDefault();
+  callback(true);
+});
 
 app.whenReady().then(() => {
   createWindows();

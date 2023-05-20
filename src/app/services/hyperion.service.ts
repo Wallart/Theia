@@ -53,8 +53,8 @@ export class HyperionService {
 
   set address(rootUrl: string) {
     this.rootUrl = rootUrl;
-    this.targetUrl = `http://${this.rootUrl}`;
-    this.socketUrl = `ws://${this.rootUrl}`;
+    this.targetUrl = `https://${this.rootUrl}`;
+    this.socketUrl = `wss://${this.rootUrl}`;
     this.store.setItem('serverAddress', rootUrl);
   }
 
