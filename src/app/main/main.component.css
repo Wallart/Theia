@@ -19,12 +19,31 @@ top-bar {
 
 chat-history {
   flex: 1;
-  overflow: scroll;
+  overflow-y: overlay;
   margin-top: 10px;
   border: thin solid #7D7E7F;
   border-radius: 4px;
   background-color: #2c2d30;
   color: white;
+}
+
+chat-history::-webkit-scrollbar {
+  width: 6px;
+}
+
+chat-history::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: #555;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
 }
 
 bottom-bar {
