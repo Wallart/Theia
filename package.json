@@ -27,6 +27,7 @@
     "@ricky0123/vad-web": "^0.0.12",
     "@types/electron": "^1.6.10",
     "@types/uuid": "^9.0.1",
+    "dexie": "^3.2.3",
     "electron-squirrel-startup": "^1.0.0",
     "mathjax": "3.2.2",
     "mathjax-angular": "^2.1.1",

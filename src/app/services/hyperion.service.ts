@@ -196,7 +196,7 @@ export class HyperionService {
   private getPrompt() {
     this.http.get(`${this.targetUrl}/prompt`, {responseType: 'text'})
       .subscribe((res) => {
-        this.prompt = res;
+        this.prompt = this.store.getItem('prompt') !== null ? this.store.getItem('prompt') : res;
         this.prompt$.next(this.prompt);
       });
   }
@@ -215,7 +215,7 @@ export class HyperionService {
   private getModel() {
     this.http.get(`${this.targetUrl}/model`, {responseType: 'text'})
       .subscribe((res) => {
-        this.model = res;
+        this.model = this.store.getItem('model') !== null ? this.store.getItem('model') : res;
         this.model$.next(this.model);
       });
   }
@@ -235,7 +235,7 @@ export class HyperionService {
     while (buffer.byteLength > 0) {
       try {
         let chunkHeader = new TextDecoder().decode(buffer.slice(0, 3));
-        if (['TIM', 'SPK', 'REQ', 'ANS', 'PCM'].indexOf(chunkHeader) === -1) {
+        if (['TIM', 'SPK', 'REQ', 'ANS', 'PCM', 'IMG'].indexOf(chunkHeader) === -1) {
           break;
         }
 
@@ -265,6 +265,9 @@ export class HyperionService {
             decodedData['PCM'] = chunkContent;
             callback(decodedData);
             decodedData = {};
+          } else if (chunkHeader === 'IMG') {
+            decodedData['IMG'] = chunkContent;
+            callback(decodedData);
           }
         }
       } catch (e) {

@@ -11,20 +11,14 @@ import { LocalStorageService } from '../../services/local-storage.service';
 })
 export class TopBarComponent {
   models: any;
-  selectedModel: string;
+  selectedModel = '';
   prompts: any;
-  selectedPrompt: string;
+  selectedPrompt = '';
   state: string = '';
   stateClass: string = '';
   bot: string = 'Unknown';
 
   constructor(public hyperion: HyperionService, private store: LocalStorageService, private status: StatusService) {
-    this.selectedModel = this.store.getItem('model') !== null ? this.store.getItem('model') : '';
-    this.hyperion.model = this.selectedModel;
-
-    this.selectedPrompt = this.store.getItem('prompt') !== null ? this.store.getItem('prompt') : '';
-    this.hyperion.prompt = this.selectedPrompt;
-
     this.models = [];
     this.prompts = [];
 

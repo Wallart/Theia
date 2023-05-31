@@ -22,7 +22,7 @@ export class ChatHistoryComponent {
     this.chat.messages$.subscribe(data => {
       let newData = [];
       for (let message of data) {
-        const clone = JSON.parse(JSON.stringify(message));
+        const clone = Object.assign({}, message);
         clone.content = this.decomposeContent(clone.content);
         newData.push(clone);
       }
@@ -58,8 +58,16 @@ export class ChatHistoryComponent {
     const chunks: any[] = [];
     let isCode = false;
     for (let i=0; i < message.length; i++) {
-      let sentence = message[i];
-      const splittedSentence = sentence.split('```');
+      let data: any = message[i];
+      // if (typeof data !== 'string') {
+      if (typeof data !== 'string' || data.startsWith('blob:')) {
+        const objectURI = (typeof data !== 'string') ? URL.createObjectURL(data) : data;
+        chunks.push({ isCode: false, isImg: true, content: objectURI});
+        continue;
+      }
+
+
+      const splittedSentence = data.split('```');
       if (splittedSentence.length > 1) {
         for (let j=0; j < splittedSentence.length; j++) {
           const chunk = splittedSentence[j];
@@ -75,14 +83,14 @@ export class ChatHistoryComponent {
           }
 
           if (chunks.length === 0 || !isCode || !chunks[chunks.length - 1].isCode) {
-            chunks.push({ isCode: isCode, content: chunk});
+            chunks.push({ isCode: isCode, isImg: false, content: chunk});
           } else {
             chunks[chunks.length - 1].content += '\n' + chunk;
           }
         }
       } else {
         if (chunks.length === 0 || !isCode || !chunks[chunks.length - 1].isCode) {
-          chunks.push({ isCode: isCode, content: splittedSentence[0]});
+          chunks.push({ isCode: isCode, isImg: false, content: splittedSentence[0]});
         } else {
           chunks[chunks.length - 1].content += '\n' + splittedSentence[0];
         }

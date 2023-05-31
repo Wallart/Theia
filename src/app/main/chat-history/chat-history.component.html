@@ -6,14 +6,15 @@
       <div class="timestamp">{{message.date | date:'MM/dd/yyyy H:mm'}}</div>
     </div>
     <div class="content">
-      <span class="line" *ngFor="let sentence of message.content">
-        <span class="text" *ngIf="!sentence.isCode" [mathjax]="sentence.content">{{sentence.content}}</span>
-        <pre class="code" *ngIf="sentence.isCode"><div class="copy-button code-copy-button" (click)="onCopy($event)"></div><code [highlight]="sentence.content"></code></pre>
+      <span class="line" *ngFor="let data of message.content">
+        <span class="text" *ngIf="!data.isCode && !data.isImg" [mathjax]="data.content">{{data.content}}</span>
+        <pre class="code" *ngIf="data.isCode"><div class="copy-button code-copy-button" (click)="onCopy($event)"></div><code [highlight]="data.content"></code></pre>
+        <img *ngIf="data.isImg" [src]="data.content" />
       </span>
     </div>
   </div>
   <div id="writing-indicator" class="hidden-indicator" #typing>
     <div class="dot-pulse"></div>
-    <span id="writing-label">{{bot}} is writing...</span>
+    <span id="writing-label">{{bot}} is thinking...</span>
   </div>
 </div>

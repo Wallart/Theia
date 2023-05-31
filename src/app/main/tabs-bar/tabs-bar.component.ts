@@ -11,12 +11,12 @@ export class TabsBarComponent {
   tabs: any[] = [];
 
   constructor(private chat: ChatService) {
-    // @ts-ignore
-    for (let key in this.chat.messagesGroups) {
-      const group = this.chat.messagesGroups[key];
-      const active = key === this.chat.activeUuid;
-      this.tabs.push({ uuid: key, name: group[0], active: active});
-    }
+    this.chat.messagesGroups$.subscribe((data: any) => {
+      for (let uuid in data) {
+        const active = uuid === this.chat.activeViewUuid;
+        this.tabs.push({ uuid, name: data[uuid][0], active });
+      }
+    });
   }
 
   activeTab(uuid: string) {

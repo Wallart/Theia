@@ -1,7 +1,7 @@
+import { Subject } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { Injectable } from '@angular/core';
 import { HyperionService } from './hyperion.service';
-import { BehaviorSubject, Observable } from 'rxjs';
 import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
@@ -9,51 +9,71 @@ import { LocalStorageService } from './local-storage.service';
 })
 export class ChatService {
   private botName: string = '';
-  private messages: any[] = [];
-  private messagesSubject = new BehaviorSubject<any[]>(this.messages);
 
-  public activeUuid: string = '';
-  public messagesGroups: {[key:string]: [string, any[]]} = {};
-  public messages$: Observable<any[]> = this.messagesSubject.asObservable();
+  public messages: any[] = [];
+  public messages$ = new Subject<any[]>();
+
+  public messagesGroups: {[key:string]: [string, any]} = {};
+  public messagesGroups$ = new Subject<any>();
+
+  public activeViewUuid: string = '';
 
   constructor(private hyperion: HyperionService, private store: LocalStorageService) {
     this.hyperion.botName$.subscribe((botName: string) => this.botName = botName);
-    let uuid: string;
-    const chatHistory = this.store.getItem('chat');
-    if (chatHistory === null) {
-      uuid = this.newChat();
-    } else {
-      this.messagesGroups = JSON.parse(chatHistory);
-      uuid = this.store.getItem('activeChat');
-      if (uuid === null) {
-        uuid = Object.keys(this.messagesGroups)[0];
+    this.fetchViews();
+  }
+
+  fetchViews() {
+    this.store.listViews().then((views) => {
+      let uuid: string;
+      if (views.length === 0) {
+        uuid = this.newChat();
+      } else {
+        for (const view of views) {
+          this.messagesGroups[view.uuid] = [view.name, null];
+        }
+
+        uuid = this.store.getItem('activeChat');
+        if (uuid === null || !(uuid in this.messagesGroups)) uuid = views[0].uuid;
       }
-    }
-    this.activeChat = uuid;
+
+      this.activeChat = uuid;
+      this.messagesGroups$.next(this.messagesGroups);
+    });
   }
 
   rename(uuid: string, name: string) {
     this.messagesGroups[uuid][0] = name;
-    this.save();
+    this.store.renameView(uuid, name);
   }
 
-  newChat(): string {
+  newChat() {
     const uuid = uuidv4();
-    this.messagesGroups[uuid] = ['New view', []];
-    this.save()
+    const name = 'New view';
+    this.messagesGroups[uuid] = [name, []];
+    this.store.addView(uuid, name);
     return uuid;
   }
 
   removeChat(uuid: string) {
     delete this.messagesGroups[uuid];
-    this.save()
+    this.store.deleteView(uuid);
   }
 
   set activeChat(uuid: string) {
-    this.activeUuid = uuid;
-    this.messages = this.messagesGroups[uuid][1];
-    this.messagesSubject.next(this.messages);
-    this.store.setItem('activeChat', this.activeUuid);
+    this.activeViewUuid = uuid;
+    this.store.setItem('activeChat', this.activeViewUuid);
+
+    let messages = this.messagesGroups[uuid][1];
+    if (messages === null) {
+      this.store.listMessages(uuid).then((messages) => {
+        this.messages = messages;
+        this.messages$.next(this.messages);
+      });
+    } else {
+      this.messages = messages;
+      this.messages$.next(this.messages);
+    }
   }
 
   mockData() {
@@ -73,7 +93,7 @@ export class ChatService {
       }
     ];
 
-    this.messagesSubject.next(this.messages);
+    this.messages$.next(this.messages);
   }
 
   isLastSpeaker(username: string) {
@@ -100,15 +120,18 @@ export class ChatService {
 
   clear() {
     this.messages.splice(0);
-    this.messagesSubject.next(this.messages);
-    this.save()
+    this.messages$.next(this.messages);
+    this.store.deleteMessages(this.activeViewUuid);
   }
 
   add(username: string, role: string, content: string, date: any) {
+    let uuid: string;
+    let message;
     if (this.isLastSpeaker(username)) {
       let last = this.messages.pop();
       let newContent = last.content;
       let splittedContent = content.split('\n');
+      uuid = last.uuid;
 
       if (role === 'user') {
         newContent = last.content.concat([content]);
@@ -119,15 +142,46 @@ export class ChatService {
           newContent = last.content.concat(splittedContent.slice(1));
         }
       }
-      this.messages.push({ username: last.username, role: last.role, date: date, content: newContent});
+      message = { uuid, username: last.username, role: last.role, date: date, content: newContent };
     } else {
       let newContent = content.split('\n');
       if (newContent.length > 1 && newContent[0] === '') newContent = newContent.slice(1);
 
-      this.messages.push({ username: username, role: role, date: date, content: newContent })
+      uuid = uuidv4();
+      message = { uuid, username: username, role: role, date: date, content: newContent };
     }
-    this.messagesSubject.next(this.messages);
-    this.save()
+
+    this.save(message);
+    this.messages.push(message);
+    this.messages$.next(this.messages);
+  }
+
+
+  addImg(username: string, role: string, content: Blob | string, date: any) {
+    let uuid: string;
+    let message;
+    if (this.isLastSpeaker(username)) {
+      let last = this.messages.pop();
+      uuid = last.uuid;
+      let newContent = last.content.concat([content]);
+
+      message = { uuid, username: username, role: role, date: date, content: newContent };
+    } else {
+      uuid = uuidv4();
+      message = { uuid, username: username, role: role, date: date, content: [content] };
+    }
+
+    this.save(message);
+    this.messages.push(message);
+    this.messages$.next(this.messages);
+  }
+
+  save(message: any) {
+    const uuid = message.uuid;
+    let messageCopy: any = Object.assign({}, message);
+    messageCopy['viewUuid'] = this.activeViewUuid;
+
+    this.store.putMessage(uuid, messageCopy);
   }
 
   addUserMsg(username: string, content: string, date: any) {
@@ -138,8 +192,15 @@ export class ChatService {
     this.add(this.botName, 'bot', content, date);
   }
 
-  save() {
-    this.store.setItem('chat', JSON.stringify(this.messagesGroups));
-    this.store.setItem('activeChat', this.activeUuid);
+  addBotImg(imgBuffer: ArrayBuffer, date: any) {
+    const blob = new Blob([imgBuffer], {type: 'image/jpeg'});
+    const objectURI = URL.createObjectURL(blob);
+    this.addImg(this.botName, 'bot', objectURI, date);
   }
+
+  // save() {
+  //   this.store.setItem('chat', JSON.stringify(this.messagesGroups));
+  //   this.store.insertMessage(JSON.stringify(this.messagesGroups));
+  //   this.store.setItem('activeChat', this.activeUuid);
+  // }
 }
