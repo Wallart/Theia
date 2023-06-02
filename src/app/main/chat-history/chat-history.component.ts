@@ -16,7 +16,6 @@ export class ChatHistoryComponent {
 
   bot = '';
   messages: any[] = [];
-  serviceAnswers = ['<ACK>', '<MEMWIPE>', '<SLEEPING>'];
 
   constructor(public chat: ChatService, private electron: ElectronService, private status: StatusService,
               private hyperion: HyperionService, private changeDetectorRef: ChangeDetectorRef) {}
@@ -75,14 +74,18 @@ export class ChatHistoryComponent {
         continue;
       }
 
-      if (this.serviceAnswers.indexOf(data) > -1) {
+      if (this.chat.serviceAnswers.indexOf(data) > -1) {
         let systemMessage;
-        if (data === this.serviceAnswers[0]) {
+        if (data === this.chat.serviceAnswers[0]) {
           continue;
-        } else if(data === this.serviceAnswers[1]) {
+        } else if(data === this.chat.serviceAnswers[1]) {
           systemMessage = 'Memory wiped';
-        } else if(data === this.serviceAnswers[2]) {
+        } else if(data === this.chat.serviceAnswers[2]) {
           systemMessage = 'Put to sleep';
+          this.status.sleeping();
+        } else if(data === this.chat.serviceAnswers[3]) {
+          systemMessage = 'Woken up';
+          this.status.online();
         }
         chunks.push({ isCode: false, isImg: false, isSystem: true, content: systemMessage});
         continue;

@@ -12,6 +12,7 @@ export class ChatService {
 
   public messages: any[] = [];
   public messages$ = new Subject<any[]>();
+  public serviceAnswers = ['<ACK>', '<MEMWIPE>', '<SLEEPING>', '<WAKE>'];
 
   public messagesGroups: {[key:string]: [string, any]} = {};
   public messagesGroups$ = new Subject<any>();
@@ -136,8 +137,13 @@ export class ChatService {
       if (role === 'user') {
         newContent = last.content.concat([content]);
       } else {
-        let sep = newContent.at(-1).length === 0 ? '' : ' ';
-        newContent[newContent.length - 1] = newContent.at(-1) + sep + splittedContent[0];
+        if (this.serviceAnswers.indexOf(newContent[0]) > -1) {
+          newContent.push(splittedContent[0]);
+        } else {
+          let sep = newContent.at(-1).length === 0 ? '' : ' ';
+          newContent[newContent.length - 1] = newContent.at(-1) + sep + splittedContent[0];
+        }
+
         if (splittedContent.length > 1) {
           newContent = last.content.concat(splittedContent.slice(1));
         }
@@ -190,6 +196,7 @@ export class ChatService {
   }
 
   addBotMsg(content: string, date: any) {
+    // if (content === '') return;
     this.add(this.botName, 'bot', content, date);
   }
 
