@@ -1,4 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
+import { ChatService } from '../services/chat.service';
+import { HyperionService } from '../services/hyperion.service';
 
 @Component({
   selector: 'app-main',
@@ -10,6 +12,11 @@ export class MainComponent {
   stickyPos = 0.75;
   lastHeight = 0;
   initialScrollDone = false;
+  botName = '';
+
+  constructor(private chat: ChatService, private hyperion: HyperionService) {
+    this.hyperion.botName$.subscribe((name) => this.botName = name);
+  }
 
   ngAfterViewChecked() {
     const element = this.container.nativeElement.getElementsByTagName('chat-history')[0];
@@ -19,12 +26,12 @@ export class MainComponent {
       if (this.initialScrollDone) {
         const scrollHeight = element.scrollHeight;
         const percentPos = (element.getBoundingClientRect().height + element.scrollTop) / scrollHeight;
-        if (percentPos >= this.stickyPos) {
+        if (percentPos >= this.stickyPos || (this.botName !== '' && !this.chat.isLastSpeaker(this.botName))) {
           element.scrollTop = scrollHeight;
         }
       } else {
         this.initialScrollDone = true;
-        element.scrollTop = element.scrollHeight;
+        setTimeout(() => element.scrollTop = element.scrollHeight, 500);
       }
     }
   }
