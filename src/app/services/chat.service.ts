@@ -160,15 +160,16 @@ export class ChatService {
   addImg(username: string, role: string, content: Blob | string, date: any) {
     let uuid: string;
     let message;
+    let newLines = [content, ''];
     if (this.isLastSpeaker(username)) {
       let last = this.messages.pop();
       uuid = last.uuid;
-      let newContent = last.content.concat([content]);
+      let newContent = last.content.concat(newLines);
 
       message = { uuid, username: username, role: role, date: date, content: newContent };
     } else {
       uuid = uuidv4();
-      message = { uuid, username: username, role: role, date: date, content: [content] };
+      message = { uuid, username: username, role: role, date: date, content: newLines };
     }
 
     this.save(message);
@@ -193,6 +194,10 @@ export class ChatService {
   }
 
   addBotImg(imgBuffer: ArrayBuffer, date: any) {
+    if (imgBuffer.byteLength === 0) {
+      return;
+    }
+
     const blob = new Blob([imgBuffer], {type: 'image/jpeg'});
     const objectURI = URL.createObjectURL(blob);
     this.addImg(this.botName, 'bot', objectURI, date);

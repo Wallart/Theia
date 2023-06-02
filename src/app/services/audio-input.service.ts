@@ -132,6 +132,7 @@ export class AudioInputService {
         let answer = this.chat.formatAnswerWithRequest(frame['ANS'], frame['REQ']);
         this.chat.addBotMsg(answer, frame['TIM']);
         this.sink.setBuffer(frame['PCM'], frame['TIM']);
+        this.chat.addBotImg(frame['IMG'], frame['TIM']);
       });
     });
   }

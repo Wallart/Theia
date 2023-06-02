@@ -102,7 +102,6 @@ export class AudioSinkService {
     }
 
     if (arrayBuffer.byteLength === 0) {
-      console.warn('Empty PCM array.');
       return;
     }
 
