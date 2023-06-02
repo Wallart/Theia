@@ -196,7 +196,7 @@ export class ChatService {
   }
 
   addBotMsg(content: string, date: any) {
-    // if (content === '') return;
+    if (content === '') return;
     this.add(this.botName, 'bot', content, date);
   }
 
