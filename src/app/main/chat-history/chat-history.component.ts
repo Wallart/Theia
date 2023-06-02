@@ -16,6 +16,7 @@ export class ChatHistoryComponent {
 
   bot = '';
   messages: any[] = [];
+  serviceAnswers = ['<ACK>', '<MEMWIPE>', '<SLEEPING>'];
 
   constructor(public chat: ChatService, private electron: ElectronService, private status: StatusService,
               private hyperion: HyperionService, private changeDetectorRef: ChangeDetectorRef) {}
@@ -74,6 +75,18 @@ export class ChatHistoryComponent {
         continue;
       }
 
+      if (this.serviceAnswers.indexOf(data) > -1) {
+        let systemMessage;
+        if (data === this.serviceAnswers[0]) {
+          continue;
+        } else if(data === this.serviceAnswers[1]) {
+          systemMessage = 'Memory wiped';
+        } else if(data === this.serviceAnswers[2]) {
+          systemMessage = 'Put to sleep';
+        }
+        chunks.push({ isCode: false, isImg: false, isSystem: true, content: systemMessage});
+        continue;
+      }
 
       const splittedSentence = data.split('```');
       if (splittedSentence.length > 1) {
@@ -91,14 +104,14 @@ export class ChatHistoryComponent {
           }
 
           if (chunks.length === 0 || !isCode || !chunks[chunks.length - 1].isCode) {
-            chunks.push({ isCode: isCode, isImg: false, content: chunk});
+            chunks.push({ isCode: isCode, isImg: false, isSystem: false, content: chunk});
           } else {
             chunks[chunks.length - 1].content += '\n' + chunk;
           }
         }
       } else {
         if (chunks.length === 0 || !isCode || !chunks[chunks.length - 1].isCode) {
-          chunks.push({ isCode: isCode, isImg: false, content: splittedSentence[0]});
+          chunks.push({ isCode: isCode, isImg: false, isSystem: false, content: splittedSentence[0]});
         } else {
           chunks[chunks.length - 1].content += '\n' + splittedSentence[0];
         }

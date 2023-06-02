@@ -7,7 +7,11 @@
     </div>
     <div class="content">
       <span class="line" *ngFor="let data of message.content">
-        <span class="text" *ngIf="!data.isCode && !data.isImg" [mathjax]="data.content">{{data.content}}</span>
+        <span class="service-text" *ngIf="data.isSystem">
+          <div class="service-icon"></div>
+          <div class="service-content">{{data.content}}</div>
+        </span>
+        <span class="text" *ngIf="!data.isCode && !data.isImg && !data.isSystem" [mathjax]="data.content">{{data.content}}</span>
         <pre class="code" *ngIf="data.isCode"><div class="copy-button code-copy-button" (click)="onCopy($event)"></div><code [highlight]="data.content"></code></pre>
         <span class="image-wrapper" *ngIf="data.isImg">
           <span class="image">

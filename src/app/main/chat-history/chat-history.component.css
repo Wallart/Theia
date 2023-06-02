@@ -244,3 +244,23 @@
     box-shadow: 10014px 0 0 -5px;
   }
 }
+
+.service-text {
+  display: block;
+  color: #969696;
+  margin: 0 0 15px 10px;
+}
+
+.service-icon, .service-content {
+  margin-right: 7px;
+  display: inline-block;
+  font-size: 0.9em;
+  /*border: 1px solid yellowgreen;*/
+  vertical-align: middle;
+}
+
+.service-icon {
+  width: 17px;
+  height: 17px;
+  background-image: url("../../../assets/circle-exclamation.svg");
+}
