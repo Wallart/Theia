@@ -31,6 +31,29 @@
   animation-fill-mode: forwards;
 }
 
+.save-button {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  right: -5%;
+  width: 15px;
+  height: 17px;
+  cursor: pointer;
+  background-size: cover;
+  background-image: url("../../../assets/save.svg");
+  /*background-color: white;*/
+}
+
+.image {
+  display: inline-block;
+  position: relative;
+}
+
+.image:hover .save-button {
+  animation: fadeIn .5s;
+  animation-fill-mode: forwards;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

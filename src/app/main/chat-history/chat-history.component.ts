@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+import { saveAs } from 'file-saver';
 import { ChatService } from '../../services/chat.service';
 import { StatusService } from '../../services/status.service';
 import { ElectronService } from '../../services/electron.service';
@@ -52,6 +54,12 @@ export class ChatHistoryComponent {
       const code = codeNode[0].innerText;
       this.electron.writeToClipboard(code);
     }
+  }
+
+  onSave(blobUrl: string) {
+    fetch(blobUrl)
+      .then((r) => r.blob())
+      .then((blob: Blob) => saveAs(blob, `${uuidv4()}.jpg`));
   }
 
   decomposeContent(message: string[]) {
