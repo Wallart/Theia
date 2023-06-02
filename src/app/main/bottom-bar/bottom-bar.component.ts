@@ -110,6 +110,7 @@ export class BottomBarComponent {
 
   onSend() {
     let message = this.message;
+    if (message === '') return;
     let username = this.username;
     if (username === '') {
       username = 'Unknown';
