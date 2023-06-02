@@ -35,7 +35,7 @@
   opacity: 0;
   position: absolute;
   top: 0;
-  right: -5%;
+  right: calc(-7.5px - 15px);
   width: 15px;
   height: 17px;
   cursor: pointer;
@@ -44,14 +44,42 @@
   /*background-color: white;*/
 }
 
+.image-wrapper {
+  /*border:1px solid crimson;*/
+  display: inline-block;
+  width: 100%;
+}
 .image {
+  border: 1px solid #7D7E7F;
+  background-color: white;
+  padding: 1%;
   display: inline-block;
   position: relative;
 }
 
-.image:hover .save-button {
-  animation: fadeIn .5s;
+.image img {
+  border: 1px solid #7D7E7F;
+}
+
+.image-wrapper:hover .save-button {
+  animation: fadeIn .25s;
   animation-fill-mode: forwards;
+}
+
+.image-wrapper:hover .image {
+  animation: float 0.5s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes float {
+ from {
+    box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.6);
+    transform: translatex(0px);
+  }
+  to {
+    box-shadow: 0 25px 15px 0 rgba(0, 0, 0, 0.2);
+    transform: translatex(5px);
+  }
 }
 
 @keyframes fadeIn {
