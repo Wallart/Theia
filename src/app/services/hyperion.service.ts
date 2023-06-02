@@ -113,16 +113,16 @@ export class HyperionService {
       this.status.online();
       this.status.addPendingResponse();
       let buffer = new Uint8Array(0).buffer;
-      let decodedData = {};
       const pump = (data: any) => {
         const {done, value} = data;
         if (done) {
+          if (buffer.byteLength > 0) console.error('Orphan data in buffer.');
           this.status.removePendingResponse();
           return;
         }
 
         buffer = this.concatenateArrayBuffers(buffer, value.buffer);
-        buffer = this.frameDecode(buffer, decodedData, (frame: any) => subject.next(frame));
+        buffer = this.frameDecode(buffer, (frame: any) => subject.next(frame));
 
         reader?.read().then(pump);
       };
@@ -231,29 +231,35 @@ export class HyperionService {
       });
   }
 
-  frameDecode(buffer: ArrayBuffer, decodedData: any, callback: Function) {
-    while (buffer.byteLength > 0) {
+  frameDecode(buffer: ArrayBuffer, callback: Function) {
+    let cursor = 0;
+    let decodedData: any = {};
+    const validHeaders = ['TIM', 'SPK', 'REQ', 'IDX', 'ANS', 'PCM', 'IMG'];
+
+    while (cursor < buffer.byteLength) {
       try {
-        let chunkHeader = new TextDecoder().decode(buffer.slice(0, 3));
-        if (['TIM', 'SPK', 'REQ', 'ANS', 'PCM', 'IMG'].indexOf(chunkHeader) === -1) {
+        let chunkHeader = new TextDecoder().decode(buffer.slice(cursor, cursor + 3));
+        cursor += 3;
+        if (validHeaders.indexOf(chunkHeader) === -1) {
+          console.error('Invalid header');
           break;
         }
 
         if (chunkHeader === 'TIM') {
-          const timestamp = new DataView(buffer.slice(3, 11)).getFloat64(0, true);
+          const timestamp = new DataView(buffer.slice(cursor, cursor + 8)).getFloat64(0, true);
           decodedData['TIM'] = new Date(timestamp * 1000);
-          buffer = buffer.slice(11);
+          cursor += 8;
         } else {
-          let chunkSize = new DataView(buffer).getInt32(3)
-          let chunkContent: any = buffer.slice(7, 7 + chunkSize);
+          let chunkSize = new DataView(buffer.slice(cursor)).getInt32(0);
+          cursor += 4;
+          let chunkContent: any = buffer.slice(cursor, cursor + chunkSize);
 
           if (chunkContent.byteLength < chunkSize) {
+            console.warn('Date frame is not complete');
             break;
-          } else {
-            buffer = buffer.slice(7 + chunkSize);
           }
 
-          // @ts-ignore
+          cursor += chunkSize;
           if (chunkHeader === 'REQ' || chunkHeader === 'SPK') {
             chunkContent = new TextDecoder().decode(chunkContent);
             decodedData[chunkHeader] = chunkContent;
@@ -261,19 +267,24 @@ export class HyperionService {
             decodedData['IDX'] = new DataView(chunkContent).getInt8(0);
             chunkContent = new TextDecoder().decode(chunkContent.slice(1));
             decodedData[chunkHeader] = chunkContent;
-          } else if (chunkHeader === 'PCM') {
-            decodedData['PCM'] = chunkContent;
+          } else if (chunkHeader === 'PCM' || chunkHeader === 'IMG') {
+            decodedData[chunkHeader] = chunkContent;
+          }
+
+          if (validHeaders.toString() === Object.keys(decodedData).toString()) {
             callback(decodedData);
+            // Remove consumed data
             decodedData = {};
-          } else if (chunkHeader === 'IMG') {
-            decodedData['IMG'] = chunkContent;
-            callback(decodedData);
+            buffer = buffer.slice(cursor);
+            cursor = 0;
           }
         }
       } catch (e) {
+        console.error(`Error occurred during frameDecode : ${e}`);
         break;
       }
     }
+
     return buffer;
   }
 
