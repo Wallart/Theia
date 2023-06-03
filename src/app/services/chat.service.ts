@@ -114,8 +114,12 @@ export class ChatService {
   }
 
   formatAnswerWithRequest(answer: string, request: string) {
-    let lastMsg = this.getLastUserMsg();
-    if (lastMsg !== null && lastMsg.content.at(-1) !== request) return '\n' + answer;
+    // Check that the message to format is not a serviceToken
+    if (this.hyperion.serviceTokens.indexOf(answer) === -1) {
+      let lastMsg = this.getLastUserMsg();
+      // Insert a new line, if last message does not match current request
+      if (lastMsg !== null && lastMsg.content.at(-1) !== request) return '\n' + answer;
+    }
     return answer;
   }
 
@@ -139,13 +143,18 @@ export class ChatService {
       if (role === 'user') {
         newContent = last.content.concat([content]);
       } else {
-        if (this.hyperion.serviceTokens.indexOf(newContent[0]) > -1) {
-          newContent.push(splittedContent[0]);
+        // Last line was a serviceToken. Or data is. Add to new line
+        if (this.hyperion.serviceTokens.indexOf(newContent.at(-1)) > -1
+          || this.hyperion.serviceTokens.indexOf(splittedContent[0]) > -1) {
+          // Don't insert blank line after a serviceToken
+          if (splittedContent[0].length > 0) newContent.push(splittedContent[0]);
         } else {
+          // Concat data before a \n with last line
           let sep = newContent.at(-1).length === 0 ? '' : ' ';
           newContent[newContent.length - 1] = newContent.at(-1) + sep + splittedContent[0];
         }
 
+        // Add remaining data on new line
         if (splittedContent.length > 1) {
           newContent = last.content.concat(splittedContent.slice(1));
         }

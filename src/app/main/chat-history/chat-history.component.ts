@@ -74,9 +74,9 @@ export class ChatHistoryComponent {
         continue;
       }
 
-      if (this.hyperion.serviceTokens.indexOf(data) > -1) {
+      if (this.hyperion.serviceTokens.indexOf(data.trim()) > -1) {
         let systemMessage;
-        switch (data) {
+        switch (data.trim()) {
           case this.hyperion.serviceTokens[1]:
             systemMessage = 'Memory wiped';
             break;
@@ -88,6 +88,9 @@ export class ChatHistoryComponent {
             break;
           case this.hyperion.serviceTokens[4]:
             systemMessage = 'Confused';
+            break;
+          case this.hyperion.serviceTokens[5]:
+            systemMessage = 'Flatlined';
             break;
         }
         chunks.push({ isCode: false, isImg: false, isSystem: true, content: systemMessage});
