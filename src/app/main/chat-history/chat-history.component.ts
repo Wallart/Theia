@@ -74,18 +74,21 @@ export class ChatHistoryComponent {
         continue;
       }
 
-      if (this.chat.serviceAnswers.indexOf(data) > -1) {
+      if (this.hyperion.serviceTokens.indexOf(data) > -1) {
         let systemMessage;
-        if (data === this.chat.serviceAnswers[0]) {
-          continue;
-        } else if(data === this.chat.serviceAnswers[1]) {
-          systemMessage = 'Memory wiped';
-        } else if(data === this.chat.serviceAnswers[2]) {
-          systemMessage = 'Put to sleep';
-          this.status.sleeping();
-        } else if(data === this.chat.serviceAnswers[3]) {
-          systemMessage = 'Woken up';
-          this.status.online();
+        switch (data) {
+          case this.hyperion.serviceTokens[1]:
+            systemMessage = 'Memory wiped';
+            break;
+          case this.hyperion.serviceTokens[2]:
+            systemMessage = 'Put to sleep';
+            break;
+          case this.hyperion.serviceTokens[3]:
+            systemMessage = 'Woken up';
+            break;
+          case this.hyperion.serviceTokens[4]:
+            systemMessage = 'Confused';
+            break;
         }
         chunks.push({ isCode: false, isImg: false, isSystem: true, content: systemMessage});
         continue;

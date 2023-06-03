@@ -13,6 +13,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 })
 export class HyperionService {
   socket: any;
+  serviceTokens = ['<ACK>', '<MEMWIPE>', '<SLEEPING>', '<WAKE>', '<CONFUSED>'];
 
   pollInterval: any;
   model: string = '';
@@ -272,7 +273,7 @@ export class HyperionService {
           }
 
           if (validHeaders.toString() === Object.keys(decodedData).toString()) {
-            callback(decodedData);
+            this.decodedFilter(decodedData, callback);
             // Remove consumed data
             decodedData = {};
             buffer = buffer.slice(cursor);
@@ -286,6 +287,25 @@ export class HyperionService {
     }
 
     return buffer;
+  }
+
+  decodedFilter(decodedData: any, callback: Function) {
+    switch (decodedData['ANS']) {
+      case this.serviceTokens[0]:
+        this.status.online();
+        // don't forward ACK
+        return;
+      case this.serviceTokens[2]:
+        this.status.sleeping();
+        break;
+      case this.serviceTokens[3]:
+        this.status.online();
+        break;
+      case this.serviceTokens[4]:
+        this.status.confused();
+        break;
+    }
+    callback(decodedData);
   }
 
   concatenateArrayBuffers(buffer1: ArrayBuffer, buffer2: ArrayBuffer) {

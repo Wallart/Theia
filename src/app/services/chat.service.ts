@@ -12,7 +12,6 @@ export class ChatService {
 
   public messages: any[] = [];
   public messages$ = new Subject<any[]>();
-  public serviceAnswers = ['<ACK>', '<MEMWIPE>', '<SLEEPING>', '<WAKE>'];
 
   public messagesGroups: {[key:string]: [string, any]} = {};
   public messagesGroups$ = new Subject<any>();
@@ -115,7 +114,8 @@ export class ChatService {
   }
 
   formatAnswerWithRequest(answer: string, request: string) {
-    if (this.getLastUserMsg().content.at(-1) !== request) return '\n' + answer;
+    let lastMsg = this.getLastUserMsg();
+    if (lastMsg !== null && lastMsg.content.at(-1) !== request) return '\n' + answer;
     return answer;
   }
 
@@ -126,6 +126,8 @@ export class ChatService {
   }
 
   add(username: string, role: string, content: string, date: any) {
+    if (content === '') return;
+
     let uuid: string;
     let message;
     if (this.isLastSpeaker(username)) {
@@ -137,7 +139,7 @@ export class ChatService {
       if (role === 'user') {
         newContent = last.content.concat([content]);
       } else {
-        if (this.serviceAnswers.indexOf(newContent[0]) > -1) {
+        if (this.hyperion.serviceTokens.indexOf(newContent[0]) > -1) {
           newContent.push(splittedContent[0]);
         } else {
           let sep = newContent.at(-1).length === 0 ? '' : ' ';
@@ -196,7 +198,6 @@ export class ChatService {
   }
 
   addBotMsg(content: string, date: any) {
-    if (content === '') return;
     this.add(this.botName, 'bot', content, date);
   }
 
