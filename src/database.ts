@@ -20,9 +20,13 @@ export class AppDB extends Dexie {
 
   constructor() {
     super('ngdexieliveQuery');
+    navigator.storage.persisted()
+      .then((res) => {
+        if (!res) navigator.storage.persist().then((res) => console.log(`DB persistance : ${res}`));
+      });
     this.version(this.versionNum).stores({
-      views: '++id, uuid',
-      messages: '++id, uuid, viewUuid',
+      views: '++id, &uuid',
+      messages: '++id, &uuid, viewUuid',
     });
     this.on('populate', () => this.populate());
   }
