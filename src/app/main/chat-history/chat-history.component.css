@@ -122,6 +122,7 @@
   margin-bottom: 5px;
   display: block;
   white-space: pre-wrap;
+  user-select: text;
 }
 
 .content .text::after {
@@ -137,6 +138,7 @@
   background-color: white;
   margin: 0 0 5px 0;
   overflow: scroll;
+  user-select: text;
 }
 
 .code::-webkit-scrollbar {
@@ -248,7 +250,7 @@
 .service-text {
   display: block;
   color: #969696;
-  margin: 0 0 15px 10px;
+  margin: 15px 0 15px 10px;
 }
 
 .service-icon, .service-content {
