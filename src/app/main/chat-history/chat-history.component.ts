@@ -92,6 +92,9 @@ export class ChatHistoryComponent {
           case this.hyperion.serviceTokens[5]:
             systemMessage = 'Flatlined';
             break;
+          case this.hyperion.serviceTokens[6]:
+            systemMessage = 'Command executed';
+            break;
         }
         chunks.push({ isCode: false, isImg: false, isSystem: true, content: systemMessage});
         continue;
