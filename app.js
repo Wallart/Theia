@@ -175,4 +175,5 @@ ipcMain.on('state-change', (event, args) => {
 
 ipcMain.on('address-change', (event, args) => {
   mainWin.webContents.send('address-changed', args);
+  feedbackWin.webContents.send('address-changed', args);
 });
