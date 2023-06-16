@@ -34,7 +34,17 @@ import { MathjaxModule } from 'mathjax-angular';
       FormsModule,
       HighlightModule,
       MathjaxModule.forRoot({
-        'src': `assets/mathjax/es5/startup.js`
+        'src': `assets/mathjax/es5/startup.js`,
+        'config': {
+          'tex': {
+            'inlineMath': [
+              ['$', '$'],
+              ['\\(', '\\)'],
+              ['\\[', '\\]']
+            ],
+            processEscapes: true
+          }
+        }
       })
   ],
   providers: [
