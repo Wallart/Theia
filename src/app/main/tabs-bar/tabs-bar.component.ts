@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
+import {ElectronService} from "../../services/electron.service";
 
 @Component({
   selector: 'tabs-bar',
@@ -9,13 +10,26 @@ import { ChatService } from '../../services/chat.service';
 export class TabsBarComponent {
 
   tabs: any[] = [];
+  newTabShortcut: string = '';
 
-  constructor(private chat: ChatService) {
+  constructor(private chat: ChatService, private electron: ElectronService) {
     this.chat.messagesGroups$.subscribe((data: any) => {
       for (let uuid in data) {
         const active = uuid === this.chat.activeViewUuid;
         this.tabs.push({ uuid, name: data[uuid][0], active });
       }
+    });
+
+    this.electron.bind('keymap', (event: Object, keymap: Object) => {
+      for(let key in keymap) {
+        const attribute = `${key}Shortcut`;
+        // @ts-ignore
+        if (attribute in this) this[attribute] = keymap[key];
+      }
+    });
+    this.electron.bind('newTab', (event: Object) => {
+      console.log(`Keyboard shortcut : newTab`);
+      this.onNewTab();
     });
   }
 

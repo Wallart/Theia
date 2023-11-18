@@ -19,6 +19,12 @@ export class BottomBarComponent {
   message: string = '';
   username: string = '';
 
+  clearShortcut: string = '';
+  toggleCamShortcut: string = '';
+  toggleMicShortcut: string = '';
+  toggleSpeakersShortcut: string = '';
+  gearShortcut: string = '';
+
   cameraMuted: boolean;
   microphoneMuted: boolean;
   speakersMuted: boolean;
@@ -29,6 +35,35 @@ export class BottomBarComponent {
     this.microphoneMuted = this.audioInput.muted;
     this.speakersMuted = this.audioSink.muted;
     this.cameraMuted = this.videoInput.muted;
+
+    this.electron.bind('keymap', (event: Object, keymap: Object) => {
+      for(let key in keymap) {
+        const attribute = `${key}Shortcut`;
+        // @ts-ignore
+        if (attribute in this) this[attribute] = keymap[key];
+      }
+    });
+
+    this.electron.bind('clear', (event: Object) => {
+      console.log(`Keyboard shortcut : clear`);
+      this.onClear();
+    });
+    this.electron.bind('toggleCam', (event: Object) => {
+      console.log(`Keyboard shortcut : toggleCam`);
+      this.toggleCam();
+    });
+    this.electron.bind('toggleMic', (event: Object) => {
+      console.log(`Keyboard shortcut : toggleMic`);
+      this.toggleMic();
+    });
+    this.electron.bind('toggleSpeakers', (event: Object) => {
+      console.log(`Keyboard shortcut : toggleSpeakers`);
+      this.toggleSpeakers();
+    });
+    this.electron.bind('gear', (event: Object) => {
+      console.log(`Keyboard shortcut : gear`);
+      this.onGear();
+    });
   }
 
   ngOnInit() {

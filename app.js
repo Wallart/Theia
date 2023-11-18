@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, systemPreferences } = require('electron')
+const { app, BrowserWindow, ipcMain, systemPreferences, globalShortcut } = require('electron')
 const path = require('path');
 
 const bounceId = process.platform === 'darwin' ? app.dock.bounce('critical') : null;
@@ -6,6 +6,14 @@ const bounceId = process.platform === 'darwin' ? app.dock.bounce('critical') : n
 let mainWin = null;
 let settingsWin = null;
 let feedbackWin = null;
+let keymap = {
+  newTab: 'CommandOrControl+T',
+  toggleCam: 'CommandOrControl+J',
+  toggleMic: 'CommandOrControl+K',
+  toggleSpeakers: 'CommandOrControl+L',
+  clear: 'CommandOrControl+D',
+  gear: 'CommandOrControl+O'
+}
 
 if (systemPreferences.getMediaAccessStatus('microphone') !== 'granted') {
   systemPreferences.askForMediaAccess('microphone')
@@ -100,15 +108,42 @@ const createWindows = () => {
   createFeedbackWindow();
 }
 
+const sendKeymap = () => {
+  let formattedKeymap = {}
+  for(let key in keymap) {
+    let shortcut = keymap[key].split('+');
+    for(let i=0; i < shortcut.length; i++) {
+      if(shortcut[i] === 'CommandOrControl' && process.platform === 'darwin') {
+        shortcut[i] = 'Cmd';
+      } else if(shortcut[i] === 'CommandOrControl') {
+        shortcut[i] = 'Ctrl';
+      }
+    }
+    formattedKeymap[key] = shortcut.join(' + ');
+  }
+  mainWin.webContents.send('keymap', formattedKeymap);
+}
+
 app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
   // Authorize self-signed certificates
   event.preventDefault();
   callback(true);
 });
 
-app.whenReady().then(() => {
-  createWindows();
-  mainWin.webContents.on('did-finish-load', () => mainWin.show());
+app.whenReady()
+  .then(() => {
+    for(let key in keymap) {
+      if (keymap[key].length > 0) {
+        globalShortcut.register(keymap[key], () => mainWin.webContents.send(key));
+      }
+    }
+  })
+  .then(() => {
+    createWindows();
+    mainWin.webContents.on('did-finish-load', () => {
+      sendKeymap();
+      mainWin.show();
+    });
 });
 
 app.on('activate', () => {
@@ -176,4 +211,9 @@ ipcMain.on('state-change', (event, args) => {
 ipcMain.on('address-change', (event, args) => {
   mainWin.webContents.send('address-changed', args);
   feedbackWin.webContents.send('address-changed', args);
+});
+
+ipcMain.on('update-keymap', (event, args) => {
+  globalShortcut.unregisterAll();
+  // TODO Update keymap here
 });

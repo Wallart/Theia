@@ -12,26 +12,26 @@
       <div class="bar"></div>
     </div>
   </div>
-  <div class="button" (click)="onClear()">
+  <div class="button" (click)="onClear()" [title]="clearShortcut">
     <div class="icon-aligner"></div>
     <img class="button-icon" src="assets/trash.svg">
   </div>
-  <div class="button" (click)="toggleCam()">
+  <div class="button" (click)="toggleCam()" [title]="toggleCamShortcut">
     <div class="icon-aligner"></div>
     <img *ngIf="!cameraMuted" class="button-icon" src="assets/video.svg">
     <img *ngIf="cameraMuted" class="button-icon" src="assets/video-muted.svg">
   </div>
-  <div class="button" (click)="toggleMic()">
+  <div class="button" (click)="toggleMic()" [title]="toggleMicShortcut">
     <div class="icon-aligner"></div>
     <img *ngIf="!microphoneMuted" class="button-icon" src="assets/microphone.svg">
     <img *ngIf="microphoneMuted" class="button-icon" src="assets/microphone-muted.svg">
   </div>
-  <div class="button" (click)="toggleSpeakers()">
+  <div class="button" (click)="toggleSpeakers()" [title]="toggleSpeakersShortcut">
     <div class="icon-aligner"></div>
     <img *ngIf="!speakersMuted" class="button-icon" src="assets/speakers.svg">
     <img *ngIf="speakersMuted" class="button-icon" src="assets/speakers-muted.svg">
   </div>
-  <div class="button" (click)="onGear()">
+  <div class="button" (click)="onGear()" [title]="gearShortcut">
     <div class="icon-aligner"></div>
     <img class="button-icon" src="assets/gears.svg">
   </div>
