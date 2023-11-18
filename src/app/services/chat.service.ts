@@ -1,4 +1,4 @@
-import { Subject } from 'rxjs';
+import {BehaviorSubject, Subject} from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { Injectable } from '@angular/core';
 import { HyperionService } from './hyperion.service';
@@ -12,6 +12,8 @@ export class ChatService {
 
   public messages: any[] = [];
   public messages$ = new Subject<any[]>();
+  public model$: Subject<string> = new Subject<string>();
+  public prompt$: Subject<string> = new Subject<string>();
 
   public messagesGroups: {[key:string]: [string, any]} = {};
   public messagesGroups$ = new Subject<any>();
@@ -20,6 +22,25 @@ export class ChatService {
 
   constructor(private hyperion: HyperionService, private store: LocalStorageService) {
     this.hyperion.botName$.subscribe((botName: string) => this.botName = botName);
+    this.hyperion.model$.subscribe((res) => {
+      this.store.getView(this.activeViewUuid).then((view) => {
+        if(view[0].model === '') {
+          this.store.changeViewModel(this.activeViewUuid, res);
+          this.hyperion.model = res;
+          this.model$.next(res);
+        }
+      });
+    });
+
+    this.hyperion.prompt$.subscribe((res) => {
+      this.store.getView(this.activeViewUuid).then((view) => {
+        if(view[0].prompt === '') {
+          this.store.changeViewPrompt(this.activeViewUuid, res);
+          this.hyperion.prompt = res;
+          this.prompt$.next(res);
+        }
+      });
+    });
     this.fetchViews();
   }
 
@@ -51,7 +72,7 @@ export class ChatService {
     const uuid = uuidv4();
     const name = 'New view';
     this.messagesGroups[uuid] = [name, []];
-    this.store.addView(uuid, name);
+    this.store.addView(uuid, name, this.hyperion.model, this.hyperion.prompt);
     return uuid;
   }
 
@@ -74,6 +95,30 @@ export class ChatService {
       this.messages = messages;
       this.messages$.next(this.messages);
     }
+
+    this.store.getView(uuid).then((view) => {
+      let model = view[0].model;
+      if (model !== '') {
+        this.hyperion.model = model;
+        this.model$.next(model);
+      }
+
+      let prompt = view[0].prompt;
+      if (prompt !== '') {
+        this.hyperion.prompt = prompt;
+        this.prompt$.next(prompt);
+      }
+    });
+  }
+
+  changeViewModel(model: string) {
+    this.hyperion.model = model;
+    this.store.changeViewModel(this.activeViewUuid, model);
+  }
+
+  changeViewPrompt(prompt: string) {
+    this.hyperion.prompt = prompt;
+    this.store.changeViewPrompt(this.activeViewUuid, prompt);
   }
 
   mockData() {

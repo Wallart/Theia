@@ -4,6 +4,8 @@ export interface Views {
   id?: number;
   uuid: string;
   name: string;
+  model: string;
+  prompt: string;
 }
 
 export interface Messages {
@@ -14,7 +16,7 @@ export interface Messages {
 }
 
 export class AppDB extends Dexie {
-  versionNum = 1;
+  versionNum = 2;
   views!: Table<Views, number>;
   messages!: Table<Messages, number>;
 

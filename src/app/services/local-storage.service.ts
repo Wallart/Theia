@@ -9,8 +9,8 @@ export class LocalStorageService {
 
   constructor() {}
 
-  addView(uuid: string, name: string) {
-    return db.views.add({ uuid, name });
+  addView(uuid: string, name: string, model: string, prompt: string) {
+    return db.views.add({ uuid, name, model, prompt });
   }
 
   deleteView(uuid: string) {
@@ -21,8 +21,20 @@ export class LocalStorageService {
     return db.views.where('uuid').equals(uuid).modify({ name });
   }
 
+  changeViewModel(uuid: string, model: string) {
+    return db.views.where('uuid').equals(uuid).modify({ model });
+  }
+
+  changeViewPrompt(uuid: string, prompt: string) {
+    return db.views.where('uuid').equals(uuid).modify({ prompt });
+  }
+
   listViews() {
     return db.views.toArray();
+  }
+
+  getView(viewUuid: string) {
+    return db.views.where('uuid').equals(viewUuid).toArray();
   }
 
   putMessage(uuid: string, message: any) {

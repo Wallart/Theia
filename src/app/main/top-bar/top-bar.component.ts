@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
+import { ChatService } from '../../services/chat.service';
 import { StatusService } from '../../services/status.service';
 import { HyperionService } from '../../services/hyperion.service';
-import { LocalStorageService } from '../../services/local-storage.service';
 
 
 @Component({
@@ -18,7 +18,7 @@ export class TopBarComponent {
   stateClass: string = '';
   bot: string = 'Unknown';
 
-  constructor(public hyperion: HyperionService, private store: LocalStorageService, private status: StatusService) {
+  constructor(public hyperion: HyperionService, private chat: ChatService, private status: StatusService) {
     this.models = [];
     this.prompts = [];
 
@@ -27,10 +27,10 @@ export class TopBarComponent {
     });
 
     this.hyperion.models$.subscribe((res) => this.models = res);
-    this.hyperion.model$.subscribe((res) => this.selectedModel = res as string);
+    this.chat.model$.subscribe((res) => this.selectedModel = res as string);
 
     this.hyperion.prompts$.subscribe((res) => this.prompts = res);
-    this.hyperion.prompt$.subscribe((res) => this.selectedPrompt = res as string);
+    this.chat.prompt$.subscribe((res) => this.selectedPrompt = res as string);
   }
 
   ngAfterContentInit() {
@@ -51,12 +51,10 @@ export class TopBarComponent {
   }
 
   onModelChanged() {
-    this.hyperion.model = this.selectedModel;
-    this.store.setItem('model', this.selectedModel);
+    this.chat.changeViewModel(this.selectedModel);
   }
 
   onPromptChanged() {
-    this.hyperion.prompt = this.selectedPrompt;
-    this.store.setItem('prompt', this.selectedPrompt);
+    this.chat.changeViewPrompt(this.selectedPrompt);
   }
 }

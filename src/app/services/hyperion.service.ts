@@ -196,10 +196,7 @@ export class HyperionService {
 
   private getPrompt() {
     this.http.get(`${this.targetUrl}/prompt`, {responseType: 'text'})
-      .subscribe((res) => {
-        this.prompt = this.store.getItem('prompt') !== null ? this.store.getItem('prompt') : res;
-        this.prompt$.next(this.prompt);
-      });
+      .subscribe((res) => this.prompt$.next(res));
   }
 
   private getPrompts() {
@@ -215,10 +212,7 @@ export class HyperionService {
 
   private getModel() {
     this.http.get(`${this.targetUrl}/model`, {responseType: 'text'})
-      .subscribe((res) => {
-        this.model = this.store.getItem('model') !== null ? this.store.getItem('model') : res;
-        this.model$.next(this.model);
-      });
+      .subscribe((res) => this.model$.next(res));
   }
 
   private getModels() {
