@@ -59,6 +59,7 @@
 
 .image img {
   border: 1px solid #7D7E7F;
+  max-width: 512px;
 }
 
 .image-wrapper:hover .save-button {
