@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { ChatService } from '../services/chat.service';
 import { HyperionService } from '../services/hyperion.service';
+import { LocalStorageService } from '../services/local-storage.service';
 
 @Component({
   selector: 'app-main',
@@ -14,7 +15,7 @@ export class MainComponent {
   initialScrollDone = false;
   botName = '';
 
-  constructor(private chat: ChatService, private hyperion: HyperionService) {
+  constructor(private chat: ChatService, private hyperion: HyperionService, private store: LocalStorageService) {
     this.hyperion.botName$.subscribe((name) => this.botName = name);
   }
 
@@ -34,5 +35,30 @@ export class MainComponent {
         setTimeout(() => element.scrollTop = element.scrollHeight, 500);
       }
     }
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    // @ts-ignore
+    const files = event.dataTransfer.files;
+    const reader = new FileReader();
+    if (files.length) {
+      let username = this.store.getItem('username');
+      if (username === null) {
+        username = 'Unknown';
+      }
+
+      reader.onload = (e: any) => {
+        const base64Image = e.target.result;
+        this.chat.addUserImg(username, base64Image, new Date());
+      };
+
+      reader.readAsDataURL(files[0]);
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.stopPropagation();
+    event.preventDefault();
   }
 }

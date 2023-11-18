@@ -265,6 +265,25 @@ export class ChatService {
     this.addImg(this.botName, 'bot', objectURI, date);
   }
 
+  addUserImg(username: string, base64Img: string, date: any) {
+    const splitContent = base64Img.split(',');
+    const base64ImageContent = splitContent[1]
+    const contentType = splitContent[0].split(':')[1].split(';')[0];
+
+    const byteCharacters = atob(base64ImageContent);
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], {type: contentType});
+
+    const objectURI = URL.createObjectURL(blob);
+    this.addImg(username, 'user', objectURI, date);
+  }
+
   // save() {
   //   this.store.setItem('chat', JSON.stringify(this.messagesGroups));
   //   this.store.insertMessage(JSON.stringify(this.messagesGroups));
