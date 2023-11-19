@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { ChatService } from '../services/chat.service';
 import { HyperionService } from '../services/hyperion.service';
+import { AudioSinkService } from '../services/audio-sink.service';
 import { LocalStorageService } from '../services/local-storage.service';
 
 @Component({
@@ -15,7 +16,8 @@ export class MainComponent {
   initialScrollDone = false;
   botName = '';
 
-  constructor(private chat: ChatService, private hyperion: HyperionService, private store: LocalStorageService) {
+  constructor(private chat: ChatService, private hyperion: HyperionService,
+              private store: LocalStorageService, private audioSink: AudioSinkService) {
     this.hyperion.botName$.subscribe((name) => this.botName = name);
   }
 
@@ -51,6 +53,15 @@ export class MainComponent {
       reader.onload = (e: any) => {
         const base64Image = e.target.result;
         this.chat.addUserImg(username, base64Image, new Date());
+        this.hyperion.sendChat(username, base64Image)
+          .then(subject => {
+            subject.subscribe((frame) => {
+              let answer = this.chat.formatAnswerWithRequest(frame['ANS'], frame['REQ']);
+              this.chat.addBotMsg(answer, frame['TIM']);
+              this.audioSink.setBuffer(frame['PCM'], frame['TIM']);
+              this.chat.addBotImg(frame['IMG'], frame['TIM']);
+            });
+          });
       };
 
       reader.readAsDataURL(files[0]);
