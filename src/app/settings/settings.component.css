@@ -44,7 +44,7 @@ input[type=text] {
   background-color: red;
 }
 
-.device-selector {
+.settings-selector {
   user-select: none;
   width: 200px;
   display: inline-block;

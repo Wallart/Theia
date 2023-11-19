@@ -9,19 +9,19 @@
   <hr/>
   <div class="option-row">
     <p class="option-label">Input device : </p>
-    <select class="device-selector" id="indevice-selector" name="indevice" [(ngModel)]="selectedInDevice" (change)="onInDeviceChanged()">
+    <select class="settings-selector" id="indevice-selector" name="indevice" [(ngModel)]="selectedInDevice" (change)="onInDeviceChanged()">
       <option *ngFor="let device of inDevices" [value]="device.label">{{device.label}}</option>
     </select>
   </div>
   <div class="option-row">
     <p class="option-label">Output device : </p>
-    <select class="device-selector" id="outdevice-selector" name="outdevice" [(ngModel)]="selectedOutDevice" (change)="onOutDeviceChanged()">
+    <select class="settings-selector" id="outdevice-selector" name="outdevice" [(ngModel)]="selectedOutDevice" (change)="onOutDeviceChanged()">
       <option *ngFor="let device of outDevices" [value]="device.label">{{device.label}}</option>
     </select>
   </div>
   <div class="option-row">
     <p class="option-label">Video input : </p>
-    <select class="device-selector" id="camera-selector" name="camera" [(ngModel)]="selectedCamDevice" (change)="onCamChanged()">
+    <select class="settings-selector" id="camera-selector" name="camera" [(ngModel)]="selectedCamDevice" (change)="onCamChanged()">
       <option *ngFor="let device of cameraDevices" [value]="device.label">{{device.label}}</option>
     </select>
   </div>
@@ -49,5 +49,18 @@
       <span></span>
       <span></span>
     </div>
+  </div>
+  <hr/>
+  <div class="option-row">
+    <p class="option-label">Voice engine : </p>
+    <select class="settings-selector" id="speech-engine-selector" name="speech-engine" [(ngModel)]="selectedSpeechEngine" (change)="onSpeechEngineChanged()">
+      <option *ngFor="let engine of speechEngines" [value]="engine">{{engine}}</option>
+    </select>
+  </div>
+  <div class="option-row">
+    <p class="option-label">Voice : </p>
+    <select class="settings-selector" id="voice-selector" name="voice" [(ngModel)]="selectedVoice" (change)="onVoiceChanged()" [disabled]="!voices.length">
+      <option *ngFor="let voice of voices" [value]="voice">{{voice}}</option>
+    </select>
   </div>
 </div>

@@ -6,7 +6,7 @@ import { StatusService } from './status.service';
 import { ElectronService } from './electron.service';
 import { AudioSinkService } from './audio-sink.service';
 import { LocalStorageService } from './local-storage.service';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +26,16 @@ export class HyperionService {
   prompts$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(this.prompts);
   botName: string = '';
   botName$: BehaviorSubject<string> = new BehaviorSubject<string>(this.botName);
+
+  speechEngines: string[] = [];
+  speechEngines$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(this.speechEngines);
+  selectedSpeechEngine: string = '';
+  selectedSpeechEngine$: BehaviorSubject<string> = new BehaviorSubject<string>(this.selectedSpeechEngine);
+  voices: string[] = [];
+  voices$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(this.voices);
+  selectedVoice: string = '';
+  selectedVoice$: BehaviorSubject<string> = new BehaviorSubject<string>(this.selectedVoice);
+
   rootUrl: string = '';
   targetUrl: string = '';
   socketUrl: string = '';
@@ -86,6 +96,7 @@ export class HyperionService {
     this.getModel();
     this.getModels();
     this.getName();
+    this.getSpeechSynthesizerDetails();
     this.pollChanges();
   }
 
@@ -224,6 +235,64 @@ export class HyperionService {
           this.models$.next(this.models);
         }
       });
+  }
+
+  private getSpeechSynthesizerDetails() {
+    this.getSpeechEngines().subscribe((engines: any) => {
+      this.speechEngines = engines;
+      this.speechEngines$.next(this.speechEngines);
+
+      this.selectedSpeechEngine = engines[0];
+      this.selectedSpeechEngine$.next(this.selectedSpeechEngine);
+
+      this.getVoices(engines[0]).subscribe((voices: any) => {
+        this.voices = voices;
+        this.voices$.next(this.voices);
+
+        this.getVoice(engines[0]).subscribe((voice: any) => {
+          this.selectedVoice = voice;
+          this.selectedVoice$.next(this.selectedVoice);
+        });
+      });
+    });
+  }
+
+  private getSpeechEngines() {
+    return this.http.get(`${this.targetUrl}/tts-preferred-engines`);
+  }
+
+  setSpeechEngines(enginesOrder: string[]) {
+    // Send as JSON
+    return this.http.post(`${this.targetUrl}/tts-preferred-engines`, enginesOrder, {responseType: 'text' as 'json'})
+      .subscribe(() => {
+        this.getVoices(enginesOrder[0]).subscribe((voices: any) => {
+          this.voices = voices;
+          this.voices$.next(this.voices);
+          this.getVoice(enginesOrder[0]).subscribe((voice: any) => {
+            this.selectedVoice = voice;
+            this.selectedVoice$.next(this.selectedVoice);
+          });
+        });
+      });
+  }
+
+  private getVoices(selectedEngine: string) {
+    let params = new HttpParams();
+    params = params.append('engine', selectedEngine);
+    return this.http.get(`${this.targetUrl}/voices`, {params});
+  }
+
+  private getVoice(selectedEngine: string) {
+    let params = new HttpParams();
+    params = params.append('engine', selectedEngine);
+    return this.http.get(`${this.targetUrl}/voice`, {responseType: 'text' as 'json', params});
+  }
+
+  setVoice(selectedEngine: string, selectedVoice: string) {
+    const payload = new FormData();
+    payload.append('engine', selectedEngine);
+    payload.append('voice', selectedVoice);
+    return this.http.post(`${this.targetUrl}/voice`, payload, {responseType: 'text' as 'json'}).subscribe();
   }
 
   frameDecode(buffer: ArrayBuffer, callback: Function) {

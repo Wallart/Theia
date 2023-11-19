@@ -21,12 +21,16 @@ export class SettingsComponent {
   inDevices: any[] = [];
   outDevices: any[] = [];
   cameraDevices: any[] = [];
+  speechEngines: string[] = [];
+  voices: string[] = [];
 
   serverAddress: string;
   selectedInDevice: string;
   selectedOutDevice: string;
   selectedCamDevice: string;
   selectedNoiseThreshold: number;
+  selectedSpeechEngine: string = '';
+  selectedVoice: string = '';
   maxDbs = 110;
 
   constructor(private media: MediaService, private audioInput: AudioInputService, private audioSink: AudioSinkService,
@@ -37,6 +41,11 @@ export class SettingsComponent {
     this.selectedOutDevice = this.audioSink.selectedSpeakers;
     this.selectedCamDevice = this.videoInput.selectedCamera;
     this.selectedNoiseThreshold = this.audioInput.noiseThreshold;
+
+    this.hyperion.speechEngines$.subscribe((engines: any) => this.speechEngines = engines);
+    this.hyperion.selectedSpeechEngine$.subscribe((engine: any) => this.selectedSpeechEngine = engine);
+    this.hyperion.voices$.subscribe((voices: any) => this.voices = voices);
+    this.hyperion.selectedVoice$.subscribe((voice: any) => this.selectedVoice = voice);
   }
 
   ngOnInit() {
@@ -142,5 +151,15 @@ export class SettingsComponent {
       this.hyperion.address = this.serverAddress;
       this.hyperion.connectSocket();
     }
+  }
+
+  onSpeechEngineChanged() {
+    let preferredEngines = this.speechEngines.filter(item => item !== this.selectedSpeechEngine);
+    preferredEngines.unshift(this.selectedSpeechEngine);
+    this.hyperion.setSpeechEngines(preferredEngines);
+  }
+
+  onVoiceChanged() {
+    this.hyperion.setVoice(this.selectedSpeechEngine, this.selectedVoice);
   }
 }
