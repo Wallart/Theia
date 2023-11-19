@@ -34,6 +34,7 @@ const createMainWindow = () => {
       width: 800,
       height: 600,
       show: false,
+      autoHideMenuBar: true,
       acceptFirstMouse: true,
       webPreferences: {
         nodeIntegration: true,
@@ -131,6 +132,7 @@ const bindMenu = () => {
 
   const menu = new Menu();
   menu.append(new MenuItem({
+    label: 'Application',
     submenu: [
       {'role': 'about'},
       {'type': 'separator'},
@@ -145,8 +147,27 @@ const bindMenu = () => {
     ]
   }));
   menu.append(new MenuItem({
+    label: 'Edit',
+    submenu: [
+      {'role': 'undo'},
+      {'role': 'redo'},
+      {'type': 'separator'},
+      {'role': 'cut'},
+      {'role': 'copy'},
+      {'role': 'paste'},
+      {'role': 'selectAll'}
+    ]
+  }));
+  menu.append(new MenuItem({
     label: 'Actions',
     submenu: submenu
+  }));
+  menu.append(new MenuItem({
+    label: 'Window',
+    submenu: [
+      {'role': 'minimize'},
+      {'role': 'zoom'}
+    ]
   }));
   Menu.setApplicationMenu(menu);
 }
