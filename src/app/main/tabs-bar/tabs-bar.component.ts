@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
-import {ElectronService} from "../../services/electron.service";
+import { ElectronService } from '../../services/electron.service';
 
 @Component({
   selector: 'tabs-bar',
@@ -13,7 +13,7 @@ export class TabsBarComponent {
   newTabShortcut: string = '';
   closeTabShortcut: string = '';
 
-  constructor(private chat: ChatService, private electron: ElectronService) {
+  constructor(private chat: ChatService, private electron: ElectronService, private changeDetectorRef: ChangeDetectorRef) {
     this.chat.messagesGroups$.subscribe((data: any) => {
       for (let uuid in data) {
         const active = uuid === this.chat.activeViewUuid;
@@ -32,7 +32,9 @@ export class TabsBarComponent {
     this.electron.bind('newTab', (event: Object) => {
       console.log(`Keyboard shortcut : newTab`);
       this.onNewTab();
+      this.changeDetectorRef.detectChanges();
     });
+
     this.electron.bind('prevTab', (event: Object) => {
       console.log(`Keyboard shortcut : prevTab`);
 
@@ -41,8 +43,11 @@ export class TabsBarComponent {
 
       this.tabs[activeTabIdx + 1].active = false;
       this.tabs[activeTabIdx].active = true;
+      this.changeDetectorRef.detectChanges();
+
       this.chat.activeChat = this.tabs[activeTabIdx].uuid;
     });
+
     this.electron.bind('nextTab', (event: Object) => {
       console.log(`Keyboard shortcut : nextTab`);
 
@@ -51,11 +56,15 @@ export class TabsBarComponent {
 
       this.tabs[activeTabIdx - 1].active = false;
       this.tabs[activeTabIdx].active = true;
+      this.changeDetectorRef.detectChanges();
+
       this.chat.activeChat = this.tabs[activeTabIdx].uuid;
     });
+
     this.electron.bind('closeTab', (event: Object) => {
       console.log(`Keyboard shortcut : closeTab`);
       this.onTabClose(this.chat.activeViewUuid);
+      this.changeDetectorRef.detectChanges();
     });
   }
 

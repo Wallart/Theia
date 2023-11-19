@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { StatusService } from '../../services/status.service';
 import { HyperionService } from '../../services/hyperion.service';
@@ -18,7 +18,8 @@ export class TopBarComponent {
   stateClass: string = '';
   bot: string = 'Unknown';
 
-  constructor(public hyperion: HyperionService, private chat: ChatService, private status: StatusService) {
+  constructor(public hyperion: HyperionService, private chat: ChatService,
+              private status: StatusService, private changeDetectorRef: ChangeDetectorRef) {
     this.models = [];
     this.prompts = [];
 
@@ -27,10 +28,16 @@ export class TopBarComponent {
     });
 
     this.hyperion.models$.subscribe((res) => this.models = res);
-    this.chat.model$.subscribe((res) => this.selectedModel = res as string);
-
     this.hyperion.prompts$.subscribe((res) => this.prompts = res);
-    this.chat.prompt$.subscribe((res) => this.selectedPrompt = res as string);
+
+    this.chat.model$.subscribe((res) => {
+      this.selectedModel = res as string;
+      this.changeDetectorRef.detectChanges();
+    });
+    this.chat.prompt$.subscribe((res) => {
+      this.selectedPrompt = res as string;
+      this.changeDetectorRef.detectChanges();
+    });
   }
 
   ngAfterContentInit() {

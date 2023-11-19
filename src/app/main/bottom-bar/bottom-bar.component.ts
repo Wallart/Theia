@@ -1,5 +1,5 @@
 import { Router } from '@angular/router';
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { ElectronService } from '../../services/electron.service';
 import { HyperionService } from '../../services/hyperion.service';
@@ -31,7 +31,7 @@ export class BottomBarComponent {
 
   constructor(private electron: ElectronService, private chat: ChatService, private hyperion: HyperionService,
               private audioSink: AudioSinkService, private audioInput: AudioInputService, private router: Router,
-              private store: LocalStorageService, private videoInput: VideoInputService) {
+              private store: LocalStorageService, private videoInput: VideoInputService, private changeDetectorRef: ChangeDetectorRef) {
     this.microphoneMuted = this.audioInput.muted;
     this.speakersMuted = this.audioSink.muted;
     this.cameraMuted = this.videoInput.muted;
@@ -51,14 +51,17 @@ export class BottomBarComponent {
     this.electron.bind('toggleCam', (event: Object) => {
       console.log(`Keyboard shortcut : toggleCam`);
       this.toggleCam();
+      this.changeDetectorRef.detectChanges();
     });
     this.electron.bind('toggleMic', (event: Object) => {
       console.log(`Keyboard shortcut : toggleMic`);
       this.toggleMic();
+      this.changeDetectorRef.detectChanges();
     });
     this.electron.bind('toggleSpeakers', (event: Object) => {
       console.log(`Keyboard shortcut : toggleSpeakers`);
       this.toggleSpeakers();
+      this.changeDetectorRef.detectChanges();
     });
     this.electron.bind('gear', (event: Object) => {
       console.log(`Keyboard shortcut : gear`);
