@@ -48,11 +48,24 @@ export class HyperionService {
       this.connectSocket();
     }
 
-    // this.getState().subscribe((res) => this.status.online());
-    this.electron.bind('address-changed', (event: Object, address: string) => {
-      this.disconnectSocket();
-      this.address = address;
-      this.connectSocket();
+    if (this.electron.isElectronApp) {
+      this.electron.bind('address-changed', (event: Object, address: string) => {
+        this.disconnectSocket();
+        this.address = address;
+        this.connectSocket();
+      });
+      this.electron.bind('voice-changed', (event: Object, args: any) => this.setVoice(args[0], args[1]));
+      this.electron.bind('voice-engines-changed', (event: Object, preferredEngines: any) => this.setSpeechEngines(preferredEngines));
+      this.electron.bind('voice-settings-requested', (event: Object) => this.notifySettingsWindow());
+    }
+  }
+
+  notifySettingsWindow() {
+    this.electron.send('voice-settings-change', {
+      'speechEngines': this.speechEngines,
+      'selectedEngine': this.selectedSpeechEngine,
+      'voices': this.voices,
+      'selectedVoice': this.selectedVoice
     });
   }
 
@@ -252,6 +265,7 @@ export class HyperionService {
         this.getVoice(engines[0]).subscribe((voice: any) => {
           this.selectedVoice = voice;
           this.selectedVoice$.next(this.selectedVoice);
+          this.notifySettingsWindow();
         });
       });
     });
@@ -262,6 +276,7 @@ export class HyperionService {
   }
 
   setSpeechEngines(enginesOrder: string[]) {
+    this.selectedSpeechEngine = enginesOrder[0];
     // Send as JSON
     return this.http.post(`${this.targetUrl}/tts-preferred-engines`, enginesOrder, {responseType: 'text' as 'json'})
       .subscribe(() => {
@@ -271,6 +286,7 @@ export class HyperionService {
           this.getVoice(enginesOrder[0]).subscribe((voice: any) => {
             this.selectedVoice = voice;
             this.selectedVoice$.next(this.selectedVoice);
+            this.notifySettingsWindow();
           });
         });
       });
@@ -289,6 +305,7 @@ export class HyperionService {
   }
 
   setVoice(selectedEngine: string, selectedVoice: string) {
+    this.selectedVoice = selectedVoice;
     const payload = new FormData();
     payload.append('engine', selectedEngine);
     payload.append('voice', selectedVoice);

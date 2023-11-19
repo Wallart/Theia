@@ -258,7 +258,23 @@ ipcMain.on('address-change', (event, args) => {
   feedbackWin.webContents.send('address-changed', args);
 });
 
-ipcMain.on('update-keymap', (event, args) => {
-  globalShortcut.unregisterAll();
-  // TODO Update keymap here
+ipcMain.on('voice-change', (event, args) => {
+  mainWin.webContents.send('voice-changed', args);
 });
+
+ipcMain.on('voice-engines-change', (event, args) => {
+  mainWin.webContents.send('voice-engines-changed', args);
+});
+
+ipcMain.on('request-voice-settings', (event, args) => {
+  mainWin.webContents.send('voice-settings-requested', args);
+});
+
+ipcMain.on('voice-settings-change', (event, args) => {
+  settingsWin.webContents.send('voice-settings-changed', args);
+});
+
+// ipcMain.on('update-keymap', (event, args) => {
+//   globalShortcut.unregisterAll();
+//   // TODO Update keymap here
+// });

@@ -41,11 +41,6 @@ export class SettingsComponent {
     this.selectedOutDevice = this.audioSink.selectedSpeakers;
     this.selectedCamDevice = this.videoInput.selectedCamera;
     this.selectedNoiseThreshold = this.audioInput.noiseThreshold;
-
-    this.hyperion.speechEngines$.subscribe((engines: any) => this.speechEngines = engines);
-    this.hyperion.selectedSpeechEngine$.subscribe((engine: any) => this.selectedSpeechEngine = engine);
-    this.hyperion.voices$.subscribe((voices: any) => this.voices = voices);
-    this.hyperion.selectedVoice$.subscribe((voice: any) => this.selectedVoice = voice);
   }
 
   ngOnInit() {
@@ -75,14 +70,26 @@ export class SettingsComponent {
 
   ngAfterViewInit() {
     if (this.electron.isElectronApp) {
+      this.electron.bind('current-noise-changed', (event: Object, dbs: number) => this.onNoiseLevelChanged(dbs));
+
       this.electron.send('request-state');
-      this.electron
-        .bind('current-noise-changed', (event: Object, dbs: number) => this.onNoiseLevelChanged(dbs));
-      this.electron
-        .bind('state-changed', (event: Object, status: string) => this.onStatusChanged(status));
+      this.electron.bind('state-changed', (event: Object, status: string) => this.onStatusChanged(status));
+
+      this.electron.send('request-voice-settings');
+      this.electron.bind('voice-settings-changed', (event: Object, settings: any) => {
+        this.speechEngines = settings['speechEngines'];
+        this.selectedSpeechEngine = settings['selectedEngine'];
+        this.voices = settings['voices'];
+        this.selectedVoice = settings['selectedVoice'];
+      });
+
     } else {
       this.audioInput.noiseLevel$.subscribe((dbs) => this.onNoiseLevelChanged(dbs));
       this.status.state$.subscribe((status) => this.onStatusChanged(status));
+      this.hyperion.speechEngines$.subscribe((engines: any) => this.speechEngines = engines);
+      this.hyperion.selectedSpeechEngine$.subscribe((engine: any) => this.selectedSpeechEngine = engine);
+      this.hyperion.voices$.subscribe((voices: any) => this.voices = voices);
+      this.hyperion.selectedVoice$.subscribe((voice: any) => this.selectedVoice = voice);
     }
   }
 
@@ -156,10 +163,18 @@ export class SettingsComponent {
   onSpeechEngineChanged() {
     let preferredEngines = this.speechEngines.filter(item => item !== this.selectedSpeechEngine);
     preferredEngines.unshift(this.selectedSpeechEngine);
-    this.hyperion.setSpeechEngines(preferredEngines);
+    if (this.electron.isElectronApp) {
+      this.electron.send('voice-engines-change', preferredEngines);
+    } else {
+      this.hyperion.setSpeechEngines(preferredEngines);
+    }
   }
 
   onVoiceChanged() {
-    this.hyperion.setVoice(this.selectedSpeechEngine, this.selectedVoice);
+    if (this.electron.isElectronApp) {
+      this.electron.send('voice-change', [this.selectedSpeechEngine, this.selectedVoice]);
+    } else {
+      this.hyperion.setVoice(this.selectedSpeechEngine, this.selectedVoice);
+    }
   }
 }
