@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, systemPreferences, globalShortcut } = require('electron')
+const { app, BrowserWindow, ipcMain, systemPreferences, globalShortcut, Menu, MenuItem } = require('electron')
 const path = require('path');
 
 const bounceId = process.platform === 'darwin' ? app.dock.bounce('critical') : null;
@@ -7,12 +7,15 @@ let mainWin = null;
 let settingsWin = null;
 let feedbackWin = null;
 let keymap = {
-  newTab: 'CommandOrControl+T',
-  toggleCam: 'CommandOrControl+J',
-  toggleMic: 'CommandOrControl+K',
-  toggleSpeakers: 'CommandOrControl+L',
-  clear: 'CommandOrControl+D',
-  gear: 'CommandOrControl+O'
+  newTab: ['CommandOrControl+T', 'New tab'],
+  prevTab: ['left', 'Previous tab'],
+  nextTab: ['right', 'Next tab'],
+  closeTab: ['CommandOrControl+W', 'Close tab'],
+  toggleCam: ['CommandOrControl+J', 'Toggle camera'],
+  toggleMic: ['CommandOrControl+K', 'Toggle microphone'],
+  toggleSpeakers: ['CommandOrControl+L', 'Toggle speakers'],
+  clear: ['CommandOrControl+D', 'Clear view'],
+  gear: ['CommandOrControl+O', 'Settings']
 }
 
 if (systemPreferences.getMediaAccessStatus('microphone') !== 'granted') {
@@ -49,6 +52,7 @@ const createMainWindow = () => {
     });
     mainWin.loadURL(`file://${url}`);
     mainWin.setMenu(null);
+    bindMenu();
   }
 }
 
@@ -108,10 +112,49 @@ const createWindows = () => {
   createFeedbackWindow();
 }
 
+const bindMenu = () => {
+  let submenu = [];
+  for(let key in keymap) {
+    if (key === 'gear') continue;
+    if (keymap[key][0].length > 0) {
+      submenu.push({
+        label: keymap[key][1],
+        accelerator: keymap[key][0],
+        click: () => mainWin.webContents.send(key)
+      });
+    }
+  }
+
+  submenu.splice(1, 0, {'type': 'separator'})
+  submenu.splice(5, 0, {'type': 'separator'})
+  submenu.splice(submenu.length - 1, 0, {'type': 'separator'})
+
+  const menu = new Menu();
+  menu.append(new MenuItem({
+    submenu: [
+      {'role': 'about'},
+      {'type': 'separator'},
+      {
+        label: keymap['gear'][1],
+        accelerator: keymap['gear'][0],
+        click: () => mainWin.webContents.send('gear')
+      },
+      {'role': 'toggleDevTools'},
+      {'type': 'separator'},
+      {'role': 'quit'}
+    ]
+  }));
+  menu.append(new MenuItem({
+    label: 'Actions',
+    submenu: submenu
+  }));
+  Menu.setApplicationMenu(menu);
+}
+
 const sendKeymap = () => {
   let formattedKeymap = {}
   for(let key in keymap) {
-    let shortcut = keymap[key].split('+');
+    let shortcut = keymap[key][0].split('+');
     for(let i=0; i < shortcut.length; i++) {
       if(shortcut[i] === 'CommandOrControl' && process.platform === 'darwin') {
         shortcut[i] = 'Cmd';
@@ -119,7 +162,8 @@ const sendKeymap = () => {
         shortcut[i] = 'Ctrl';
       }
     }
-    formattedKeymap[key] = shortcut.join(' + ');
+    shortcut = shortcut.join(' + ')
+    formattedKeymap[key] = `${keymap[key][1]} (${shortcut})`;
   }
   mainWin.webContents.send('keymap', formattedKeymap);
 }
@@ -131,13 +175,14 @@ app.on('certificate-error', (event, webContents, url, error, certificate, callba
 });
 
 app.whenReady()
-  .then(() => {
-    for(let key in keymap) {
-      if (keymap[key].length > 0) {
-        globalShortcut.register(keymap[key], () => mainWin.webContents.send(key));
-      }
-    }
-  })
+  // .then(() => {
+    // TODO Using GlobalShortcut is a bad idea. Interfering it's hiding other apps shortcut
+    // for(let key in keymap) {
+    //   if (keymap[key].length > 0) {
+    //     globalShortcut.register(keymap[key], () => mainWin.webContents.send(key));
+    //   }
+    // }
+  // })
   .then(() => {
     createWindows();
     mainWin.webContents.on('did-finish-load', () => {

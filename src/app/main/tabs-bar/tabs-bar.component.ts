@@ -11,6 +11,7 @@ export class TabsBarComponent {
 
   tabs: any[] = [];
   newTabShortcut: string = '';
+  closeTabShortcut: string = '';
 
   constructor(private chat: ChatService, private electron: ElectronService) {
     this.chat.messagesGroups$.subscribe((data: any) => {
@@ -27,10 +28,46 @@ export class TabsBarComponent {
         if (attribute in this) this[attribute] = keymap[key];
       }
     });
+
     this.electron.bind('newTab', (event: Object) => {
       console.log(`Keyboard shortcut : newTab`);
       this.onNewTab();
     });
+    this.electron.bind('prevTab', (event: Object) => {
+      console.log(`Keyboard shortcut : prevTab`);
+
+      let activeTabIdx = this.findActiveTabIdx();
+      activeTabIdx = Math.max(0, activeTabIdx - 1);
+
+      this.tabs[activeTabIdx + 1].active = false;
+      this.tabs[activeTabIdx].active = true;
+      this.chat.activeChat = this.tabs[activeTabIdx].uuid;
+    });
+    this.electron.bind('nextTab', (event: Object) => {
+      console.log(`Keyboard shortcut : nextTab`);
+
+      let activeTabIdx = this.findActiveTabIdx();
+      activeTabIdx = Math.min(activeTabIdx + 1, this.tabs.length - 1);
+
+      this.tabs[activeTabIdx - 1].active = false;
+      this.tabs[activeTabIdx].active = true;
+      this.chat.activeChat = this.tabs[activeTabIdx].uuid;
+    });
+    this.electron.bind('closeTab', (event: Object) => {
+      console.log(`Keyboard shortcut : closeTab`);
+      this.onTabClose(this.chat.activeViewUuid);
+    });
+  }
+
+  findActiveTabIdx() {
+    let activeTabIdx = -1;
+    for (let i=0; i < this.tabs.length; i++) {
+      if (this.tabs[i].active) {
+        activeTabIdx = i;
+        break;
+      }
+    }
+    return activeTabIdx;
   }
 
   activeTab(uuid: string) {

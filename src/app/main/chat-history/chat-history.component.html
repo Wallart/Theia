@@ -1,6 +1,6 @@
 <div id="chat-frame">
   <div class="message" *ngFor="let message of messages">
-    <div class="copy-button text-copy-button" (click)="onCopy($event)"></div>
+    <div class="copy-button text-copy-button" (click)="onCopy($event)" title="Copy"></div>
     <div class="header">
       <div class="username {{message.role}}">{{message.username}}</div>
       <div class="timestamp">{{message.date | date:'MM/dd/yyyy H:mm'}}</div>
@@ -15,7 +15,7 @@
         <pre class="code" *ngIf="data.isCode"><div class="copy-button code-copy-button" (click)="onCopy($event)"></div><code [highlight]="data.content"></code></pre>
         <span class="image-wrapper" *ngIf="data.isImg">
           <span class="image">
-            <div class="save-button" (click)="onSave(data.content)"></div>
+            <div class="save-button" (click)="onSave(data.content)" title="Save"></div>
             <img [src]="data.content" />
           </span>
         </span>
