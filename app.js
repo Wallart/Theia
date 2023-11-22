@@ -12,8 +12,8 @@ let keymap = {
   nextTab: ['right', 'Next tab'],
   closeTab: ['CommandOrControl+W', 'Close tab'],
   toggleCam: ['CommandOrControl+J', 'Toggle camera'],
-  toggleMic: ['CommandOrControl+K', 'Toggle microphone'],
-  toggleSpeakers: ['CommandOrControl+L', 'Toggle speakers'],
+  toggleMic: ['CommandOrControl+L', 'Toggle microphone'],
+  toggleSpeakers: ['CommandOrControl+M', 'Toggle speakers'],
   clear: ['CommandOrControl+D', 'Clear view'],
   gear: ['CommandOrControl+O', 'Settings']
 }
