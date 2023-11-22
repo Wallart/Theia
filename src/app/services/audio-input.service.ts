@@ -58,7 +58,9 @@ export class AudioInputService {
         if (this.selectedMicrophone !== label) {
           this.selectedMicrophone = label;
           this.selectedMicrophone$.next(label);
-          this.initVADWithStream(deviceId, !this.muted);
+          if (!this.muted) {
+            this.initVADWithStream(deviceId, true);
+          }
         }
       }
     });
@@ -149,17 +151,16 @@ export class AudioInputService {
   openMicrophone() {
     this.muted = false;
     this.store.setItem('micMuted', JSON.stringify(this.muted));
-    if (this.activityDetector !== undefined) {
-      this.activityDetector.start();
-    }
+    this.initVADWithStream(this.media.getDeviceId(this.selectedMicrophone, 'audioinput'), true);
   }
 
   closeMicrophone() {
     this.muted = true;
     this.store.setItem('micMuted', JSON.stringify(this.muted));
-    if (this.activityDetector !== undefined) {
-      this.activityDetector.pause();
-    }
+
+    this.activityDetector?.pause();
+    this.activityDetector?.stream.getTracks()[0].stop()
+    delete this.activityDetector;
 
     this.speaking = false;
     this.speaking$.next(this.speaking);
