@@ -95,6 +95,12 @@ export class ChatHistoryComponent {
           case this.hyperion.serviceTokens[6]:
             systemMessage = 'Command executed';
             break;
+          case this.hyperion.serviceTokens[7]:
+            systemMessage = 'Document registered';
+            break;
+          case this.hyperion.serviceTokens[8]:
+            systemMessage = 'Invalid document';
+            break;
         }
         chunks.push({ isCode: false, isImg: false, isSystem: true, content: systemMessage});
         continue;

@@ -13,7 +13,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 })
 export class HyperionService {
   socket: any;
-  serviceTokens = ['<ACK>', '<MEMWIPE>', '<SLEEPING>', '<WAKE>', '<CONFUSED>', '<ERR>', '<CMD>'];
+  serviceTokens = ['<ACK>', '<MEMWIPE>', '<SLEEPING>', '<WAKE>', '<CONFUSED>', '<ERR>', '<CMD>', '<DOCOK>', '<DOCNOK>'];
 
   pollInterval: any;
   model: string = '';
@@ -204,6 +204,19 @@ export class HyperionService {
 
     const options: any = { responseType: 'text', headers: new HttpHeaders(headers) };
     return this.http.post(`${this.targetUrl}/video`, payload, options);
+  }
+
+  sendFileToContext(file: File) {
+    const payload = new FormData();
+    payload.append('file', file, file.name);
+
+    const options: any = {
+      method: 'POST',
+      body: payload,
+      responseType: 'text',
+      headers: this.getHttpHeaders()
+    }
+    return this.http.post(`${this.targetUrl}/upload-to-context`, payload, options);
   }
 
   getState() {

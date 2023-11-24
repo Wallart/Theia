@@ -44,27 +44,42 @@ export class MainComponent {
     // @ts-ignore
     const files = event.dataTransfer.files;
     const reader = new FileReader();
-    if (files.length) {
-      let username = this.store.getItem('username');
-      if (username === null) {
-        username = 'Unknown';
-      }
+    if (files.length ) {
+      let file = files[0];
+      let mimeType = file.type;
+      if (mimeType.startsWith('image/')) {
+        let username = this.store.getItem('username');
+        if (username === null) {
+          username = 'Unknown';
+        }
 
-      reader.onload = (e: any) => {
-        const base64Image = e.target.result;
-        this.chat.addUserImg(username, base64Image, new Date());
-        this.hyperion.sendChat(username, base64Image)
-          .then(subject => {
-            subject.subscribe((frame) => {
-              let answer = this.chat.formatAnswerWithRequest(frame['ANS'], frame['REQ']);
-              this.chat.addBotMsg(answer, frame['TIM']);
-              this.audioSink.setBuffer(frame['PCM'], frame['TIM']);
-              this.chat.addBotImg(frame['IMG'], frame['TIM']);
+        reader.onload = (e: any) => {
+          const base64Image = e.target.result;
+          this.chat.addUserImg(username, base64Image, new Date());
+          this.hyperion.sendChat(username, base64Image)
+            .then(subject => {
+              subject.subscribe((frame) => {
+                let answer = this.chat.formatAnswerWithRequest(frame['ANS'], frame['REQ']);
+                this.chat.addBotMsg(answer, frame['TIM']);
+                this.audioSink.setBuffer(frame['PCM'], frame['TIM']);
+                this.chat.addBotImg(frame['IMG'], frame['TIM']);
+              });
             });
-          });
-      };
+        };
 
-      reader.readAsDataURL(files[0]);
+        reader.readAsDataURL(file);
+      } else if (mimeType === 'application/pdf') {
+        this.hyperion.sendFileToContext(file).subscribe((res) => {
+          this.chat.addBotMsg('<DOCOK>', new Date());
+          console.log(res);
+        }, (err) => {
+          this.chat.addBotMsg('<DOCNOK>', new Date());
+          console.error(err.error);
+        });
+      } else {
+        this.chat.addBotMsg('<DOCNOK>', new Date());
+        console.error(`"${mimeType}" file type not supported.`);
+      }
     }
   }
 
