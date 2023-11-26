@@ -4,14 +4,14 @@
       <input placeholder="{{ tab.name }}" readonly (click)="onClick(tab.uuid)" (dblclick)="onDblClick($event)" (focusout)="onFocusOut($event, tab.uuid)">
       <div class="button" (click)="onTabClose(tab.uuid)"  [title]="closeTabShortcut">
         <div class="icon-aligner"></div>
-        <img *ngIf="!tab.active" class="button-icon" src="assets/xmark.svg">
-        <img *ngIf="tab.active" class="button-icon" src="assets/xmark-active.svg">
+        <img *ngIf="!tab.active" class="button-icon" src="assets/xmark.svg" draggable="false">
+        <img *ngIf="tab.active" class="button-icon" src="assets/xmark-active.svg" draggable="false">
       </div>
     </div>
   </div>
   <div class="vertical-sep"></div>
   <div id="new-tab" class="button" (click)="onNewTab()" [title]="newTabShortcut">
     <div class="icon-aligner"></div>
-    <img class="button-icon" src="assets/square-plus.svg">
+    <img class="button-icon" src="assets/square-plus.svg" draggable="false">
   </div>
 </div>
