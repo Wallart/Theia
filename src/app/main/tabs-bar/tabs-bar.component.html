@@ -1,11 +1,6 @@
 <div id="tabs-bar">
-  <div id="new-tab" class="button" (click)="onNewTab()" [title]="newTabShortcut">
-    <div class="icon-aligner"></div>
-    <img class="button-icon" src="assets/square-plus.svg">
-  </div>
-  <div class="vertical-sep"></div>
   <div id="tabs-container">
-    <div class="tab" *ngFor="let tab of tabs" [ngClass]="{'tab-selected': tab.active}">
+    <div class="tab" *ngFor="let tab of tabs" [ngClass]="{'tab-selected': tab.active}" title="{{tab.name}}">
       <input placeholder="{{ tab.name }}" readonly (click)="onClick(tab.uuid)" (dblclick)="onDblClick($event)" (focusout)="onFocusOut($event, tab.uuid)">
       <div class="button" (click)="onTabClose(tab.uuid)"  [title]="closeTabShortcut">
         <div class="icon-aligner"></div>
@@ -13,5 +8,10 @@
         <img *ngIf="tab.active" class="button-icon" src="assets/xmark-active.svg">
       </div>
     </div>
+  </div>
+  <div class="vertical-sep"></div>
+  <div id="new-tab" class="button" (click)="onNewTab()" [title]="newTabShortcut">
+    <div class="icon-aligner"></div>
+    <img class="button-icon" src="assets/square-plus.svg">
   </div>
 </div>

@@ -1,13 +1,9 @@
-#top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 #status-indicator {
+  /*border: 1px solid;*/
   user-select: none;
   color: whitesmoke;
   font-family: "Helvetica", serif;
+  white-space: nowrap;
 }
 
 #status-indicator div {
@@ -29,9 +25,9 @@
   font-weight: bold;
   border-radius: 50%;
   vertical-align: middle;
-  width: 35px;
-  height: 35px;
-  line-height: 35px;
+  width: 37px;
+  height: 37px;
+  line-height: 37px;
   text-align: center;
 }
 
@@ -86,12 +82,4 @@
   color: #cbcaca;
   font-size: 0.9em;
   font-weight: lighter;
-}
-
-#option-selectors {
-  user-select: none;
-}
-
-#models-selector {
-  margin-right: 5px;
 }

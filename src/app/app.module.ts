@@ -6,7 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { SettingsComponent } from './settings/settings.component';
-import { TopBarComponent } from './main/top-bar/top-bar.component';
+import { OptionBarComponent } from './main/option-bar/option-bar.component';
 import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
 import { BottomBarComponent } from './main/bottom-bar/bottom-bar.component';
 import { ChatHistoryComponent } from './main/chat-history/chat-history.component';
@@ -14,18 +14,20 @@ import { ButtonsAreaComponent } from './main/buttons-area/buttons-area.component
 import { VideoFeedbackComponent } from './video-feedback/video-feedback.component';
 import { TabsBarComponent } from './main/tabs-bar/tabs-bar.component';
 import { MathjaxModule } from 'mathjax-angular';
+import { StatusIndicatorComponent } from './main/status-indicator/status-indicator.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ChatHistoryComponent,
     ButtonsAreaComponent,
-    TopBarComponent,
+    OptionBarComponent,
     BottomBarComponent,
     SettingsComponent,
     MainComponent,
     VideoFeedbackComponent,
-    TabsBarComponent
+    TabsBarComponent,
+    StatusIndicatorComponent
   ],
   imports: [
       BrowserModule,

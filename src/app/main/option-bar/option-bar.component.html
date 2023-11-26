@@ -1,14 +1,4 @@
-<div id="top-bar">
-  <div id="status-indicator">
-    <div id="avatar">
-      <div [attr.data-initials]="bot[0]"></div>
-      <div [class]="stateClass"></div>
-    </div>
-    <div id="label">
-      <span id="botname">{{bot}}</span>
-      <span id="state">{{state}}</span>
-    </div>
-  </div>
+<div id="option-bar">
   <div id="option-selectors">
     <select name="models" id="models-selector" [(ngModel)]="selectedModel" (change)="onModelChanged()">
       <option *ngFor="let model of models" [value]="model">{{model}}</option>

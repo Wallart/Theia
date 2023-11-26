@@ -1,23 +1,23 @@
 #tabs-bar {
-  margin-top: 10px;
   display: flex;
 }
 
-#new-tab, #tabs-container {
-  height: 30px;
-  /*border: 1px solid yellowgreen;*/
-  display: inline-block;
+#tabs-container, .vertical-sep {
+  height: 37px;
+}
+
+#new-tab {
+  flex-shrink: 0;
+  width: 37px;
 }
 
 .vertical-sep {
-  /*width: 2px;*/
+  /*width: 1px;*/
   background-color: #7D7E7F;
-  /*border: 1px solid crimson;*/
-  margin: 0 10px 0 5px;
+  margin: 0 5px 0 0;
 }
 
 #tabs-container {
-  flex: 1;
   white-space: nowrap;
   overflow-x: scroll;
 }
@@ -36,14 +36,14 @@
   user-select: none;
   /*border:1px solid white;*/
   cursor: pointer;
-  border-radius: 5px;
-  width: 30px;
+  border-radius: 4px;
+  width: 25px;
   display: table-cell;
   text-align: center;
 }
 
 .button:hover {
-  background-color: #313436;
+  background-color: #444749;
 }
 
 .button-icon {
@@ -53,22 +53,27 @@
 }
 
 .tab {
+  padding-right: 5px;
   width: 120px;
-  height: 28px;
+  height: 35px;
   /*margin-top: 1px;*/
   margin-right: 5px;
   border: thin #7D7E7F solid;
   border-radius: 4px;
-  background-color: #2c2d30;
+  /*background-color: #2c2d30;*/
   display: inline-flex;
   justify-content: space-between;
   align-items: center; /*vertical align flexed elements*/
   /*overflow: hidden;*/
 }
 
-.tab-selected {
-  border: thin white solid;
+.tab:hover, .tab:hover input {
+  background-color: #2c2d30;
 }
+
+/*.tab-selected {*/
+/*  border: thin white solid;*/
+/*}*/
 
 .tab-selected input::placeholder {
   color: white;
@@ -88,7 +93,7 @@ input {
   padding: 0 0 0 5px;
   border: 0;
   border-radius: 4px;
-  background-color: #2c2d30;
+  background-color: #1f2020;
   color: white;
   text-overflow: ellipsis;
 }

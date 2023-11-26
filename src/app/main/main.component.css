@@ -11,9 +11,24 @@
   margin-right: 10px;
 }
 
-top-bar {
+#tabs-indicator-wrapper {
   margin-top: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  display: flex;
+}
+
+#tabs-indicator-wrapper tabs-bar {
+  flex: 1;
+  overflow: hidden;
+}
+
+#tabs-indicator-wrapper status-indicator {
+  margin-left: 15px;
+}
+
+option-bar {
+  margin-top: 10px;
+  /*margin-bottom: 10px;*/
   height: 35px;
 }
 
