@@ -31,6 +31,7 @@ if (systemPreferences.getMediaAccessStatus('camera') !== 'granted') {
 const createMainWindow = () => {
   if (mainWin === null || mainWin.isDestroyed()) {
     mainWin = new BrowserWindow({
+      titleBarStyle: 'hiddenInset',
       width: 800,
       height: 600,
       show: false,

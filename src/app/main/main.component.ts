@@ -3,6 +3,7 @@ import { ChatService } from '../services/chat.service';
 import { HyperionService } from '../services/hyperion.service';
 import { AudioSinkService } from '../services/audio-sink.service';
 import { LocalStorageService } from '../services/local-storage.service';
+import {ElectronService} from "../services/electron.service";
 
 @Component({
   selector: 'app-main',
@@ -16,7 +17,7 @@ export class MainComponent {
   initialScrollDone = false;
   botName = '';
 
-  constructor(private chat: ChatService, private hyperion: HyperionService,
+  constructor(private chat: ChatService, private hyperion: HyperionService, public electron: ElectronService,
               private store: LocalStorageService, private audioSink: AudioSinkService) {
     this.hyperion.botName$.subscribe((name) => this.botName = name);
   }

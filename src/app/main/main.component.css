@@ -11,6 +11,10 @@
   margin-right: 10px;
 }
 
+#macos-inset-bar {
+  height: 25px;
+}
+
 #tabs-indicator-wrapper {
   margin-top: 10px;
   margin-bottom: 15px;

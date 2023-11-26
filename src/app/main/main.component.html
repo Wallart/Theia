@@ -1,4 +1,5 @@
 <div class="container" #container>
+  <div *ngIf="electron.isElectronApp" id="macos-inset-bar" class="container-row" style="-webkit-app-region: drag"></div>
   <div id="tabs-indicator-wrapper" class="container-row">
     <tabs-bar></tabs-bar>
     <status-indicator></status-indicator>
