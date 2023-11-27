@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { ElectronService } from '../../services/electron.service';
 
@@ -13,7 +13,8 @@ export class TabsBarComponent {
   newTabShortcut: string = '';
   closeTabShortcut: string = '';
 
-  constructor(private chat: ChatService, private electron: ElectronService, private changeDetectorRef: ChangeDetectorRef) {
+  constructor(private chat: ChatService, private electron: ElectronService,
+              private changeDetectorRef: ChangeDetectorRef, private el: ElementRef) {
     this.chat.messagesGroups$.subscribe((data: any) => {
       for (let uuid in data) {
         const active = uuid === this.chat.activeViewUuid;
@@ -91,6 +92,10 @@ export class TabsBarComponent {
     const chat = this.chat.messagesGroups[uuid];
     this.tabs.push({ uuid: uuid, name: chat[0], active: true});
     this.activeTab(uuid);
+
+    // Auto-scroll tabs
+    const tabsContainer = this.el.nativeElement.querySelector('#tabs-container');
+    setTimeout(() => tabsContainer.scrollLeft = tabsContainer.scrollWidth, 100);
   }
 
   onTabClose(uuid: string) {
@@ -108,8 +113,9 @@ export class TabsBarComponent {
     }
 
     if (changeRequired) {
-      this.tabs[0].active = true;
-      this.chat.activeChat = this.tabs[0].uuid;
+      const idx = this.tabs.length - 1;
+      this.tabs[idx].active = true;
+      this.chat.activeChat = this.tabs[idx].uuid;
     }
   }
 
