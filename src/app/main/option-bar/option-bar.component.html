@@ -6,9 +6,15 @@
       <ng-template ng-option-tmp let-item="item" let-index="index">
         <div class="option-template">
           <span class="label">{{item}}</span>
-          <div class="button" (click)="onPromptDeleted($event, item)" title="Delete prompt">
-            <div class="icon-aligner"></div>
-            <img class="button-icon" src="assets/xmark.svg" draggable="false">
+          <div class="buttons-bar">
+            <div class="button" title="Edit prompt" (click)="onEditPrompt(item)">
+              <div class="icon-aligner"></div>
+              <img class="button-icon" src="assets/edit-file.svg" draggable="false">
+            </div>
+            <div class="button" (click)="onPromptDeleted($event, item)" title="Delete prompt">
+              <div class="icon-aligner"></div>
+              <img class="button-icon" src="assets/xmark.svg" draggable="false">
+            </div>
           </div>
         </div>
       </ng-template>

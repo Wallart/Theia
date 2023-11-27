@@ -17,6 +17,7 @@ import { ButtonsAreaComponent } from './main/buttons-area/buttons-area.component
 import { VideoFeedbackComponent } from './video-feedback/video-feedback.component';
 import { TabsBarComponent } from './main/tabs-bar/tabs-bar.component';
 import { StatusIndicatorComponent } from './main/status-indicator/status-indicator.component';
+import { EditComponent } from './edit/edit.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { StatusIndicatorComponent } from './main/status-indicator/status-indicat
     MainComponent,
     VideoFeedbackComponent,
     TabsBarComponent,
-    StatusIndicatorComponent
+    StatusIndicatorComponent,
+    EditComponent
   ],
   imports: [
       BrowserModule,

@@ -1,6 +1,8 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { ChatService } from '../../services/chat.service';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { HyperionService } from '../../services/hyperion.service';
+import { ElectronService } from '../../services/electron.service';
 
 
 @Component({
@@ -15,7 +17,8 @@ export class OptionBarComponent {
   selectedPrompt: any = '';
   prevSelectedPrompt = '';
 
-  constructor(public hyperion: HyperionService, private chat: ChatService, private changeDetectorRef: ChangeDetectorRef) {
+  constructor(public hyperion: HyperionService, private chat: ChatService,
+              private changeDetectorRef: ChangeDetectorRef, private router: Router, private electron: ElectronService) {
     this.models = [];
     this.prompts = [];
 
@@ -45,6 +48,14 @@ export class OptionBarComponent {
     } else {
       this.selectedPrompt = this.prompts[0];
       this.chat.changeViewPrompt(this.selectedPrompt);
+    }
+  }
+
+  onEditPrompt(prompt: string) {
+    if (this.electron.isElectronApp) {
+      this.electron.send('open-edit', prompt);
+    } else {
+      this.router.navigate(['/edit'], { queryParams: { prompt: prompt } });
     }
   }
 

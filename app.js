@@ -6,6 +6,7 @@ const bounceId = process.platform === 'darwin' ? app.dock.bounce('critical') : n
 let mainWin = null;
 let settingsWin = null;
 let feedbackWin = null;
+let editWin = null;
 let keymap = {
   newTab: ['CommandOrControl+T', 'New tab'],
   prevTab: ['left', 'Previous tab'],
@@ -108,10 +109,36 @@ const createFeedbackWindow = () => {
   }
 }
 
+const createEditWindow = () => {
+  if (editWin === null || editWin.isDestroyed()) {
+    editWin = new BrowserWindow({
+      parent: mainWin,
+      width: 640,
+      height: 385,
+      show: false,
+      acceptFirstMouse: true,
+      resizable: false,
+      fullscreen: false,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+      }
+    });
+    const popupUrl = path.join(__dirname, 'dist/theia/index.html');
+    editWin.on('close', (e) => {
+      e.preventDefault();
+      editWin.hide();
+    });
+    editWin.loadURL(`file://${popupUrl}#/edit`);
+    editWin.setMenu(null);
+  }
+}
+
 const createWindows = () => {
   createMainWindow();
   createSettingsWindow();
   createFeedbackWindow();
+  createEditWindow();
 }
 
 const bindMenu = () => {
@@ -243,6 +270,22 @@ ipcMain.on('open-video', () => {
 ipcMain.on('close-video', () => {
   feedbackWin.webContents.send('close-camera');
   feedbackWin.close();
+});
+
+ipcMain.on('open-edit', (event, prompt) => {
+  const popupUrl = path.join(__dirname, 'dist/theia/index.html');
+  editWin.webContents.on('did-finish-load', () => {
+    if (editWin.isVisible()) {
+      editWin.focus();
+    } else {
+      editWin.show();
+    }
+  });
+  editWin.loadURL(`file://${popupUrl}#/edit?prompt=${prompt}`);
+});
+
+ipcMain.on('close-edit', () => {
+  editWin.close();
 });
 
 ipcMain.on('in-device', (event, args) => {

@@ -260,6 +260,10 @@ export class HyperionService {
     return this.http.post(`${this.targetUrl}/upload-prompts`, payload, {responseType: 'text' as 'json'});
   }
 
+  public readPrompt(prompt: string) {
+    return this.http.get(`${this.targetUrl}/read-prompt/${prompt}`, {responseType: 'text' as 'json'});
+  }
+
   private getModel() {
     this.http.get(`${this.targetUrl}/model`, {responseType: 'text'})
       .subscribe((res) => this.model$.next(res));
