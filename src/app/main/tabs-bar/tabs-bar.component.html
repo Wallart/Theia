@@ -1,5 +1,5 @@
 <div id="tabs-bar">
-  <div id="tabs-container">
+  <div id="tabs-container" (scroll)="onScroll()">
     <div class="tab" *ngFor="let tab of tabs" [ngClass]="{'tab-selected': tab.active}" title="{{tab.name}}">
       <input placeholder="{{ tab.name }}" readonly (click)="onClick(tab.uuid)" (dblclick)="onDblClick($event)" (focusout)="onFocusOut($event, tab.uuid)">
       <div class="button" (click)="onTabClose(tab.uuid)"  [title]="closeTabShortcut">

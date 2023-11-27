@@ -2,6 +2,14 @@
   display: flex;
 }
 
+.left-border-visible {
+  border-left:1px solid #7D7E7F;
+}
+
+.right-border-visible {
+  border-right:1px solid #7D7E7F;
+}
+
 #tabs-container, .vertical-sep {
   height: 37px;
 }

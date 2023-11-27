@@ -20,6 +20,7 @@ export class TabsBarComponent {
         const active = uuid === this.chat.activeViewUuid;
         this.tabs.push({ uuid, name: data[uuid][0], active });
       }
+      setTimeout(() => this.defineBorderStyle(), 100);
     });
 
     this.electron.bind('keymap', (event: Object, keymap: Object) => {
@@ -135,6 +136,30 @@ export class TabsBarComponent {
       this.chat.rename(uuid, name);
       event.target.placeholder = name;
       event.target.value = '';
+    }
+  }
+
+  onScroll() {
+    this.defineBorderStyle();
+  }
+
+  defineBorderStyle() {
+    const container = this.el.nativeElement.querySelector('#tabs-container');
+    const scrollLeft = container.scrollLeft;
+    const scrollWidth = container.scrollWidth;
+    const clientWidth = container.clientWidth;
+    const scrollLeftMax = scrollWidth - clientWidth;
+
+    if (scrollLeft > 0) {
+      container.classList.add('left-border-visible');
+    } else {
+      container.classList.remove('left-border-visible');
+    }
+
+    if (scrollLeft < scrollLeftMax) {
+      container.classList.add('right-border-visible');
+    } else {
+      container.classList.remove('right-border-visible');
     }
   }
 }
