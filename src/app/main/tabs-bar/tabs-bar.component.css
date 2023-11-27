@@ -6,6 +6,10 @@
   height: 37px;
 }
 
+#tabs-container {
+  /*border-left:1px solid #7D7E7F;*/
+}
+
 #new-tab {
   flex-shrink: 0;
   width: 37px;

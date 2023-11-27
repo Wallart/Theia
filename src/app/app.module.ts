@@ -1,7 +1,10 @@
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { AppComponent } from './app.component';
+import { MathjaxModule } from 'mathjax-angular';
 import { MainComponent } from './main/main.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserModule } from '@angular/platform-browser';
@@ -13,7 +16,6 @@ import { ChatHistoryComponent } from './main/chat-history/chat-history.component
 import { ButtonsAreaComponent } from './main/buttons-area/buttons-area.component';
 import { VideoFeedbackComponent } from './video-feedback/video-feedback.component';
 import { TabsBarComponent } from './main/tabs-bar/tabs-bar.component';
-import { MathjaxModule } from 'mathjax-angular';
 import { StatusIndicatorComponent } from './main/status-indicator/status-indicator.component';
 
 @NgModule({
@@ -34,6 +36,8 @@ import { StatusIndicatorComponent } from './main/status-indicator/status-indicat
       HttpClientModule,
       AppRoutingModule,
       FormsModule,
+      CommonModule,
+      NgSelectModule,
       HighlightModule,
       MathjaxModule.forRoot({
         'config': {

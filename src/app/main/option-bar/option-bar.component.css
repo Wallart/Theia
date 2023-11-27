@@ -5,9 +5,88 @@
 }
 
 #option-selectors {
-  user-select: none;
+  /*border:1px solid salmon;*/
+  /*user-select: none;*/
 }
 
-#models-selector {
+#prompts-selector, #models-selector {
+  /*min-width: 100px;*/
+  width: 200px;
+  display: inline-block;
+  vertical-align: top;
   margin-right: 5px;
+}
+
+.option-template {
+  display: flex;
+}
+
+.option-template .label, .option-template .button {
+  display: inline-block;
+  /*border:1px solid red;*/
+  vertical-align: middle;
+}
+
+.option-template .label {
+  flex: 1;
+}
+
+.option-template .button {
+  width: 20px;
+  height: 20px;
+  user-select: none;
+  cursor: pointer;
+  border-radius: 4px;
+  visibility: hidden;
+  display: table-cell;
+  text-align: center;
+}
+
+.option-template .button:hover {
+  /*background-color: #444749;*/
+  background-color: #55585b;
+}
+
+.option-template:hover .button {
+  visibility: visible;
+  /*display: table-cell;*/
+  /*text-align: center;*/
+}
+
+.option-template .button .icon-aligner {
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+}
+
+.option-template .button .button-icon {
+  vertical-align: middle;
+  width: 15px;
+  height: 15px;
+}
+
+#upload-prompt {
+  /*border: 1px solid salmon;*/
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+#upload-prompt:hover {
+  background-color: #444749;
+}
+
+#upload-prompt .button-icon {
+  vertical-align: middle;
+  width: 20px;
+  height: 20px;
+}
+
+#upload-prompt .icon-aligner {
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
 }

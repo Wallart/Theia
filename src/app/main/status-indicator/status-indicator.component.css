@@ -17,6 +17,7 @@
 }
 
 [data-initials]:before {
+  /*background: #f2cb5a;*/
   background: grey;
   color: white;
   opacity: 1;

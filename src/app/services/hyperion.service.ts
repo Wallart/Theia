@@ -236,7 +236,7 @@ export class HyperionService {
       .subscribe((res) => this.prompt$.next(res));
   }
 
-  private getPrompts() {
+  public getPrompts() {
     this.http.get(`${this.targetUrl}/prompts`)
       .subscribe((res) => {
         let prompts = res as string[];
@@ -245,6 +245,19 @@ export class HyperionService {
           this.prompts$.next(this.prompts);
         }
       });
+  }
+
+  public deletePrompt(promptName: string) {
+    return this.http.delete(`${this.targetUrl}/delete-prompt/${promptName}`, {responseType: 'text' as 'json'})
+  }
+
+  public uploadPrompts(prompts: File[]) {
+    let payload = new FormData();
+    for (let prompt of prompts) {
+      let castedPrompt = new File([prompt], prompt.name, { type: 'text/plain' });
+      payload.append(castedPrompt.name, castedPrompt, castedPrompt.name);
+    }
+    return this.http.post(`${this.targetUrl}/upload-prompts`, payload, {responseType: 'text' as 'json'});
   }
 
   private getModel() {

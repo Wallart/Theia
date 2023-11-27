@@ -1,11 +1,23 @@
 <div id="option-bar">
   <div id="option-selectors">
-    <select name="models" id="models-selector" [(ngModel)]="selectedModel" (change)="onModelChanged()">
-      <option *ngFor="let model of models" [value]="model">{{model}}</option>
-    </select>
-    <select name="prompts" id="prompts-selector" [(ngModel)]="selectedPrompt" (change)="onPromptChanged()">
-      <option *ngFor="let prompt of prompts" [value]="prompt">{{prompt}}</option>
-    </select>
+    <ng-select id="models-selector" [items]="models" [(ngModel)]="selectedModel" (change)="onModelChanged()" [clearable]="false">
+    </ng-select>
+    <ng-select id="prompts-selector" [items]="prompts" [(ngModel)]="selectedPrompt" (change)="onPromptChanged($event)" [clearable]="false">
+      <ng-template ng-option-tmp let-item="item" let-index="index">
+        <div class="option-template">
+          <span class="label">{{item}}</span>
+          <div class="button" (click)="onPromptDeleted($event, item)">
+            <div class="icon-aligner"></div>
+            <img class="button-icon" src="assets/xmark.svg" draggable="false">
+          </div>
+        </div>
+      </ng-template>
+    </ng-select>
+    <div id="upload-prompt" class="button" title="Upload new prompt" (click)="promptInput.click()">
+      <div class="icon-aligner"></div>
+      <img class="button-icon" src="assets/upload.svg" draggable="false">
+      <input type="file" #promptInput style="display: none" (change)="onPromptUploaded($event)" multiple />
+    </div>
   </div>
 </div>
 
