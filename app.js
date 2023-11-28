@@ -248,6 +248,7 @@ app.on('before-quit', () => {
   mainWin.destroy();
   feedbackWin.destroy();
   settingsWin.destroy();
+  editWin.destroy();
 });
 
 ipcMain.on('open-settings', () => {
