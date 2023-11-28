@@ -18,6 +18,7 @@ import { VideoFeedbackComponent } from './video-feedback/video-feedback.componen
 import { TabsBarComponent } from './main/tabs-bar/tabs-bar.component';
 import { StatusIndicatorComponent } from './main/status-indicator/status-indicator.component';
 import { EditComponent } from './edit/edit.component';
+import { LinkifyPipe } from '../pipes/linkify.pipe';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { EditComponent } from './edit/edit.component';
     VideoFeedbackComponent,
     TabsBarComponent,
     StatusIndicatorComponent,
-    EditComponent
+    EditComponent,
+    LinkifyPipe
   ],
   imports: [
       BrowserModule,

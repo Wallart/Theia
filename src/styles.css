@@ -9,6 +9,10 @@ body {
   background-color: #1f2020;
 }
 
+a {
+  color: white;
+}
+
 select {
   /* styling */
   min-width: 100px;
