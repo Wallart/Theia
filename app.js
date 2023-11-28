@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, systemPreferences, globalShortcut, Menu, MenuItem } = require('electron')
+const { app, BrowserWindow, ipcMain, systemPreferences, globalShortcut, Menu, MenuItem, shell } = require('electron')
 const path = require('path');
 
 const bounceId = process.platform === 'darwin' ? app.dock.bounce('critical') : null;
@@ -55,6 +55,11 @@ const createMainWindow = () => {
     });
     mainWin.loadURL(`file://${url}`);
     mainWin.setMenu(null);
+    // Open <a target="_blank"> link in OS native window
+    mainWin.webContents.setWindowOpenHandler(({ url }) => {
+      shell.openExternal(url);
+      return { action: 'deny' };
+    });
     bindMenu();
   }
 }
