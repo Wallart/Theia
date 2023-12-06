@@ -107,7 +107,6 @@ export class OptionBarComponent {
   }
 
   onIndexSelected() {
-    debugger;
     this.chat.changeViewIndexes(this.selectedIndexes);
   }
 }

@@ -132,6 +132,7 @@ export class HyperionService {
       SID: this.sid,
       model: this.model,
       preprompt: this.prompt,
+      indexes: this.indexes,
       silent: this.sink.muted.toString()
     };
   }
@@ -249,11 +250,11 @@ export class HyperionService {
     return this.http.get(`${this.targetUrl}/index/${indexName}/documents`);
   }
 
-  queryIndex(indexName: string, query: string) {
-    let params = new HttpParams();
-    params = params.append('value', query);
-    return this.http.get(`${this.targetUrl}/index/${indexName}/query`, {params});
-  }
+  // queryIndex(indexName: string, query: string) {
+  //   let params = new HttpParams();
+  //   params = params.append('value', query);
+  //   return this.http.get(`${this.targetUrl}/index/${indexName}/query`, {params});
+  // }
 
   deleteIndex(indexName: string) {
     return this.http.delete(`${this.targetUrl}/index/${indexName}`, {responseType: 'text'});
