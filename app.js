@@ -7,6 +7,7 @@ let mainWin = null;
 let settingsWin = null;
 let feedbackWin = null;
 let editWin = null;
+let indexesWin = null;
 let keymap = {
   newTab: ['CommandOrControl+T', 'New tab'],
   prevTab: ['left', 'Previous tab'],
@@ -139,11 +140,37 @@ const createEditWindow = () => {
   }
 }
 
+const createIndexesWindow = () => {
+  if (indexesWin === null || indexesWin.isDestroyed()) {
+    indexesWin = new BrowserWindow({
+      parent: mainWin,
+      width: 450,
+      height: 370,
+      show: false,
+      acceptFirstMouse: true,
+      resizable: true,
+      fullscreen: false,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+      }
+    });
+    const popupUrl = path.join(__dirname, 'dist/theia/index.html');
+    indexesWin.on('close', (e) => {
+      e.preventDefault();
+      indexesWin.hide();
+    });
+    indexesWin.loadURL(`file://${popupUrl}#/indexes`);
+    indexesWin.setMenu(null);
+  }
+}
+
 const createWindows = () => {
   createMainWindow();
   createSettingsWindow();
   createFeedbackWindow();
   createEditWindow();
+  createIndexesWindow();
 }
 
 const bindMenu = () => {
@@ -278,6 +305,14 @@ ipcMain.on('close-video', () => {
   feedbackWin.close();
 });
 
+ipcMain.on('open-indexes', () => {
+  if (indexesWin.isVisible()) {
+    indexesWin.focus();
+  } else {
+    indexesWin.show();
+  }
+});
+
 ipcMain.on('open-edit', (event, prompt) => {
   const popupUrl = path.join(__dirname, 'dist/theia/index.html');
   editWin.webContents.on('did-finish-load', () => {
@@ -327,6 +362,7 @@ ipcMain.on('state-change', (event, args) => {
 ipcMain.on('address-change', (event, args) => {
   mainWin.webContents.send('address-changed', args);
   feedbackWin.webContents.send('address-changed', args);
+  indexesWin.webContents.send('address-changed', args);
 });
 
 ipcMain.on('voice-change', (event, args) => {

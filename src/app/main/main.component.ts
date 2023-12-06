@@ -69,8 +69,8 @@ export class MainComponent {
         };
 
         reader.readAsDataURL(file);
-      } else if (mimeType === 'application/pdf') {
-        this.hyperion.sendFileToContext(file).subscribe((res) => {
+      } else if (mimeType === 'application/pdf' || mimeType.startsWith('text/')) {
+        this.hyperion.sendFileToIndex(file, 'default').subscribe((res) => {
           this.chat.addBotMsg('<DOCOK>', new Date());
           console.log(res);
         }, (err) => {

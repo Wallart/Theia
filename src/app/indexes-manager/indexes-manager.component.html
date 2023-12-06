@@ -1,0 +1,29 @@
+<div class="container">
+  <div id="top-bar" class="container-row">
+    <div id="indexes-creator">
+      <div id="indexes-input">
+        <input type="text" [(ngModel)]="indexesInput" placeholder="Create index..." (keydown.enter)="onIndexCreated()">
+      </div>
+    </div>
+    <div id="top-buttons-bar">
+      <div id="refresh-button" class="button" title="Refresh view" (click)="onRefresh()">
+        <div class="icon-aligner"></div>
+        <img class="button-icon" src="assets/refresh.svg" draggable="false">
+      </div>
+    </div>
+  </div>
+  <div id="hierarchy" class="container-row">
+    <tree-root [nodes]="nodes" [options]="options" [focused]="true">
+      <ng-template #treeNodeTemplate let-node let-index="index">
+        <div class="node-wrapper">
+          <div class="node-name">{{ node.data.name }}</div>
+          <div class="button" title="Delete node" (click)="onNodeDelete(node.data.name, node.data.index)">
+            <div class="icon-aligner"></div>
+            <img class="button-icon" src="assets/xmark.svg" draggable="false">
+          </div>
+        </div>
+      </ng-template>
+    </tree-root>
+  </div>
+  <div id="bottom-bar" class="container-row"></div>
+</div>

@@ -25,5 +25,20 @@
       <input type="file" #promptInput style="display: none" (change)="onPromptUploaded($event)" multiple />
     </div>
   </div>
+  <div id="indexes-bar">
+    <ng-select id="indexes-selector" [items]="indexes"
+               [hideSelected]="true"
+               bindLabel="name"
+               [multiple]="true"
+               placeholder="No indexes connected"
+               [(ngModel)]="selectedIndexes"
+               (add)="onIndexSelected()"
+               (remove)="onIndexSelected()">
+    </ng-select>
+    <div id="manage-indexes" class="button" title="Manage indexes" (click)="onManageIndexes()">
+      <div class="icon-aligner"></div>
+      <img class="button-icon" src="assets/toolbox.svg" draggable="false">
+    </div>
+  </div>
 </div>
 

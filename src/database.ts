@@ -6,6 +6,7 @@ export interface Views {
   name: string;
   model: string;
   prompt: string;
+  indexes: string[];
 }
 
 export interface Messages {
@@ -16,7 +17,7 @@ export interface Messages {
 }
 
 export class AppDB extends Dexie {
-  versionNum = 2;
+  versionNum = 3;
   views!: Table<Views, number>;
   messages!: Table<Messages, number>;
 

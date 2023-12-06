@@ -3,11 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AppComponent } from './app.component';
 import { MathjaxModule } from 'mathjax-angular';
+import { LinkifyPipe } from '../pipes/linkify.pipe';
+import { EditComponent } from './edit/edit.component';
 import { MainComponent } from './main/main.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserModule } from '@angular/platform-browser';
+import { TreeModule } from '@circlon/angular-tree-component';
 import { SettingsComponent } from './settings/settings.component';
 import { OptionBarComponent } from './main/option-bar/option-bar.component';
 import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
@@ -16,9 +19,8 @@ import { ChatHistoryComponent } from './main/chat-history/chat-history.component
 import { ButtonsAreaComponent } from './main/buttons-area/buttons-area.component';
 import { VideoFeedbackComponent } from './video-feedback/video-feedback.component';
 import { TabsBarComponent } from './main/tabs-bar/tabs-bar.component';
+import { IndexesManagerComponent } from './indexes-manager/indexes-manager.component';
 import { StatusIndicatorComponent } from './main/status-indicator/status-indicator.component';
-import { EditComponent } from './edit/edit.component';
-import { LinkifyPipe } from '../pipes/linkify.pipe';
 
 @NgModule({
   declarations: [
@@ -33,12 +35,14 @@ import { LinkifyPipe } from '../pipes/linkify.pipe';
     TabsBarComponent,
     StatusIndicatorComponent,
     EditComponent,
-    LinkifyPipe
+    LinkifyPipe,
+    IndexesManagerComponent
   ],
   imports: [
       BrowserModule,
       HttpClientModule,
       AppRoutingModule,
+      TreeModule,
       FormsModule,
       CommonModule,
       NgSelectModule,

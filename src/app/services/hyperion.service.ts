@@ -2,6 +2,7 @@ import {BehaviorSubject, from, Subject} from 'rxjs';
 import { io } from 'socket.io-client';
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
+import { IndexService } from './index.service';
 import { StatusService } from './status.service';
 import { ElectronService } from './electron.service';
 import { AudioSinkService } from './audio-sink.service';
@@ -26,6 +27,7 @@ export class HyperionService {
   prompts$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(this.prompts);
   botName: string = '';
   botName$: BehaviorSubject<string> = new BehaviorSubject<string>(this.botName);
+  indexes: string[] = [];
 
   speechEngines: string[] = [];
   speechEngines$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(this.speechEngines);
@@ -42,7 +44,7 @@ export class HyperionService {
   sid: string = '';
 
   constructor(private http: HttpClient, private electron: ElectronService, private sink: AudioSinkService,
-              private router: Router, private status: StatusService, private store: LocalStorageService) {
+              private router: Router, private status: StatusService, private store: LocalStorageService, private indices: IndexService) {
     this.address = this.store.getItem('serverAddress') === null ? 'localhost:6450' : this.store.getItem('serverAddress');
     if (!this.electron.isElectronApp || this.router.url === '/') {
       this.connectSocket();
@@ -72,6 +74,7 @@ export class HyperionService {
   pollChanges() {
     this.getModels();
     this.getPrompts();
+    this.listIndexes();
     this.pollInterval = setTimeout(() => this.pollChanges(), 60 * 1000);
   }
 
@@ -110,6 +113,7 @@ export class HyperionService {
     this.getModels();
     this.getName();
     this.getSpeechSynthesizerDetails();
+    this.listIndexes();
     this.pollChanges();
   }
 
@@ -217,6 +221,46 @@ export class HyperionService {
       headers: this.getHttpHeaders()
     }
     return this.http.post(`${this.targetUrl}/upload-to-context`, payload, options);
+  }
+
+  sendFileToIndex(file: File, indexName: string) {
+    const payload = new FormData();
+    payload.append('file', file, file.name);
+
+    const options: any = {
+      method: 'POST',
+      body: payload,
+      responseType: 'text',
+      headers: this.getHttpHeaders()
+    }
+    return this.http.post(`${this.targetUrl}/index/${indexName}/upload`, payload, options);
+  }
+
+  listIndexes() {
+    return this.http.get(`${this.targetUrl}/index`)
+      .subscribe((res: any) => this.indices.updateIndices(res));
+  }
+
+  createIndex(indexName: string) {
+    return this.http.post(`${this.targetUrl}/index/${indexName}`, {}, {responseType: 'text'});
+  }
+
+  listDocuments(indexName: string) {
+    return this.http.get(`${this.targetUrl}/index/${indexName}/documents`);
+  }
+
+  queryIndex(indexName: string, query: string) {
+    let params = new HttpParams();
+    params = params.append('value', query);
+    return this.http.get(`${this.targetUrl}/index/${indexName}/query`, {params});
+  }
+
+  deleteIndex(indexName: string) {
+    return this.http.delete(`${this.targetUrl}/index/${indexName}`, {responseType: 'text'});
+  }
+
+  deleteInIndex(indexName: string, docId: string) {
+    return this.http.delete(`${this.targetUrl}/index/${indexName}/documents/${docId}`, {responseType: 'text'});
   }
 
   getState() {

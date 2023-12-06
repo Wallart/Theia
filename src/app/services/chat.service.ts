@@ -14,6 +14,7 @@ export class ChatService {
   public messages$ = new Subject<any[]>();
   public model$: Subject<string> = new Subject<string>();
   public prompt$: Subject<string> = new Subject<string>();
+  public indexes$: Subject<string[]> = new Subject<string[]>();
 
   public messagesGroups: {[key:string]: [string, any]} = {};
   public messagesGroups$ = new Subject<any>();
@@ -72,7 +73,7 @@ export class ChatService {
     const uuid = uuidv4();
     const name = 'New view';
     this.messagesGroups[uuid] = [name, []];
-    this.store.addView(uuid, name, this.hyperion.model, this.hyperion.prompt);
+    this.store.addView(uuid, name, this.hyperion.model, this.hyperion.prompt, this.hyperion.indexes);
     return uuid;
   }
 
@@ -108,6 +109,10 @@ export class ChatService {
         this.hyperion.prompt = prompt;
         this.prompt$.next(prompt);
       }
+
+      let indexes = view[0].indexes;
+      this.hyperion.indexes = indexes;
+      this.indexes$.next(indexes);
     });
   }
 
@@ -119,6 +124,11 @@ export class ChatService {
   changeViewPrompt(prompt: string) {
     this.hyperion.prompt = prompt;
     this.store.changeViewPrompt(this.activeViewUuid, prompt);
+  }
+
+  changeViewIndexes(indexes: string[]) {
+    this.hyperion.indexes = indexes;
+    this.store.changeViewIndexes(this.activeViewUuid, indexes);
   }
 
   mockData() {

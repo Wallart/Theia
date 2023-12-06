@@ -1,8 +1,10 @@
 import { Router } from '@angular/router';
 import { ChatService } from '../../services/chat.service';
+import { IndexService } from '../../services/index.service';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { HyperionService } from '../../services/hyperion.service';
 import { ElectronService } from '../../services/electron.service';
+import { LocalStorageService } from '../../services/local-storage.service';
 
 
 @Component({
@@ -16,8 +18,10 @@ export class OptionBarComponent {
   prompts: string[];
   selectedPrompt: any = '';
   prevSelectedPrompt = '';
+  indexes: string[] = [];
+  selectedIndexes: string[] = [];
 
-  constructor(public hyperion: HyperionService, private chat: ChatService,
+  constructor(public hyperion: HyperionService, private chat: ChatService, private index: IndexService, private store: LocalStorageService,
               private changeDetectorRef: ChangeDetectorRef, private router: Router, private electron: ElectronService) {
     this.models = [];
     this.prompts = [];
@@ -25,6 +29,7 @@ export class OptionBarComponent {
     // See ng-select documentation [...res]
     this.hyperion.models$.subscribe((res) => this.models = [...res]);
     this.hyperion.prompts$.subscribe((res) => this.prompts = [...res]);
+    this.index.indexes$.subscribe((res) => this.indexes = [...res]);
 
     this.chat.model$.subscribe((res) => {
       this.selectedModel = res as string;
@@ -32,6 +37,10 @@ export class OptionBarComponent {
     });
     this.chat.prompt$.subscribe((res) => {
       this.selectedPrompt = res as string;
+      this.changeDetectorRef.detectChanges();
+    });
+    this.chat.indexes$.subscribe((res: string[]) => {
+      this.selectedIndexes = res;
       this.changeDetectorRef.detectChanges();
     });
   }
@@ -79,5 +88,26 @@ export class OptionBarComponent {
   onPromptUploaded(event: any) {
     const files: File[] = event.target.files;
     this.hyperion.uploadPrompts(files).subscribe(() => this.hyperion.getPrompts());
+  }
+
+  onAddIndex(indexName: string) {
+    // [addTag]="onAddIndex.bind(this)"
+    // See ng-select doc
+    return new Promise((resolve) => {
+      this.hyperion.createIndex(indexName).subscribe((res) => resolve(indexName));
+    });
+  }
+
+  onManageIndexes() {
+    if (this.electron.isElectronApp) {
+      this.electron.send('open-indexes');
+    } else {
+      this.router.navigate(['/indexes']);
+    }
+  }
+
+  onIndexSelected() {
+    debugger;
+    this.chat.changeViewIndexes(this.selectedIndexes);
   }
 }
