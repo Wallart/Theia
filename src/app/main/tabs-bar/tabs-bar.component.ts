@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { ElectronService } from '../../services/electron.service';
 
@@ -140,6 +140,11 @@ export class TabsBarComponent {
   }
 
   onScroll() {
+    this.defineBorderStyle();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
     this.defineBorderStyle();
   }
 
