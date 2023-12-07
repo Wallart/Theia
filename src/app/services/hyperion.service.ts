@@ -224,9 +224,11 @@ export class HyperionService {
     return this.http.post(`${this.targetUrl}/upload-to-context`, payload, options);
   }
 
-  sendFileToIndex(file: File, indexName: string) {
+  sendFilesToIndex(files: File[], indexName: string) {
     const payload = new FormData();
-    payload.append('file', file, file.name);
+    for (let file of files) {
+      payload.append(file.name, file, file.name);
+    }
 
     const options: any = {
       method: 'POST',

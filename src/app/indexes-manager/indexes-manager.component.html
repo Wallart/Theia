@@ -17,6 +17,11 @@
       <ng-template #treeNodeTemplate let-node let-index="index">
         <div class="node-wrapper">
           <div class="node-name">{{ node.data.name }}</div>
+          <div *ngIf="node.data.index === undefined" id="upload-button" class="button" title="Upload files" (click)="fileInput.click()">
+            <div class="icon-aligner"></div>
+            <img class="button-icon" src="assets/upload.svg" draggable="false">
+            <input type="file" #fileInput style="display: none" (change)="onFileUpload($event, node.data.name)" multiple />
+          </div>
           <div class="button" title="Delete node" (click)="onNodeDelete(node.data.name, node.data.index)">
             <div class="icon-aligner"></div>
             <img class="button-icon" src="assets/xmark.svg" draggable="false">

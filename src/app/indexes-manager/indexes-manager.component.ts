@@ -24,8 +24,8 @@ export class IndexesManagerComponent {
         drop: (tree: TreeModel, node: TreeNode, $event: any, {from, to}: any) => {
           let indexName = to.parent.data.name;
           if (indexName !== undefined) {
-            const file = $event.dataTransfer.files[0];
-            this.hyperion.sendFileToIndex(file, indexName).subscribe((res) => {
+            const files = $event.dataTransfer.files;
+            this.hyperion.sendFilesToIndex(files, indexName).subscribe((res) => {
               this.indexes = [];
               this.hyperion.listIndexes();
             });
@@ -141,5 +141,13 @@ export class IndexesManagerComponent {
         this.hyperion.listIndexes();
       });
     this.indexesInput = '';
+  }
+
+  onFileUpload(event: any, indexName: string) {
+    const files = event.target.files;
+    this.hyperion.sendFilesToIndex(files, indexName).subscribe((res) => {
+      this.indexes = [];
+      this.hyperion.listIndexes();
+    });
   }
 }

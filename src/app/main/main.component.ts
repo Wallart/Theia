@@ -69,18 +69,19 @@ export class MainComponent {
         };
 
         reader.readAsDataURL(file);
-      } else if (mimeType === 'application/pdf' || mimeType.startsWith('text/')) {
-        this.hyperion.sendFileToIndex(file, 'default').subscribe((res) => {
-          this.chat.addBotMsg('<DOCOK>', new Date());
-          console.log(res);
-        }, (err) => {
-          this.chat.addBotMsg('<DOCNOK>', new Date());
-          console.error(err.error);
-        });
       } else {
         this.chat.addBotMsg('<DOCNOK>', new Date());
         console.error(`"${mimeType}" file type not supported.`);
       }
+      // else if (mimeType === 'application/pdf' || mimeType.startsWith('text/')) {
+      //   this.hyperion.sendFileToIndex(file, 'default').subscribe((res) => {
+      //     this.chat.addBotMsg('<DOCOK>', new Date());
+      //     console.log(res);
+      //   }, (err) => {
+      //     this.chat.addBotMsg('<DOCNOK>', new Date());
+      //     console.error(err.error);
+      //   });
+      // }
     }
   }
 
