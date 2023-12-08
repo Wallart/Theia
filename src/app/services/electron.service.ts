@@ -6,14 +6,17 @@ import { IpcRenderer, Clipboard } from 'electron';
 })
 export class ElectronService {
 
+  private os: any;
   private ipc: IpcRenderer | undefined;
   private clipboard: Clipboard | undefined;
 
   constructor() {
     if ((<any>window).require) {
       try {
+        // require nodeIntegration: true in electron
         this.ipc = (<any>window).require('electron').ipcRenderer;
         this.clipboard = (<any>window).require('electron').clipboard;
+        this.os = window.require('os');
       } catch (error) {
         throw error;
       }
@@ -43,5 +46,17 @@ export class ElectronService {
 
   public get isElectronApp(): boolean {
     return !!window.navigator.userAgent.match(/Electron/);
+  }
+
+  public get isMac(): boolean {
+    return this.os.platform() === 'darwin';
+  }
+
+  public get isWindows(): boolean {
+    return this.os.platform() === 'win32';
+  }
+
+  public get isLinux(): boolean {
+    return this.os.platform() === 'linux';
   }
 }
