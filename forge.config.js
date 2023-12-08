@@ -1,6 +1,6 @@
 module.exports = {
   packagerConfig: {
-    icon: 'src/assets/icon',
+    icon: 'src/assets/icons/icon',
     ignore: [
       '^/.angular$',
       '^/.vscode$',
