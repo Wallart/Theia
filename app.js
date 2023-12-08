@@ -33,6 +33,7 @@ if (systemPreferences.getMediaAccessStatus('camera') !== 'granted') {
 const createMainWindow = () => {
   if (mainWin === null || mainWin.isDestroyed()) {
     mainWin = new BrowserWindow({
+      backgroundColor: '#000000',
       titleBarStyle: 'hiddenInset',
       width: 800,
       height: 600,
@@ -69,6 +70,7 @@ const createSettingsWindow = () => {
   if (settingsWin === null || settingsWin.isDestroyed()) {
     settingsWin = new BrowserWindow({
       parent: mainWin,
+      backgroundColor: '#000000',
       width: 344,
       height: 430,
       show: false,
@@ -94,6 +96,7 @@ const createFeedbackWindow = () => {
   if (feedbackWin === null || feedbackWin.isDestroyed()) {
     feedbackWin = new BrowserWindow({
       parent: mainWin,
+      backgroundColor: '#000000',
       width: 640,
       height: 480,
       show: false,
@@ -119,6 +122,7 @@ const createEditWindow = () => {
   if (editWin === null || editWin.isDestroyed()) {
     editWin = new BrowserWindow({
       parent: mainWin,
+      backgroundColor: '#000000',
       width: 640,
       height: 385,
       show: false,
@@ -144,6 +148,7 @@ const createIndexesWindow = () => {
   if (indexesWin === null || indexesWin.isDestroyed()) {
     indexesWin = new BrowserWindow({
       parent: mainWin,
+      backgroundColor: '#000000',
       width: 450,
       height: 370,
       show: false,

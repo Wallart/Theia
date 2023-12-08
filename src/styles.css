@@ -1,3 +1,16 @@
+@font-face {
+  font-family: "Helvetica";
+  src: url(assets/helvetica.ttf) format("truetype");
+}
+
+input::-webkit-input-placeholder {
+  font-family: "Helvetica", serif;
+}
+
+body * {
+  font-family:"Helvetica", serif;
+}
+
 html, body {
   height: 100%;
   overflow: hidden;
