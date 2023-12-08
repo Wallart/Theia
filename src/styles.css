@@ -3,12 +3,8 @@
   src: url(assets/helvetica.ttf) format("truetype");
 }
 
-input::-webkit-input-placeholder {
+input, textarea, input::-webkit-input-placeholder {
   font-family: "Helvetica", serif;
-}
-
-body * {
-  font-family:"Helvetica", serif;
 }
 
 html, body {
