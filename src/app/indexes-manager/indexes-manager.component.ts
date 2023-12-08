@@ -40,10 +40,11 @@ export class IndexesManagerComponent {
 
   constructor(private hyperion: HyperionService, private index: IndexService, private title: Title) {
     this.index.indexes$.subscribe((res) => {
-      this.loaderVisible = false;
       if (JSON.stringify(this.indexes) !== JSON.stringify(res)) {
         this.indexes = res;
         this.updateNodes();
+      } else {
+        this.loaderVisible = false;
       }
     });
   }
@@ -67,21 +68,26 @@ export class IndexesManagerComponent {
   }
 
   updateNodes() {
-    let indexes: any = [];
-    let requests = [];
-    for (let e of this.indexes) {
-      requests.push(this.hyperion.listDocuments(e));
-      indexes.push(e);
-    }
-
-    forkJoin(requests).subscribe((values: any) => {
-      let nodes: any = [];
-      for (let i=0; i < values.length; i++) {
-        nodes.push({ name: indexes[i], children: values[i].map((e: any) => ({ name: e, index: indexes[i]}) )});
+    if (this.indexes.length > 0) {
+      let indexes: any = [];
+      let requests = [];
+      for (let e of this.indexes) {
+        requests.push(this.hyperion.listDocuments(e));
+        indexes.push(e);
       }
-      this.nodes = nodes;
+
+      forkJoin(requests).subscribe((values: any) => {
+        let nodes: any = [];
+        for (let i=0; i < values.length; i++) {
+          nodes.push({ name: indexes[i], children: values[i].map((e: any) => ({ name: e, index: indexes[i]}) )});
+        }
+        this.nodes = nodes;
+        this.loaderVisible = false;
+      });
+    } else {
+      this.nodes = [];
       this.loaderVisible = false;
-    });
+    }
   }
 
   findIndex(indexName: string) {
