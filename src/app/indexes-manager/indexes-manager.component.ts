@@ -51,6 +51,7 @@ export class IndexesManagerComponent {
   ngOnInit() {
     this.title.setTitle('Indexes manager');
     this.pollMemoryState();
+    this.hyperion.listIndexes();
   }
 
   pollMemoryState() {

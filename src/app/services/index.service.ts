@@ -13,6 +13,6 @@ export class IndexService {
 
   updateIndices(indexes: string[]) {
     this.indexes = indexes;
-    this.indexes$.next(this.indexes)
+    this.indexes$.next(this.indexes);
   }
 }
