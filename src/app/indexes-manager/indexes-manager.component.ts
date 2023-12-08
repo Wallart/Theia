@@ -13,6 +13,8 @@ import { TreeModel, TreeNode } from '@circlon/angular-tree-component';
 export class IndexesManagerComponent {
   indexesInput: string = '';
   nodes: any = [];
+  label = '';
+  loaderVisible = false;
 
   options = {
     allowDrag: false,
@@ -38,6 +40,7 @@ export class IndexesManagerComponent {
 
   constructor(private hyperion: HyperionService, private index: IndexService, private title: Title) {
     this.index.indexes$.subscribe((res) => {
+      this.loaderVisible = false;
       if (JSON.stringify(this.indexes) !== JSON.stringify(res)) {
         this.indexes = res;
         this.updateNodes();
@@ -47,6 +50,19 @@ export class IndexesManagerComponent {
 
   ngOnInit() {
     this.title.setTitle('Indexes manager');
+    this.pollMemoryState();
+  }
+
+  pollMemoryState() {
+    setTimeout(() => {
+      this.hyperion.getMemoryState().subscribe((res) => {
+        this.label = res;
+        console.log(res);
+
+        this.loaderVisible = res === 'indexing';
+        this.pollMemoryState();
+      }, () => this.pollMemoryState());
+    }, 1000);
   }
 
   updateNodes() {
@@ -63,6 +79,7 @@ export class IndexesManagerComponent {
         nodes.push({ name: indexes[i], children: values[i].map((e: any) => ({ name: e, index: indexes[i]}) )});
       }
       this.nodes = nodes;
+      this.loaderVisible = false;
     });
   }
 
@@ -117,15 +134,18 @@ export class IndexesManagerComponent {
   }
 
   onNodeDelete(nodeName: string, hasParent: string) {
+    this.loaderVisible = true;
     if (hasParent === undefined) {
       this.hyperion.deleteIndex(nodeName).subscribe((res) => {
         this.deleteIndexFromNodes(nodeName);
         this.deleteFromIndexes(nodeName);
+        this.loaderVisible = false;
       });
     } else {
       // this.deleteDocFromNodes(this.findIndex(hasParent), nodeName);
       this.hyperion.deleteInIndex(hasParent, nodeName).subscribe((res) => {
         this.deleteDocFromNodes(this.findIndex(hasParent), nodeName);
+        this.loaderVisible = false;
       });
     }
   }
@@ -133,6 +153,7 @@ export class IndexesManagerComponent {
   onRefresh() {
     this.indexes = [];
     this.hyperion.listIndexes();
+    this.loaderVisible = true;
   }
 
   onIndexCreated() {
@@ -141,10 +162,12 @@ export class IndexesManagerComponent {
         this.hyperion.listIndexes();
       });
     this.indexesInput = '';
+    this.loaderVisible = true;
   }
 
   onFileUpload(event: any, indexName: string) {
     const files = event.target.files;
+    this.loaderVisible = true;
     this.hyperion.sendFilesToIndex(files, indexName).subscribe((res) => {
       this.indexes = [];
       this.hyperion.listIndexes();

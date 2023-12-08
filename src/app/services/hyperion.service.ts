@@ -270,6 +270,10 @@ export class HyperionService {
     return this.http.get(`${this.targetUrl}/state`, {responseType: 'text'});
   }
 
+  getMemoryState() {
+    return this.http.get(`${this.targetUrl}/index/state`, {responseType: 'text'});
+  }
+
   private getName() {
     this.http.get(`${this.targetUrl}/name`, {responseType: 'text'})
       .subscribe((res) => {

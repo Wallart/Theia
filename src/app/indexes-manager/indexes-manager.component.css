@@ -99,10 +99,13 @@
 
 .node-name {
   margin-right: 10px;
+  /*border: 1px solid crimson;*/
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 400px;
 }
 
 .node-name, .button {
-  /*border: 1px solid crimson;*/
   display: inline-block;
   vertical-align: middle;
 }
@@ -131,6 +134,61 @@
 
 #bottom-bar {
   /*border:1px solid #4b86f8;*/
-  height: 10px;
-  /*display: none;*/
+  /*height: 50px;*/
+  margin: 10px 0 10px 0;
+  color: #7D7E7F;
+  font-family: "Helvetica", serif;
+  vertical-align: middle;
+}
+
+#bottom-bar #memory-status {
+  /*border:1px solid purple;*/
+  text-align: right;
+  height: 20px;
+}
+
+#bottom-bar #status-loader, #bottom-bar #status-label {
+  display: inline-block;
+  /*border:1px solid red;*/
+  vertical-align: middle;
+}
+
+#bottom-bar #status-label {
+  /*border:1px solid crimson;*/
+  margin-right: 15px;
+}
+
+#bottom-bar #status-loader .loader {
+  width: 20px;
+  height: 20px;
+}
+
+.loader {
+  /*width: 48px;*/
+  /*height: 48px;*/
+  border-radius: 50%;
+  position: relative;
+  animation: rotate 1s linear infinite
+}
+
+.loader::before {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  inset: 0px;
+  border-radius: 50%;
+  border: 3px solid #7D7E7F;
+  animation: prixClipFix 2s linear infinite ;
+}
+
+@keyframes rotate {
+  100%   {transform: rotate(360deg)}
+}
+
+@keyframes prixClipFix {
+  0%   {clip-path:polygon(50% 50%,0 0,0 0,0 0,0 0,0 0)}
+  25%  {clip-path:polygon(50% 50%,0 0,100% 0,100% 0,100% 0,100% 0)}
+  50%  {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,100% 100%,100% 100%)}
+  75%  {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 100%)}
+  100% {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 0)}
 }

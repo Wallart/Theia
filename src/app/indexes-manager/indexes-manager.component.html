@@ -15,7 +15,7 @@
   <div id="hierarchy" class="container-row">
     <tree-root [nodes]="nodes" [options]="options" [focused]="true">
       <ng-template #treeNodeTemplate let-node let-index="index">
-        <div class="node-wrapper">
+        <div class="node-wrapper" title="{{ node.data.name }}">
           <div class="node-name">{{ node.data.name }}</div>
           <div *ngIf="node.data.index === undefined" id="upload-button" class="button" title="Upload files" (click)="fileInput.click()">
             <div class="icon-aligner"></div>
@@ -30,5 +30,12 @@
       </ng-template>
     </tree-root>
   </div>
-  <div id="bottom-bar" class="container-row"></div>
+  <div id="bottom-bar" class="container-row">
+    <div id="memory-status">
+      <div id="status-label">{{label}}</div>
+      <div [style.display]="loaderVisible ? 'inline-block' : 'none'" id="status-loader">
+        <div class="loader"></div>
+      </div>
+    </div>
+  </div>
 </div>
