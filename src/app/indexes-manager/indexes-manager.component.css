@@ -155,7 +155,11 @@
 
 #bottom-bar #status-label {
   /*border:1px solid crimson;*/
-  margin-right: 15px;
+  /*margin-right: 15px;*/
+}
+
+#bottom-bar #status-loader {
+  margin-left: 15px;
 }
 
 #bottom-bar #status-loader .loader {
