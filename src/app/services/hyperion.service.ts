@@ -240,7 +240,7 @@ export class HyperionService {
   }
 
   listIndexes() {
-    return this.http.get(`${this.targetUrl}/index`)
+    return this.http.get(`${this.targetUrl}/indexes`)
       .subscribe((res: any) => this.indices.updateIndices(res));
   }
 
@@ -299,7 +299,7 @@ export class HyperionService {
   }
 
   public deletePrompt(promptName: string) {
-    return this.http.delete(`${this.targetUrl}/delete-prompt/${promptName}`, {responseType: 'text' as 'json'})
+    return this.http.delete(`${this.targetUrl}/prompt/${promptName}`, {responseType: 'text' as 'json'})
   }
 
   public uploadPrompts(prompts: File[]) {
@@ -308,11 +308,11 @@ export class HyperionService {
       let castedPrompt = new File([prompt], prompt.name, { type: 'text/plain' });
       payload.append(castedPrompt.name, castedPrompt, castedPrompt.name);
     }
-    return this.http.post(`${this.targetUrl}/upload-prompts`, payload, {responseType: 'text' as 'json'});
+    return this.http.post(`${this.targetUrl}/prompts`, payload, {responseType: 'text' as 'json'});
   }
 
   public readPrompt(prompt: string) {
-    return this.http.get(`${this.targetUrl}/read-prompt/${prompt}`, {responseType: 'text' as 'json'});
+    return this.http.get(`${this.targetUrl}/prompt/${prompt}`, {responseType: 'text' as 'json'});
   }
 
   private getModel() {
@@ -359,7 +359,7 @@ export class HyperionService {
   setSpeechEngines(enginesOrder: string[]) {
     this.selectedSpeechEngine = enginesOrder[0];
     // Send as JSON
-    return this.http.post(`${this.targetUrl}/tts-preferred-engines`, enginesOrder, {responseType: 'text' as 'json'})
+    return this.http.put(`${this.targetUrl}/tts-preferred-engines`, enginesOrder, {responseType: 'text' as 'json'})
       .subscribe(() => {
         this.getVoices(enginesOrder[0]).subscribe((voices: any) => {
           this.voices = voices;
@@ -390,7 +390,7 @@ export class HyperionService {
     const payload = new FormData();
     payload.append('engine', selectedEngine);
     payload.append('voice', selectedVoice);
-    return this.http.post(`${this.targetUrl}/voice`, payload, {responseType: 'text' as 'json'}).subscribe();
+    return this.http.put(`${this.targetUrl}/voice`, payload, {responseType: 'text' as 'json'}).subscribe();
   }
 
   frameDecode(buffer: ArrayBuffer, callback: Function) {
