@@ -11,7 +11,7 @@ export class StatusIndicatorComponent {
   state: string = '';
   stateClass: string = '';
   bot: string = 'Unknown';
-  usage: number = 78;
+  usage: number = 100;
 
   constructor(private hyperion: HyperionService, private status: StatusService) {
     this.hyperion.botName$.subscribe((res) => {
