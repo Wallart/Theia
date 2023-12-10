@@ -12,13 +12,15 @@ import { LocalStorageService } from './local-storage.service';
 export class VideoInputService {
 
   muted: boolean = true;
-  stream: MediaStream | undefined = undefined;
   capture: any;
   captureTimeout: any;
   timeout = 1000;
   selectedCamera: string = '';
   selectedCamera$: BehaviorSubject<string> = new BehaviorSubject<string>(this.selectedCamera);
+  stream: MediaStream | undefined = undefined;
   stream$: BehaviorSubject<any> = new BehaviorSubject<any>(this.stream);
+  caption: string = '';
+  caption$: BehaviorSubject<any> = new BehaviorSubject<any>(this.caption);
 
   constructor(private media: MediaService, private electron: ElectronService, private hyperion: HyperionService,
               private store: LocalStorageService, private router: Router) {
@@ -119,7 +121,8 @@ export class VideoInputService {
             .then((imageBlob: Blob) => {
               this.hyperion
                 .sendImage(imageBlob, width, height)
-                .subscribe((res: any) => {
+                .subscribe((caption: any) => {
+                  this.caption$.next(caption);
                   this.captureTimeout = setTimeout(() => this.captureFrame(), this.timeout);
                 });
             });

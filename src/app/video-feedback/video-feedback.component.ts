@@ -12,6 +12,8 @@ import { Title } from '@angular/platform-browser';
 export class VideoFeedbackComponent {
   @ViewChild('video') videoElement: any;
 
+  caption = '';
+
   constructor(private videoInput: VideoInputService, private electron: ElectronService, private media: MediaService,
               private title: Title) {}
 
@@ -38,5 +40,6 @@ export class VideoFeedbackComponent {
         this.videoElement.nativeElement.srcObject = stream;
       }
     });
+    this.videoInput.caption$.subscribe((caption) => this.caption = caption);
   }
 }
