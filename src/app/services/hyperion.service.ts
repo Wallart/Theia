@@ -28,6 +28,7 @@ export class HyperionService {
   botName: string = '';
   botName$: BehaviorSubject<string> = new BehaviorSubject<string>(this.botName);
   indexes: string[] = [];
+  pushedData$ = new Subject<any>();
 
   speechEngines: string[] = [];
   speechEngines$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>(this.speechEngines);
@@ -91,6 +92,7 @@ export class HyperionService {
     this.socket.on('disconnect', (reason: string) => this.onDisconnect(reason));
     this.socket.on('error', (err: any) => this.onError(err));
     this.socket.on('interrupt', (timestamp: number) => this.onInterrupt(timestamp));
+    this.socket.on('data', (frame: any) => this.onData(frame));
   }
 
   disconnectSocket() {
@@ -101,6 +103,10 @@ export class HyperionService {
 
   onInterrupt(timestamp: number) {
     this.sink.interrupt(new Date(timestamp * 1000));
+  }
+
+  onData(buffer: any) {
+    this.frameDecode(buffer, (frame: any) => this.pushedData$.next(frame));
   }
 
   onConnect() {

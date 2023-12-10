@@ -20,6 +20,12 @@ export class MainComponent {
   constructor(private chat: ChatService, private hyperion: HyperionService, public electron: ElectronService,
               private store: LocalStorageService, private audioSink: AudioSinkService) {
     this.hyperion.botName$.subscribe((name) => this.botName = name);
+    this.hyperion.pushedData$.subscribe((frame) => {
+      let answer = this.chat.formatAnswerWithRequest(frame['ANS'], frame['REQ']);
+      this.chat.addBotMsg(answer, frame['TIM']);
+      this.audioSink.setBuffer(frame['PCM'], frame['TIM']);
+      this.chat.addBotImg(frame['IMG'], frame['TIM']);
+    });
   }
 
   ngAfterViewChecked() {
