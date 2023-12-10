@@ -11,9 +11,32 @@
   display: inline-block;
 }
 
-#avatar {
-  /*border: 1px solid;*/
+@property --progress-value {
+  syntax: "<integer>";
+  initial-value: 0;
+  inherits: false;
+}
+
+@keyframes progress {
+  to { --progress-value: 0; }
+}
+
+#progress-bar {
+  border: 1px solid #5b6062;
+  vertical-align: middle;
   position: relative;
+  width: 47px;
+  height: 47px;
+  border-radius: 50%;
+  background: conic-gradient(#444749 calc(var(--progress-value) * 1%), #2c2d30 0);
+  /*radial-gradient(closest-side, white 79%, transparent 80% 100%);*/
+  animation: progress 2s 1 reverse;
+}
+
+#avatar {
+  position: absolute;
+  top:5px;
+  left: 5px;
 }
 
 [data-initials]:before {
