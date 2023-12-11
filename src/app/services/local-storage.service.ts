@@ -1,13 +1,20 @@
-import { Injectable } from '@angular/core';
 import { liveQuery } from 'dexie';
 import { db } from '../../database';
+import { v4 as uuidv4 } from 'uuid';
+import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocalStorageService {
 
-  constructor() {}
+  constructor() {
+    if (this.getItem('appIdentifier') === null) {
+      const identifier = uuidv4();
+      this.setItem('appIdentifier', identifier);
+      console.log(`App identifier: ${identifier}`);
+    }
+  }
 
   addView(uuid: string, name: string, model: string, prompt: string, indexes: string[]) {
     return db.views.add({ uuid, name, model, prompt, indexes });

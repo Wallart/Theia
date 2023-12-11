@@ -112,6 +112,7 @@ export class HyperionService {
   onConnect() {
     this.sid = this.socket.id;
     console.log(`WebSocket connected with sid : ${this.sid}`);
+    this.socket.emit('identify', this.store.getItem('appIdentifier'));
     this.status.online();
     this.getPrompt();
     this.getPrompts();
