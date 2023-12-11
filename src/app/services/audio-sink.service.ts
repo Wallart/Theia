@@ -18,7 +18,7 @@ export class AudioSinkService {
   queue: any[];
   selectedSpeakers: string = '';
   selectedSpeakers$: BehaviorSubject<string> = new BehaviorSubject<string>(this.selectedSpeakers);
-  interruptStamp: Date = new Date(Date.now());
+  interruptStamp: Date | undefined = undefined; //new Date(Date.now());
 
   constructor(private media: MediaService, private electron: ElectronService, private store: LocalStorageService,
               private router: Router) {
@@ -97,7 +97,7 @@ export class AudioSinkService {
       return;
     }
 
-    if (date < this.interruptStamp) {
+    if (this.interruptStamp !== undefined && date < this.interruptStamp) {
       return;
     }
 
