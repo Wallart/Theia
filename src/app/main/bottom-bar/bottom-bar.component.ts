@@ -15,6 +15,7 @@ import { VideoInputService } from '../../services/video-input.service';
 })
 export class BottomBarComponent {
   @ViewChild('speechBars') speechBars: any;
+  @ViewChild('messageInput') messageInput: any;
 
   message: string = '';
   username: string = '';
@@ -165,5 +166,16 @@ export class BottomBarComponent {
           this.chat.addBotImg(frame['IMG'], frame['TIM']);
         });
       });
+  }
+
+  onPrevious() {
+    let lastMsg = this.chat.getLastUserMsg();
+    if (lastMsg !== null && this.message === '') {
+      let pastMessages = lastMsg.content.join('\n');
+      this.message = pastMessages;
+      setTimeout(() => {
+        this.messageInput.nativeElement.setSelectionRange(pastMessages.length, pastMessages.length);
+      },50);
+    }
   }
 }

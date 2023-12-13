@@ -3,7 +3,7 @@
     <input type="text" placeholder="Username" [(ngModel)]="username" (change)="onUsernameChanged()">
   </div>
   <div id="message-input">
-    <input type="text" placeholder="Send a message..." [(ngModel)]="message" (keydown.enter)="onSend()">
+    <input #messageInput type="text" placeholder="Send a message..." [(ngModel)]="message" (keydown.enter)="onSend()" (keydown.arrowUp)="onPrevious()">
     <div id="speech-bars" class="hidden-bars" #speechBars>
       <div class="bar"></div>
       <div class="bar"></div>
