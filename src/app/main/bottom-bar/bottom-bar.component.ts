@@ -171,7 +171,7 @@ export class BottomBarComponent {
   onPrevious() {
     let lastMsg = this.chat.getLastUserMsg();
     if (lastMsg !== null && this.message === '') {
-      let pastMessages = lastMsg.content.join('\n');
+      let pastMessages = lastMsg.content.join(' ');
       this.message = pastMessages;
       setTimeout(() => {
         this.messageInput.nativeElement.setSelectionRange(pastMessages.length, pastMessages.length);
