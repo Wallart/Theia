@@ -205,8 +205,9 @@ export class ChatService {
           if (splittedContent[0].length > 0) newContent.push(splittedContent[0]);
         } else {
           // Concat data before a \n with last line
-          let sep = newContent.at(-1).length === 0 ? '' : ' ';
-          newContent[newContent.length - 1] = newContent.at(-1) + sep + splittedContent[0];
+          //let sep = newContent.at(-1).length === 0 ? '' : ' ';
+          // newContent[newContent.length - 1] = newContent.at(-1) + sep + splittedContent[0];
+          newContent[newContent.length - 1] = newContent.at(-1) + splittedContent[0];
         }
 
         // Add remaining data on new line
