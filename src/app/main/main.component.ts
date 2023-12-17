@@ -1,9 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
 import { ChatService } from '../services/chat.service';
 import { HyperionService } from '../services/hyperion.service';
+import { ElectronService } from '../services/electron.service';
 import { AudioSinkService } from '../services/audio-sink.service';
 import { LocalStorageService } from '../services/local-storage.service';
-import {ElectronService} from "../services/electron.service";
 
 @Component({
   selector: 'app-main',

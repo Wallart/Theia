@@ -40,8 +40,8 @@ export class StatusService {
     this.notify('confused');
   }
 
-  unknown(code: number) {
-    this.notify(`Unknown ${code}`);
+  custom(message: string) {
+    this.notify(message);
   }
 
   addPendingResponse() {

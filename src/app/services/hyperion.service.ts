@@ -1,10 +1,10 @@
-import {BehaviorSubject, from, Subject} from 'rxjs';
 import { io } from 'socket.io-client';
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { IndexService } from './index.service';
 import { StatusService } from './status.service';
 import { ElectronService } from './electron.service';
+import { BehaviorSubject, from, Subject } from 'rxjs';
 import { AudioSinkService } from './audio-sink.service';
 import { LocalStorageService } from './local-storage.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -13,6 +13,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
   providedIn: 'root'
 })
 export class HyperionService {
+  version = require('../../../package.json').version;
   socket: any;
   serviceTokens = ['<ACK>', '<MEMWIPE>', '<SLEEPING>', '<WAKE>', '<CONFUSED>', '<ERR>', '<CMD>', '<DOCOK>', '<DOCNOK>'];
 
@@ -47,10 +48,7 @@ export class HyperionService {
   constructor(private http: HttpClient, private electron: ElectronService, private sink: AudioSinkService,
               private router: Router, private status: StatusService, private store: LocalStorageService, private indices: IndexService) {
     this.address = this.store.getItem('serverAddress') === null ? 'localhost:6450' : this.store.getItem('serverAddress');
-    if (!this.electron.isElectronApp || this.router.url === '/') {
-      this.connectSocket();
-    }
-
+    this.start();
     if (this.electron.isElectronApp) {
       this.electron.bind('address-changed', (event: Object, address: string) => {
         this.disconnectSocket();
@@ -61,6 +59,12 @@ export class HyperionService {
       this.electron.bind('voice-engines-changed', (event: Object, preferredEngines: any) => this.setSpeechEngines(preferredEngines));
       this.electron.bind('voice-settings-requested', (event: Object) => this.notifySettingsWindow());
     }
+  }
+
+  start() {
+      if (!this.electron.isElectronApp || this.router.url === '/') {
+        this.connectSocket();
+      }
   }
 
   notifySettingsWindow() {
@@ -140,7 +144,8 @@ export class HyperionService {
       model: this.model,
       preprompt: this.prompt,
       indexes: this.indexes,
-      silent: this.sink.muted.toString()
+      version: this.version,
+      silent: this.sink.muted.toString(),
     };
   }
 
@@ -169,8 +174,12 @@ export class HyperionService {
       this.status.sleeping();
     } else if(status === 204) {
       this.status.confused();
+    } else if (status === 401) {
+      this.status.custom('Unauthorized');
+    } else if (status === 426) {
+      this.status.custom('Upgrade required');
     } else {
-      this.status.unknown(status);
+      this.status.custom(`Unknown ${status}`);
     }
 
     return subject;
@@ -247,16 +256,16 @@ export class HyperionService {
   }
 
   listIndexes() {
-    return this.http.get(`${this.targetUrl}/indexes`)
+    return this.http.get(`${this.targetUrl}/indexes`, {headers: this.getHttpHeaders()})
       .subscribe((res: any) => this.indices.updateIndices(res));
   }
 
   createIndex(indexName: string) {
-    return this.http.post(`${this.targetUrl}/index/${indexName}`, {}, {responseType: 'text'});
+    return this.http.post(`${this.targetUrl}/index/${indexName}`, {}, {responseType: 'text', headers: this.getHttpHeaders()});
   }
 
   listDocuments(indexName: string) {
-    return this.http.get(`${this.targetUrl}/index/${indexName}/documents`);
+    return this.http.get(`${this.targetUrl}/index/${indexName}/documents`, {headers: this.getHttpHeaders()});
   }
 
   // queryIndex(indexName: string, query: string) {
@@ -266,23 +275,23 @@ export class HyperionService {
   // }
 
   deleteIndex(indexName: string) {
-    return this.http.delete(`${this.targetUrl}/index/${indexName}`, {responseType: 'text'});
+    return this.http.delete(`${this.targetUrl}/index/${indexName}`, {responseType: 'text', headers: this.getHttpHeaders()});
   }
 
   deleteInIndex(indexName: string, docId: string) {
-    return this.http.delete(`${this.targetUrl}/index/${indexName}/documents/${docId}`, {responseType: 'text'});
+    return this.http.delete(`${this.targetUrl}/index/${indexName}/documents/${docId}`, {responseType: 'text', headers: this.getHttpHeaders()});
   }
 
   getState() {
-    return this.http.get(`${this.targetUrl}/state`, {responseType: 'text'});
+    return this.http.get(`${this.targetUrl}/state`, {responseType: 'text', headers: this.getHttpHeaders()});
   }
 
   getMemoryState() {
-    return this.http.get(`${this.targetUrl}/index/state`, {responseType: 'text'});
+    return this.http.get(`${this.targetUrl}/index/state`, {responseType: 'text', headers: this.getHttpHeaders()});
   }
 
   private getName() {
-    this.http.get(`${this.targetUrl}/name`, {responseType: 'text'})
+    this.http.get(`${this.targetUrl}/name`, {responseType: 'text', headers: this.getHttpHeaders()})
       .subscribe((res) => {
         this.botName = res;
         this.botName$.next(this.botName);
@@ -290,12 +299,12 @@ export class HyperionService {
   }
 
   private getPrompt() {
-    this.http.get(`${this.targetUrl}/prompt`, {responseType: 'text'})
+    this.http.get(`${this.targetUrl}/prompt`, {responseType: 'text', headers: this.getHttpHeaders()})
       .subscribe((res) => this.prompt$.next(res));
   }
 
   public getPrompts() {
-    this.http.get(`${this.targetUrl}/prompts`)
+    this.http.get(`${this.targetUrl}/prompts`, {headers: this.getHttpHeaders()})
       .subscribe((res) => {
         let prompts = res as string[];
         if (JSON.stringify(this.prompts) !== JSON.stringify(prompts)) {
@@ -306,7 +315,7 @@ export class HyperionService {
   }
 
   public deletePrompt(promptName: string) {
-    return this.http.delete(`${this.targetUrl}/prompt/${promptName}`, {responseType: 'text' as 'json'})
+    return this.http.delete(`${this.targetUrl}/prompt/${promptName}`, {responseType: 'text' as 'json', headers: this.getHttpHeaders()})
   }
 
   public uploadPrompts(prompts: File[]) {
@@ -315,20 +324,20 @@ export class HyperionService {
       let castedPrompt = new File([prompt], prompt.name, { type: 'text/plain' });
       payload.append(castedPrompt.name, castedPrompt, castedPrompt.name);
     }
-    return this.http.post(`${this.targetUrl}/prompts`, payload, {responseType: 'text' as 'json'});
+    return this.http.post(`${this.targetUrl}/prompts`, payload, {responseType: 'text' as 'json', headers: this.getHttpHeaders()});
   }
 
   public readPrompt(prompt: string) {
-    return this.http.get(`${this.targetUrl}/prompt/${prompt}`, {responseType: 'text' as 'json'});
+    return this.http.get(`${this.targetUrl}/prompt/${prompt}`, {responseType: 'text' as 'json', headers: this.getHttpHeaders()});
   }
 
   private getModel() {
-    this.http.get(`${this.targetUrl}/model`, {responseType: 'text'})
+    this.http.get(`${this.targetUrl}/model`, {responseType: 'text', headers: this.getHttpHeaders()})
       .subscribe((res) => this.model$.next(res));
   }
 
   private getModels() {
-    this.http.get(`${this.targetUrl}/models`)
+    this.http.get(`${this.targetUrl}/models`, {headers: this.getHttpHeaders()})
       .subscribe((res) => {
         let models = res as string[];
         if (JSON.stringify(this.prompts) !== JSON.stringify(models)) {
@@ -360,13 +369,13 @@ export class HyperionService {
   }
 
   private getSpeechEngines() {
-    return this.http.get(`${this.targetUrl}/tts-preferred-engines`);
+    return this.http.get(`${this.targetUrl}/tts-preferred-engines`, {headers: this.getHttpHeaders()});
   }
 
   setSpeechEngines(enginesOrder: string[]) {
     this.selectedSpeechEngine = enginesOrder[0];
     // Send as JSON
-    return this.http.put(`${this.targetUrl}/tts-preferred-engines`, enginesOrder, {responseType: 'text' as 'json'})
+    return this.http.put(`${this.targetUrl}/tts-preferred-engines`, enginesOrder, {responseType: 'text' as 'json', headers: this.getHttpHeaders()})
       .subscribe(() => {
         this.getVoices(enginesOrder[0]).subscribe((voices: any) => {
           this.voices = voices;
@@ -383,13 +392,13 @@ export class HyperionService {
   private getVoices(selectedEngine: string) {
     let params = new HttpParams();
     params = params.append('engine', selectedEngine);
-    return this.http.get(`${this.targetUrl}/voices`, {params});
+    return this.http.get(`${this.targetUrl}/voices`, {params, headers: this.getHttpHeaders()});
   }
 
   private getVoice(selectedEngine: string) {
     let params = new HttpParams();
     params = params.append('engine', selectedEngine);
-    return this.http.get(`${this.targetUrl}/voice`, {responseType: 'text' as 'json', params});
+    return this.http.get(`${this.targetUrl}/voice`, {responseType: 'text' as 'json', params, headers: this.getHttpHeaders()});
   }
 
   setVoice(selectedEngine: string, selectedVoice: string) {
@@ -397,7 +406,7 @@ export class HyperionService {
     const payload = new FormData();
     payload.append('engine', selectedEngine);
     payload.append('voice', selectedVoice);
-    return this.http.put(`${this.targetUrl}/voice`, payload, {responseType: 'text' as 'json'}).subscribe();
+    return this.http.put(`${this.targetUrl}/voice`, payload, {responseType: 'text' as 'json', headers: this.getHttpHeaders()}).subscribe();
   }
 
   frameDecode(buffer: ArrayBuffer, callback: Function) {
