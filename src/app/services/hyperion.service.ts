@@ -1,5 +1,4 @@
 import { io } from 'socket.io-client';
-import { encrypt } from '../../crypto';
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { IndexService } from './index.service';
@@ -15,9 +14,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 })
 export class HyperionService {
   version = require('../../../package.json').version;
-  secret: string = '';
-  rawSecret: string = '582b3d20-8810-435b-a2f1-c64b40c13e21';
   socket: any;
+  secret: string = '';
   serviceTokens = ['<ACK>', '<MEMWIPE>', '<SLEEPING>', '<WAKE>', '<CONFUSED>', '<ERR>', '<CMD>', '<DOCOK>', '<DOCNOK>'];
 
   pollInterval: any;
@@ -51,7 +49,11 @@ export class HyperionService {
   constructor(private http: HttpClient, private electron: ElectronService, private sink: AudioSinkService,
               private router: Router, private status: StatusService, private store: LocalStorageService, private indices: IndexService) {
     this.address = this.store.getItem('serverAddress') === null ? 'localhost:6450' : this.store.getItem('serverAddress');
-    this.loadPublicKeyAndStart();
+    this.electron.getSecret().then(res => {
+      this.secret = res;
+      this.start();
+    });
+
     if (this.electron.isElectronApp) {
       this.electron.bind('address-changed', (event: Object, address: string) => {
         this.disconnectSocket();
@@ -63,17 +65,6 @@ export class HyperionService {
       this.electron.bind('voice-settings-requested', (event: Object) => this.notifySettingsWindow());
     }
   }
-
-  loadPublicKeyAndStart() {
-    fetch('assets/public_key.pem')
-      .then(response => response.text())
-      .then(pem => encrypt(pem, this.rawSecret))
-      .then((secret) => {
-        this.secret = secret;
-        this.start();
-      });
-  }
-
 
   start() {
     if (!this.electron.isElectronApp || this.router.url === '/') {
