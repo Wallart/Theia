@@ -10,7 +10,7 @@
     "test": "ng test",
     "unpack-vad": "mv dist/theia/vad/* dist/theia/.; rm -r dist/theia/vad",
     "electron": "ng build --configuration development && yarn run unpack-vad && electron . --remote-debugging-port=5858",
-    "electron-win": "ng build && electron . --remote-debugging-port=5858",
+    "electron-win": "ng build && electron . --remote-debugging-port=5858 --remote-allow-origins=*",
     "forge-start": "electron-forge start",
     "forge-package": "yarn run build && yarn run unpack-vad && electron-forge package --platform=all",
     "package-win": "electron-forge package --platform=win32 --arch=x64",
