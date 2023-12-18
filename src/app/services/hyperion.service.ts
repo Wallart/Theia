@@ -1,6 +1,7 @@
 import { io } from 'socket.io-client';
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
+import { pki, util, md } from 'node-forge';
 import { IndexService } from './index.service';
 import { StatusService } from './status.service';
 import { ElectronService } from './electron.service';
@@ -14,6 +15,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 })
 export class HyperionService {
   version = require('../../../package.json').version;
+  secret: string = '';
+  rawSecret: string = '582b3d20-8810-435b-a2f1-c64b40c13e21';
   socket: any;
   serviceTokens = ['<ACK>', '<MEMWIPE>', '<SLEEPING>', '<WAKE>', '<CONFUSED>', '<ERR>', '<CMD>', '<DOCOK>', '<DOCNOK>'];
 
@@ -62,9 +65,20 @@ export class HyperionService {
   }
 
   start() {
-      if (!this.electron.isElectronApp || this.router.url === '/') {
-        this.connectSocket();
-      }
+    fetch('assets/public_key.pem')
+      .then(response => response.text())
+      .then(pem => {
+        let publicKey = pki.publicKeyFromPem(pem);
+        const encrypted = publicKey.encrypt(this.rawSecret, 'RSA-OAEP', {
+          md: md.sha256.create(),
+          mgf1: {md: md.sha1.create()}
+        });
+
+        this.secret = util.encode64(encrypted);
+        if (!this.electron.isElectronApp || this.router.url === '/') {
+          this.connectSocket();
+        }
+      });
   }
 
   notifySettingsWindow() {
@@ -142,9 +156,10 @@ export class HyperionService {
     return {
       SID: this.sid,
       model: this.model,
-      preprompt: this.prompt,
+      secret: this.secret,
       indexes: this.indexes,
       version: this.version,
+      preprompt: this.prompt,
       silent: this.sink.muted.toString(),
     };
   }
