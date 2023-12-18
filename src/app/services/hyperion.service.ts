@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
+import { encrypt } from '../../crypto';
 import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
-import { pki, util, md } from 'node-forge';
 import { IndexService } from './index.service';
 import { StatusService } from './status.service';
 import { ElectronService } from './electron.service';
@@ -51,7 +51,7 @@ export class HyperionService {
   constructor(private http: HttpClient, private electron: ElectronService, private sink: AudioSinkService,
               private router: Router, private status: StatusService, private store: LocalStorageService, private indices: IndexService) {
     this.address = this.store.getItem('serverAddress') === null ? 'localhost:6450' : this.store.getItem('serverAddress');
-    this.start();
+    this.loadPublicKeyAndStart();
     if (this.electron.isElectronApp) {
       this.electron.bind('address-changed', (event: Object, address: string) => {
         this.disconnectSocket();
@@ -64,21 +64,21 @@ export class HyperionService {
     }
   }
 
-  start() {
+  loadPublicKeyAndStart() {
     fetch('assets/public_key.pem')
       .then(response => response.text())
-      .then(pem => {
-        let publicKey = pki.publicKeyFromPem(pem);
-        const encrypted = publicKey.encrypt(this.rawSecret, 'RSA-OAEP', {
-          md: md.sha256.create(),
-          mgf1: {md: md.sha1.create()}
-        });
-
-        this.secret = util.encode64(encrypted);
-        if (!this.electron.isElectronApp || this.router.url === '/') {
-          this.connectSocket();
-        }
+      .then(pem => encrypt(pem, this.rawSecret))
+      .then((secret) => {
+        this.secret = secret;
+        this.start();
       });
+  }
+
+
+  start() {
+    if (!this.electron.isElectronApp || this.router.url === '/') {
+      this.connectSocket();
+    }
   }
 
   notifySettingsWindow() {
