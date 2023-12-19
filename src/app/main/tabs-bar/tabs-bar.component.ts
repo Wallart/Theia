@@ -12,6 +12,8 @@ export class TabsBarComponent {
   tabs: any[] = [];
   newTabShortcut: string = '';
   closeTabShortcut: string = '';
+  dragging = false;
+  dragIndex = -1;
 
   constructor(private chat: ChatService, private electron: ElectronService,
               private changeDetectorRef: ChangeDetectorRef, private el: ElementRef) {
@@ -166,5 +168,22 @@ export class TabsBarComponent {
     } else {
       container.classList.remove('right-border-visible');
     }
+  }
+
+  dragStart(index: number) {
+    this.dragging = true;
+    this.dragIndex = index;
+  }
+
+  dragOver(index: number) {
+    const draggedTab = this.tabs[this.dragIndex];
+    this.tabs.splice(this.dragIndex, 1);
+    this.tabs.splice(index, 0, draggedTab);
+    this.dragIndex = index;
+  }
+
+  dragEnd() {
+    this.dragging = false;
+    this.dragIndex = -1;
   }
 }

@@ -1,6 +1,10 @@
 <div id="tabs-bar">
   <div id="tabs-container" (scroll)="onScroll()">
-    <div class="tab" *ngFor="let tab of tabs" [ngClass]="{'tab-selected': tab.active}" title="{{tab.name}}">
+
+    <div class="tab" *ngFor="let tab of tabs; let index=index"
+         [ngClass]="{'tab-selected': tab.active}"
+         (dragstart)="dragStart(index)" (dragover)="dragOver(index)" (dragend)="dragEnd()"
+         title="{{tab.name}}" draggable="true">
       <input placeholder="{{ tab.name }}" readonly (click)="onClick(tab.uuid)" (dblclick)="onDblClick($event)" (focusout)="onFocusOut($event, tab.uuid)">
       <div class="button" (click)="onTabClose(tab.uuid)"  [title]="closeTabShortcut">
         <div class="icon-aligner"></div>
