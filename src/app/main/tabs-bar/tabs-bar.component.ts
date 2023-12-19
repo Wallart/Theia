@@ -170,7 +170,11 @@ export class TabsBarComponent {
     }
   }
 
-  dragStart(index: number) {
+  dragStart(event: any, index: number) {
+    // const dragIcon = new Image();
+    // dragIcon.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    // event.dataTransfer.setDragImage(dragIcon, 0, 0);
+
     this.dragging = true;
     this.dragIndex = index;
   }
