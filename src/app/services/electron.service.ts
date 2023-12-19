@@ -8,7 +8,7 @@ import { IpcRenderer, Clipboard } from 'electron';
 export class ElectronService {
 
   private os: any;
-  private fs: any;
+  // private fs: any;
   private ipc: IpcRenderer | undefined;
   private clipboard: Clipboard | undefined;
   private rawSecret: string = '582b3d20-8810-435b-a2f1-c64b40c13e21';
@@ -20,7 +20,7 @@ export class ElectronService {
         this.ipc = (<any>window).require('electron').ipcRenderer;
         this.clipboard = (<any>window).require('electron').clipboard;
         this.os = window.require('os');
-        this.fs = window.require('fs');
+        // this.fs = window.require('fs');
       } catch (error) {
         throw error;
       }
@@ -64,19 +64,13 @@ export class ElectronService {
     return this.os.platform() === 'linux';
   }
 
-  public getFile(path: string): string {
-    return this.fs.readFileSync(path, 'utf8');
-  }
+  // public getFile(path: string): string {
+  //   return this.fs.readFileSync(path, 'utf8');
+  // }
 
   public async getPublicKey() {
-    let pem = '';
-    if (this.isElectronApp) {
-      pem = this.getFile('dist/theia/assets/public_key.pem');
-    } else {
-      let res = await fetch('assets/public_key.pem');
-      pem = await res.text();
-    }
-    return pem;
+    let res = await fetch('assets/public_key.pem');
+    return await res.text();
   }
 
   public async getSecret(): Promise<string> {
