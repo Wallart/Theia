@@ -111,8 +111,10 @@ export class ChatService {
       }
 
       let indexes = view[0].indexes;
-      this.hyperion.indexes = indexes;
-      this.indexes$.next(indexes);
+      if (indexes !== undefined) {
+        this.hyperion.indexes = indexes;
+        this.indexes$.next(indexes);
+      }
     });
   }
 
