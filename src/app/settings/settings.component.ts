@@ -151,6 +151,7 @@ export class SettingsComponent {
   }
 
   onAddressChanged() {
+    this.serverAddress = this.serverAddress.trim()
     if (this.electron.isElectronApp) {
       this.electron.send('address-change', this.serverAddress);
     } else {
