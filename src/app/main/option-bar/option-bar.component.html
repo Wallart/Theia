@@ -33,7 +33,8 @@
                placeholder="No indexes connected"
                [(ngModel)]="selectedIndexes"
                (add)="onIndexSelected()"
-               (remove)="onIndexSelected()">
+               (remove)="onIndexSelected()"
+               (clear)="onIndexSelected()">
     </ng-select>
     <div id="manage-indexes" class="button" title="Manage indexes" (click)="onManageIndexes()">
       <div class="icon-aligner"></div>
