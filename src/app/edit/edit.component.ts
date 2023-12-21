@@ -23,10 +23,18 @@ export class EditComponent {
     this.route.queryParams.subscribe(params => {
       this.promptName = params['prompt'];
       this.title.setTitle(`Edit prompt ${this.promptName}`);
+      this.loadPrompt();
+    });
+  }
+
+  loadPrompt() {
+    if (this.hyperion.secret === '') {
+      setTimeout(() => this.loadPrompt(), 100);
+    } else {
       this.hyperion.readPrompt(this.promptName).subscribe((res: any) => {
         this.promptContent = res;
       });
-    });
+    }
   }
 
   onCancel() {
