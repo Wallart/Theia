@@ -1,6 +1,6 @@
-import {BehaviorSubject, Subject} from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { HyperionService } from './hyperion.service';
 import { LocalStorageService } from './local-storage.service';
 
