@@ -365,6 +365,13 @@ ipcMain.on('state-change', (event, args) => {
   settingsWin.webContents.send('state-changed', args);
 });
 
+ipcMain.on('model-change', (event, args) => {
+  feedbackWin.webContents.send('model-changed', args);
+  indexesWin.webContents.send('model-changed', args);
+  settingsWin.webContents.send('model-changed', args);
+  editWin.webContents.send('model-changed', args);
+});
+
 ipcMain.on('address-change', (event, args) => {
   mainWin.webContents.send('address-changed', args);
   feedbackWin.webContents.send('address-changed', args);

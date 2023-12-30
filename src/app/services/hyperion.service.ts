@@ -60,6 +60,7 @@ export class HyperionService {
         this.address = address;
         this.connectSocket();
       });
+      this.electron.bind('model-changed', (event: Object, args: string) => this.model = args);
       this.electron.bind('voice-changed', (event: Object, args: any) => this.setVoice(args[0], args[1]));
       this.electron.bind('voice-engines-changed', (event: Object, preferredEngines: any) => this.setSpeechEngines(preferredEngines));
       this.electron.bind('voice-settings-requested', (event: Object) => this.notifySettingsWindow());

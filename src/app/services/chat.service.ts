@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { HyperionService } from './hyperion.service';
+import { ElectronService } from './electron.service';
 import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
@@ -21,13 +22,13 @@ export class ChatService {
 
   public activeViewUuid: string = '';
 
-  constructor(private hyperion: HyperionService, private store: LocalStorageService) {
+  constructor(private hyperion: HyperionService, private store: LocalStorageService, private electron: ElectronService) {
     this.hyperion.botName$.subscribe((botName: string) => this.botName = botName);
     this.hyperion.model$.subscribe((res) => {
       this.store.getView(this.activeViewUuid).then((view) => {
         if(view[0].model === '') {
           this.store.changeViewModel(this.activeViewUuid, res);
-          this.hyperion.model = res;
+          this.updateModel(res);
           this.model$.next(res);
         }
       });
@@ -43,6 +44,12 @@ export class ChatService {
       });
     });
     this.fetchViews();
+  }
+
+  updateModel(model: string) {
+    this.hyperion.model = model;
+    // Update hyperion service in other windows
+    this.electron.send('model-change', model);
   }
 
   fetchViews() {
@@ -100,7 +107,7 @@ export class ChatService {
     this.store.getView(uuid).then((view) => {
       let model = view[0].model;
       if (model !== '') {
-        this.hyperion.model = model;
+        this.updateModel(model);
         this.model$.next(model);
       }
 
@@ -119,7 +126,7 @@ export class ChatService {
   }
 
   changeViewModel(model: string) {
-    this.hyperion.model = model;
+    this.updateModel(model);
     this.store.changeViewModel(this.activeViewUuid, model);
   }
 
