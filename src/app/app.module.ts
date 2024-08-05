@@ -58,6 +58,7 @@ import { StatusIndicatorComponent } from './main/status-indicator/status-indicat
               ['$$', '$$'],
               ['\\[', '\\]']
             ],
+            'packages': ['base', 'require', 'ams'],
             processEscapes: true
           },
           'src': `assets/mathjax/es5/startup.js`

@@ -1,6 +1,6 @@
 {
   "name": "Theia",
-  "version": "1.4.8",
+  "version": "1.4.9",
   "main": "app.js",
   "scripts": {
     "ng": "ng",
