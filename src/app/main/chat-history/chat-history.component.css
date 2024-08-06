@@ -44,6 +44,18 @@
   /*background-color: white;*/
 }
 
+.latex-equation-wrapper {
+  position: relative;
+  /*border:1px solid crimson;*/
+  display: inline-block;
+  width: 100%;
+}
+
+.latex-equation-wrapper:hover .latex-copy-button {
+  animation: fadeIn .5s;
+  animation-fill-mode: forwards;
+}
+
 .image-wrapper {
   /*border:1px solid crimson;*/
   display: inline-block;

@@ -47,12 +47,16 @@ export class ChatHistoryComponent {
   onCopy(event: any) {
     const contentNode = event.target.parentElement.getElementsByClassName('content');
     const codeNode = event.target.parentElement.getElementsByTagName('code');
+    const latexEqNode = event.target.parentElement.getElementsByClassName('latex');
     if (contentNode.length > 0) {
       const text = contentNode[0].innerText;
       this.electron.writeToClipboard(text);
     } else if (codeNode.length > 0) {
       const code = codeNode[0].innerText;
       this.electron.writeToClipboard(code);
+    } else if (latexEqNode.length > 0) {
+      const latexEquation = latexEqNode[0].getAttribute('data-latex-equation');
+      this.electron.writeToClipboard(latexEquation);
     }
   }
 
@@ -65,12 +69,13 @@ export class ChatHistoryComponent {
   decomposeContent(message: string[]) {
     const chunks: any[] = [];
     let isCode = false;
+    let isLatex = false;
     for (let i=0; i < message.length; i++) {
       let data: any = message[i];
       // if (typeof data !== 'string') {
       if (typeof data !== 'string' || data.startsWith('blob:')) {
         const objectURI = (typeof data !== 'string') ? URL.createObjectURL(data) : data;
-        chunks.push({ isCode: false, isImg: true, content: objectURI});
+        chunks.push({ isCode: false, isLatex:false, isImg: true, content: objectURI});
         continue;
       }
 
@@ -94,6 +99,7 @@ export class ChatHistoryComponent {
             break;
           case this.hyperion.serviceTokens[6]:
             systemMessage = 'Command executed';
+            // TODO Improved with details
             break;
           case this.hyperion.serviceTokens[7]:
             systemMessage = 'Document registered';
@@ -102,14 +108,15 @@ export class ChatHistoryComponent {
             systemMessage = 'Invalid document';
             break;
         }
-        chunks.push({ isCode: false, isImg: false, isSystem: true, content: systemMessage});
+        chunks.push({ isCode: false, isLatex:false, isImg: false, isSystem: true, content: systemMessage});
         continue;
       }
 
-      const splittedSentence = data.split('```');
-      if (splittedSentence.length > 1) {
-        for (let j=0; j < splittedSentence.length; j++) {
-          const chunk = splittedSentence[j];
+      const splittedSentenceInCode = data.split('```');
+      const splittedSentenceInLatex = data.split(/\$\$|\\\[|\\\]/); // for multine latex "$$ $$" or "\[ \]"
+      if (splittedSentenceInCode.length > 1) {
+        for (let j=0; j < splittedSentenceInCode.length; j++) {
+          const chunk = splittedSentenceInCode[j];
           if (j % 2 === 0) {
             isCode = false;
           } else if (chunk === '') {
@@ -122,16 +129,48 @@ export class ChatHistoryComponent {
           }
 
           if (chunks.length === 0 || !isCode || !chunks[chunks.length - 1].isCode) {
-            chunks.push({ isCode: isCode, isImg: false, isSystem: false, content: chunk});
+            chunks.push({ isCode: isCode, isLatex:false, isImg: false, isSystem: false, content: chunk});
+          } else {
+            chunks[chunks.length - 1].content += '\n' + chunk;
+          }
+        }
+      } else if (splittedSentenceInLatex.length > 1) {
+        for (let j=0; j < splittedSentenceInLatex.length; j++) {
+          let chunk = splittedSentenceInLatex[j];
+
+          if (splittedSentenceInLatex.length % 2 === 0) {
+            // Multiline LateX equation
+            if ((j % 2 === 0 && !isLatex) || (j % 2 !== 0 && isLatex))  {
+              isLatex = false;
+              if (chunk === '') continue;
+            } else if ((j % 2 !== 0) || (j % 2 == 0 && isLatex)) {
+              isLatex = true;
+              chunk = '$$ ' + chunk;
+            }
+          } else {
+            // One line LateX equation
+            if (j % 2 === 0) {
+              isLatex = false;
+              if (chunk === '') continue;
+            } else {
+              isLatex = true;
+              chunk = `$$ ${chunk} $$`;
+            }
+
+          }
+
+          if (chunks.length === 0 || !isLatex || !chunks[chunks.length - 1].isLatex) {
+            chunks.push({ isLatex: isLatex, isCode: false, isImg: false, isSystem: false, content: chunk});
           } else {
             chunks[chunks.length - 1].content += '\n' + chunk;
           }
         }
       } else {
-        if (chunks.length === 0 || !isCode || !chunks[chunks.length - 1].isCode) {
-          chunks.push({ isCode: isCode, isImg: false, isSystem: false, content: splittedSentence[0]});
+        if (chunks.length === 0 || (!isCode && !isLatex) || (!chunks[chunks.length - 1].isCode && !chunks[chunks.length - 1].isLatex)) {
+          chunks.push({ isLatex: isLatex, isCode: isLatex, isImg: false, isSystem: false, content: data});
         } else {
-          chunks[chunks.length - 1].content += '\n' + splittedSentence[0];
+          // Adding new code / latex lines
+          chunks[chunks.length - 1].content += '\n' + data;
         }
       }
     }

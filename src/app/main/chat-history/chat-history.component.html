@@ -11,7 +11,13 @@
           <div class="service-icon"></div>
           <div class="service-content">{{data.content}}</div>
         </span>
-        <span class="text" *ngIf="!data.isCode && !data.isImg && !data.isSystem" [mathjax]="data.content | linkify"></span>
+        <!-- for inline latex-->
+        <span class="text" *ngIf="!data.isCode && !data.isLatex && !data.isImg && !data.isSystem" [mathjax]="data.content | linkify"></span>
+        <!-- for multiline latex-->
+        <span class="latex-equation-wrapper" *ngIf="data.isLatex">
+          <div class="copy-button latex-copy-button" (click)="onCopy($event)" title="Copy"></div>
+          <span class="latex" [attr.data-latex-equation]="data.content" [mathjax]="data.content"></span>
+        </span>
         <pre class="code" *ngIf="data.isCode"><div class="copy-button code-copy-button" (click)="onCopy($event)"></div><code [highlight]="data.content"></code></pre>
         <span class="image-wrapper" *ngIf="data.isImg">
           <span class="image">
