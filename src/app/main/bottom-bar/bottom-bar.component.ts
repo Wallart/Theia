@@ -16,6 +16,7 @@ import { VideoInputService } from '../../services/video-input.service';
 export class BottomBarComponent {
   @ViewChild('speechBars') speechBars: any;
   @ViewChild('messageInput') messageInput: any;
+  @ViewChild('messageTextarea') messageTextarea: any;
 
   message: string = '';
   username: string = '';
@@ -26,6 +27,7 @@ export class BottomBarComponent {
   toggleSpeakersShortcut: string = '';
   gearShortcut: string = '';
 
+  isMultiline: boolean = false;
   cameraMuted: boolean;
   microphoneMuted: boolean;
   speakersMuted: boolean;
@@ -176,6 +178,52 @@ export class BottomBarComponent {
       setTimeout(() => {
         this.messageInput.nativeElement.setSelectionRange(pastMessages.length, pastMessages.length);
       },50);
+    }
+  }
+
+  switchMultiline() {
+    this.isMultiline = true;
+    setTimeout(() => this.messageTextarea.nativeElement.focus(), 100);
+  }
+
+  switchMonoline() {
+    this.isMultiline = false;
+    setTimeout(() => this.messageInput.nativeElement.focus(), 100);
+  }
+
+  adjustTextareaHeight() {
+    const textarea = this.messageTextarea.nativeElement;
+    textarea.style.height = 'auto'; // Réinitialiser la hauteur pour calculer
+    textarea.style.height = textarea.scrollHeight + 'px'; // Ajuster à la hauteur de défilement
+  }
+
+  autoScroll() {
+    const textarea = this.messageTextarea.nativeElement;
+    setTimeout(() => textarea.scrollTop = textarea.scrollHeight, 20); // Défilez vers le bas dans le textarea
+  }
+
+  onKeydown(event: KeyboardEvent) {
+    if (event.shiftKey && event.key === 'Enter') {
+      // For <input>
+      event.preventDefault(); // Évite de soumettre le formulaire
+      this.switchMultiline()
+      this.message += '\n';
+      this.adjustTextareaHeight();
+      this.autoScroll();
+    } else if (!event.shiftKey && event.key === 'Enter' && this.isMultiline) {
+      // For <textarea>
+      this.onSend();
+      this.switchMonoline();
+    } else if (event.key === 'Backspace' || event.key === 'Delete') {
+      if (this.isMultiline) {
+        setTimeout(() => {
+          this.adjustTextareaHeight();
+          // Vérifier si le contenu a une seule ligne
+          if (this.message === '' || this.messageTextarea.nativeElement.scrollHeight <= this.messageTextarea.nativeElement.clientHeight) {
+            this.switchMonoline();
+          }
+        }, 10);
+      }
     }
   }
 }

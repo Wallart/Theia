@@ -2,8 +2,9 @@
   <div id="username-input">
     <input type="text" placeholder="Username" [(ngModel)]="username" (change)="onUsernameChanged()">
   </div>
-  <div id="message-input">
-    <input #messageInput type="text" placeholder="Send a message..." [(ngModel)]="message" (keydown.enter)="onSend()" (keydown.arrowUp)="onPrevious()">
+  <div id="message-input" [ngClass]="{'message-input-with-border': !isMultiline}">
+    <input *ngIf="!isMultiline" #messageInput type="text" placeholder="Send a message..." [(ngModel)]="message" (keydown.enter)="onSend()" (keydown.arrowUp)="onPrevious()" (keydown)="onKeydown($event)">
+    <textarea *ngIf="isMultiline" #messageTextarea [(ngModel)]="message" (keydown)="onKeydown($event)"></textarea>
     <div id="speech-bars" class="hidden-bars" #speechBars>
       <div class="bar"></div>
       <div class="bar"></div>
