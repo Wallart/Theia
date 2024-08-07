@@ -243,4 +243,20 @@ export class BottomBarComponent {
       }
     }
   }
+
+  onPaste(event: ClipboardEvent) {
+    if (this.isMultiline) {
+      setTimeout(() => this.adjustTextareaHeight(), 50);
+    } else {
+      const pastedText: any = event.clipboardData?.getData('text');
+      if (pastedText.indexOf('\n') > -1) {
+        this.switchMultiline();
+        setTimeout(() => this.message = pastedText, 100);
+        setTimeout(() => {
+          this.adjustTextareaHeight();
+          this.messageTextarea.nativeElement.setSelectionRange(pastedText.length, pastedText.length);
+        }, 200);
+      }
+    }
+  }
 }
