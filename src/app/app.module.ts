@@ -21,6 +21,7 @@ import { VideoFeedbackComponent } from './video-feedback/video-feedback.componen
 import { TabsBarComponent } from './main/tabs-bar/tabs-bar.component';
 import { IndexesManagerComponent } from './indexes-manager/indexes-manager.component';
 import { StatusIndicatorComponent } from './main/status-indicator/status-indicator.component';
+import { EscapePipe } from '../pipes/escape.pipe';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { StatusIndicatorComponent } from './main/status-indicator/status-indicat
     StatusIndicatorComponent,
     EditComponent,
     LinkifyPipe,
-    IndexesManagerComponent
+    IndexesManagerComponent,
+    EscapePipe
   ],
   imports: [
       BrowserModule,
