@@ -182,8 +182,28 @@ export class BottomBarComponent {
   }
 
   switchMultiline() {
-    this.isMultiline = true;
-    setTimeout(() => this.messageTextarea.nativeElement.focus(), 100);
+    let cursorPosition = 0;
+    if (!this.isMultiline) {
+      cursorPosition = this.messageInput.nativeElement.selectionStart;
+      this.isMultiline = true;
+      // Because Textarea not yet loaded
+      setTimeout(() => {
+        this.messageTextarea.nativeElement.focus();
+        this.updateTextarea(cursorPosition);
+      }, 100);
+    } else {
+      cursorPosition = this.messageTextarea.nativeElement.selectionStart;
+      this.updateTextarea(cursorPosition);
+    }
+  }
+
+  updateTextarea(cursorPosition: number) {
+    const textarea = this.messageTextarea.nativeElement;
+    this.message = this.message.slice(0, cursorPosition) + '\n' + this.message.slice(cursorPosition);
+    this.adjustTextareaHeight();
+    this.autoScroll();
+    // Wait for text rendering
+    setTimeout(() => textarea.setSelectionRange(cursorPosition + 1, cursorPosition + 1), 10);
   }
 
   switchMonoline() {
@@ -206,10 +226,7 @@ export class BottomBarComponent {
     if (event.shiftKey && event.key === 'Enter') {
       // For <input>
       event.preventDefault(); // Évite de soumettre le formulaire
-      this.switchMultiline()
-      this.message += '\n';
-      this.adjustTextareaHeight();
-      this.autoScroll();
+      this.switchMultiline();
     } else if (!event.shiftKey && event.key === 'Enter' && this.isMultiline) {
       // For <textarea>
       this.onSend();
