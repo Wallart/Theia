@@ -116,16 +116,24 @@ export class ChatHistoryComponent {
       const splittedSentenceInLatex = data.split(/\$\$|\\\[|\\\]/); // for multine latex "$$ $$" or "\[ \]"
       if (splittedSentenceInCode.length > 1) {
         for (let j=0; j < splittedSentenceInCode.length; j++) {
-          const chunk = splittedSentenceInCode[j];
-          if (j % 2 === 0) {
-            isCode = false;
-          } else if (chunk === '') {
-            isCode = false;
+          let chunk = splittedSentenceInCode[j];
+
+          if (splittedSentenceInCode.length % 2 === 0) {
+            // Multiline code
+            if ((j % 2 === 0 && !isCode) || (j % 2 !== 0 && isCode)) {
+              isCode = false;
+              if (chunk === '') continue;
+            } else {
+              isCode = true;
+            }
           } else {
-            isCode = !isCode;
-          }
-          if (chunk === '') {
-            continue;
+            // One line code
+            if (j % 2 === 0) {
+              isCode = false;
+              if (chunk === '') continue;
+            } else {
+              isCode = true;
+            }
           }
 
           if (chunks.length === 0 || !isCode || !chunks[chunks.length - 1].isCode) {
