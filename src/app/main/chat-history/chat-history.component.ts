@@ -121,11 +121,11 @@ export class ChatHistoryComponent {
 
       // Process SVG
       // TODO To be improved
-      if (data.startsWith('<svg')) {
+      if (data.startsWith('<svg') && !isCode) {
         isSvg = true;
         chunks.push({ isCode: false, isLatex:false, isSvg:true, isImg: false, isSystem: false, content: data});
         continue;
-      } else if (data.startsWith('</svg>')) {
+      } else if (data.startsWith('</svg>') && !isCode) {
         chunks[chunks.length - 1].content += data;
         isSvg = false;
         continue;
