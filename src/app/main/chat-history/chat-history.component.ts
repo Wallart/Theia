@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { saveAs } from 'file-saver';
+import { DomSanitizer } from '@angular/platform-browser';
 import { ChatService } from '../../services/chat.service';
 import { StatusService } from '../../services/status.service';
 import { ElectronService } from '../../services/electron.service';
@@ -17,7 +18,7 @@ export class ChatHistoryComponent {
   bot = '';
   messages: any[] = [];
 
-  constructor(public chat: ChatService, private electron: ElectronService, private status: StatusService,
+  constructor(public chat: ChatService, public sanitizer: DomSanitizer, private electron: ElectronService, private status: StatusService,
               private hyperion: HyperionService, private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit() {
@@ -66,19 +67,25 @@ export class ChatHistoryComponent {
       .then((blob: Blob) => saveAs(blob, `${uuidv4()}.jpg`));
   }
 
+  onSaveSvg(svgContent: string) {
+    const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+    saveAs(blob, `${uuidv4()}.svg`);
+  }
+
   decomposeContent(message: string[]) {
     const chunks: any[] = [];
+    let isSvg = false;
     let isCode = false;
     let isLatex = false;
     for (let i=0; i < message.length; i++) {
       let data: any = message[i];
-      // if (typeof data !== 'string') {
       if (typeof data !== 'string' || data.startsWith('blob:')) {
         const objectURI = (typeof data !== 'string') ? URL.createObjectURL(data) : data;
-        chunks.push({ isCode: false, isLatex:false, isImg: true, content: objectURI});
+        chunks.push({ isCode: false, isLatex:false, isSvg:false, isImg: true, isSystem: false, content: objectURI});
         continue;
       }
 
+      // Process system tokens
       if (this.hyperion.serviceTokens.indexOf(data.trim()) > -1) {
         let systemMessage;
         switch (data.trim()) {
@@ -108,10 +115,26 @@ export class ChatHistoryComponent {
             systemMessage = 'Invalid document';
             break;
         }
-        chunks.push({ isCode: false, isLatex:false, isImg: false, isSystem: true, content: systemMessage});
+        chunks.push({ isCode: false, isLatex:false, isSvg:false, isImg: false, isSystem: true, content: systemMessage});
         continue;
       }
 
+      // Process SVG
+      // TODO To be improved
+      if (data.startsWith('<svg')) {
+        isSvg = true;
+        chunks.push({ isCode: false, isLatex:false, isSvg:true, isImg: false, isSystem: false, content: data});
+        continue;
+      } else if (data.startsWith('</svg>')) {
+        chunks[chunks.length - 1].content += data;
+        isSvg = false;
+        continue;
+      } else if (isSvg) {
+        chunks[chunks.length - 1].content += data;
+        continue;
+      }
+
+      // Process Code and LateX
       const splittedSentenceInCode = data.split('```');
       const splittedSentenceInLatex = data.split(/\$\$|\\\[|\\\]/); // for multine latex "$$ $$" or "\[ \]"
       if (splittedSentenceInCode.length > 1) {
@@ -137,7 +160,7 @@ export class ChatHistoryComponent {
           }
 
           if (chunks.length === 0 || !isCode || !chunks[chunks.length - 1].isCode) {
-            chunks.push({ isCode: isCode, isLatex:false, isImg: false, isSystem: false, content: chunk});
+            chunks.push({ isCode: isCode, isLatex:false, isSvg:false, isImg: false, isSystem: false, content: chunk});
           } else {
             chunks[chunks.length - 1].content += '\n' + chunk;
           }
@@ -168,14 +191,14 @@ export class ChatHistoryComponent {
           }
 
           if (chunks.length === 0 || !isLatex || !chunks[chunks.length - 1].isLatex) {
-            chunks.push({ isLatex: isLatex, isCode: false, isImg: false, isSystem: false, content: chunk});
+            chunks.push({ isLatex: isLatex, isCode: false, isSvg:false, isImg: false, isSystem: false, content: chunk});
           } else {
             chunks[chunks.length - 1].content += '\n' + chunk;
           }
         }
       } else {
         if (chunks.length === 0 || (!isCode && !isLatex) || (!chunks[chunks.length - 1].isCode && !chunks[chunks.length - 1].isLatex)) {
-          chunks.push({ isLatex: isLatex, isCode: isLatex, isImg: false, isSystem: false, content: data});
+          chunks.push({ isLatex: isLatex, isCode: isLatex, isSvg:false, isImg: false, isSystem: false, content: data});
         } else {
           // Adding new code / latex lines
           chunks[chunks.length - 1].content += '\n' + data;

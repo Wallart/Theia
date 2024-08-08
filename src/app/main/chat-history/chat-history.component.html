@@ -12,7 +12,7 @@
           <div class="service-content">{{data.content}}</div>
         </span>
         <!-- for inline latex-->
-        <span class="text" *ngIf="!data.isCode && !data.isLatex && !data.isImg && !data.isSystem" [mathjax]="data.content | escape | linkify"></span>
+        <span class="text" *ngIf="!data.isCode && !data.isLatex && !data.isImg && !data.isSvg && !data.isSystem" [mathjax]="data.content | escape | linkify"></span>
         <!-- for multiline latex-->
         <span class="latex-equation-wrapper" *ngIf="data.isLatex">
           <div class="copy-button latex-copy-button" (click)="onCopy($event)" title="Copy"></div>
@@ -23,6 +23,12 @@
           <span class="image">
             <div class="save-button" (click)="onSave(data.content)" title="Save"></div>
             <img [src]="data.content" />
+          </span>
+        </span>
+        <span class="image-wrapper" *ngIf="data.isSvg">
+          <span class="image">
+            <div class="save-button" (click)="onSaveSvg(data.content)" title="Save"></div>
+            <span class="svg-img-wrapper" [innerHTML]="sanitizer.bypassSecurityTrustHtml(data.content)"></span>
           </span>
         </span>
       </span>

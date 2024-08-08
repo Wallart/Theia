@@ -74,6 +74,17 @@
   max-width: 512px;
 }
 
+.image .svg-img-wrapper {
+  border: 1px solid #7D7E7F;
+  display: inline-block;
+  max-width: 512px;
+}
+
+.image .svg-img-wrapper svg {
+  width: 100%;
+  height: 100%;
+}
+
 .image-wrapper:hover .save-button {
   animation: fadeIn .25s;
   animation-fill-mode: forwards;
