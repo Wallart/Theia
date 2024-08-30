@@ -21,10 +21,11 @@ export class MainComponent {
               private store: LocalStorageService, private audioSink: AudioSinkService) {
     this.hyperion.botName$.subscribe((name) => this.botName = name);
     this.hyperion.pushedData$.subscribe((frame) => {
+      let viewUuid = this.chat.activeViewUuid;
       let answer = this.chat.formatAnswerWithRequest(frame['ANS'], frame['REQ']);
-      this.chat.addBotMsg(answer, frame['TIM']);
+      this.chat.addBotMsg(answer, frame['TIM'], viewUuid);
       this.audioSink.setBuffer(frame['PCM'], frame['TIM']);
-      this.chat.addBotImg(frame['IMG'], frame['TIM']);
+      this.chat.addBotImg(frame['IMG'], frame['TIM'], viewUuid);
     });
   }
 
@@ -36,7 +37,7 @@ export class MainComponent {
       if (this.initialScrollDone) {
         const scrollHeight = element.scrollHeight;
         const percentPos = (element.getBoundingClientRect().height + element.scrollTop) / scrollHeight;
-        if (percentPos >= this.stickyPos || (this.botName !== '' && !this.chat.isLastSpeaker(this.botName))) {
+        if (percentPos >= this.stickyPos || (this.botName !== '' && !this.chat.isLastSpeaker(this.chat.messages, this.botName))) {
           element.scrollTop = scrollHeight;
         }
       } else {
@@ -54,6 +55,7 @@ export class MainComponent {
     if (files.length ) {
       let file = files[0];
       let mimeType = file.type;
+      let viewUuid = this.chat.activeViewUuid;
       if (mimeType.startsWith('image/')) {
         let username = this.store.getItem('username');
         if (username === null) {
@@ -62,21 +64,21 @@ export class MainComponent {
 
         reader.onload = (e: any) => {
           const base64Image = e.target.result;
-          this.chat.addUserImg(username, base64Image, new Date());
+          this.chat.addUserImg(username, base64Image, new Date(), viewUuid);
           this.hyperion.sendChat(username, base64Image)
             .then(subject => {
               subject.subscribe((frame) => {
                 let answer = this.chat.formatAnswerWithRequest(frame['ANS'], frame['REQ']);
-                this.chat.addBotMsg(answer, frame['TIM']);
+                this.chat.addBotMsg(answer, frame['TIM'], viewUuid);
                 this.audioSink.setBuffer(frame['PCM'], frame['TIM']);
-                this.chat.addBotImg(frame['IMG'], frame['TIM']);
+                this.chat.addBotImg(frame['IMG'], frame['TIM'], viewUuid);
               });
             });
         };
 
         reader.readAsDataURL(file);
       } else {
-        this.chat.addBotMsg('<DOCNOK>', new Date());
+        this.chat.addBotMsg('<DOCNOK>', new Date(), viewUuid);
         console.error(`"${mimeType}" file type not supported.`);
       }
       // else if (mimeType === 'application/pdf' || mimeType.startsWith('text/')) {

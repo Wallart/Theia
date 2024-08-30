@@ -158,14 +158,16 @@ export class BottomBarComponent {
     }
 
     this.message = '';
-    this.chat.addUserMsg(username, message, new Date());
+    let viewUuid = this.chat.activeViewUuid;
+
+    this.chat.addUserMsg(username, message, new Date(), viewUuid);
     this.hyperion.sendChat(username, message)
       .then(subject => {
         subject.subscribe((frame) => {
           let answer = this.chat.formatAnswerWithRequest(frame['ANS'], frame['REQ']);
-          this.chat.addBotMsg(answer, frame['TIM']);
+          this.chat.addBotMsg(answer, frame['TIM'], viewUuid);
           this.audioSink.setBuffer(frame['PCM'], frame['TIM']);
-          this.chat.addBotImg(frame['IMG'], frame['TIM']);
+          this.chat.addBotImg(frame['IMG'], frame['TIM'], viewUuid);
         });
       });
   }

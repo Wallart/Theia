@@ -96,6 +96,7 @@ export class ChatService {
     let messages = this.messagesGroups[uuid][1];
     if (messages === null) {
       this.store.listMessages(uuid).then((messages) => {
+        this.messagesGroups[uuid][1] = messages;
         this.messages = messages;
         this.messages$.next(this.messages);
       });
@@ -160,10 +161,9 @@ export class ChatService {
     this.messages$.next(this.messages);
   }
 
-  isLastSpeaker(username: string) {
-    if (this.messages.length > 0) {
-      // @ts-ignore
-      return username == this.messages.at(-1).username;
+  isLastSpeaker(messages: any[], username: string) {
+    if (messages.length > 0) {
+      return username == messages.at(-1).username;
     }
     return false;
   }
@@ -193,13 +193,14 @@ export class ChatService {
     this.store.deleteMessages(this.activeViewUuid);
   }
 
-  add(username: string, role: string, content: string, date: any) {
+  add(username: string, role: string, content: string, date: any, viewUuid: string) {
     if (content === '') return;
 
     let uuid: string;
     let message;
-    if (this.isLastSpeaker(username)) {
-      let last = this.messages.pop();
+    let messages = this.messagesGroups[viewUuid][1];
+    if (this.isLastSpeaker(messages, username)) {
+      let last = messages.pop();
       let newContent = last.content;
       let splittedContent = content.split('\n');
       uuid = last.uuid;
@@ -234,17 +235,18 @@ export class ChatService {
     }
 
     this.save(message);
-    this.messages.push(message);
+    messages.push(message);
     this.messages$.next(this.messages);
   }
 
 
-  addImg(username: string, role: string, content: Blob | string, date: any) {
+  addImg(username: string, role: string, content: Blob | string, date: any, viewUuid: string) {
     let uuid: string;
     let message;
+    let messages = this.messagesGroups[viewUuid][1];
     let newLines = [content, ''];
-    if (this.isLastSpeaker(username)) {
-      let last = this.messages.pop();
+    if (this.isLastSpeaker(messages, username)) {
+      let last = messages.pop();
       uuid = last.uuid;
       let newContent = last.content.concat(newLines);
 
@@ -255,7 +257,7 @@ export class ChatService {
     }
 
     this.save(message);
-    this.messages.push(message);
+    messages.push(message);
     this.messages$.next(this.messages);
   }
 
@@ -267,25 +269,26 @@ export class ChatService {
     this.store.putMessage(uuid, messageCopy);
   }
 
-  addUserMsg(username: string, content: string, date: any) {
-    this.add(username, 'user', content, date);
+  addUserMsg(username: string, content: string, date: any, viewUuid: string) {
+    this.add(username, 'user', content, date, viewUuid);
   }
 
-  addBotMsg(content: string, date: any) {
-    this.add(this.botName, 'bot', content, date);
+  addBotMsg(content: string, date: any, viewUuid: string) {
+    debugger;
+    this.add(this.botName, 'bot', content, date, viewUuid);
   }
 
-  addBotImg(imgBuffer: ArrayBuffer, date: any) {
+  addBotImg(imgBuffer: ArrayBuffer, date: any, viewUuid: string) {
     if (imgBuffer.byteLength === 0) {
       return;
     }
 
     const blob = new Blob([imgBuffer], {type: 'image/jpeg'});
     const objectURI = URL.createObjectURL(blob);
-    this.addImg(this.botName, 'bot', objectURI, date);
+    this.addImg(this.botName, 'bot', objectURI, date, viewUuid);
   }
 
-  addUserImg(username: string, base64Img: string, date: any) {
+  addUserImg(username: string, base64Img: string, date: any, viewUuid: string) {
     const splitContent = base64Img.split(',');
     const base64ImageContent = splitContent[1]
     const contentType = splitContent[0].split(':')[1].split(';')[0];
@@ -301,7 +304,7 @@ export class ChatService {
     const blob = new Blob([byteArray], {type: contentType});
 
     const objectURI = URL.createObjectURL(blob);
-    this.addImg(username, 'user', objectURI, date);
+    this.addImg(username, 'user', objectURI, date, viewUuid);
   }
 
   // save() {
